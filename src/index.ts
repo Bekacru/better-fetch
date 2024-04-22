@@ -17,7 +17,7 @@ interface ResponseContext {
 	response: Response;
 }
 
-export interface BaseFetchOptions extends Omit<RequestInit, "body"> {
+export interface BetterFetchOptions extends Omit<RequestInit, "body"> {
 	/**
 	 * a base url that will be prepended to the url
 	 */
@@ -87,9 +87,9 @@ export interface BaseFetchOptions extends Omit<RequestInit, "body"> {
 }
 
 // biome-ignore lint/suspicious/noEmptyInterface: <explanation>
-interface CreateFetchOption extends BaseFetchOptions {}
+export interface CreateFetchOption extends BetterFetchOptions {}
 
-type FetchOption<T extends Record<string, unknown> = any> = (
+export type FetchOption<T extends Record<string, unknown> = any> = (
 	| {
 			body?: never;
 	  }
@@ -113,7 +113,7 @@ type FetchOption<T extends Record<string, unknown> = any> = (
 			body?: T;
 	  }
 ) &
-	BaseFetchOptions;
+	BetterFetchOptions;
 
 type FetchResponse<T, E extends Record<string, unknown> | unknown> =
 	| {
@@ -269,17 +269,22 @@ export const betterFetch = async <T = any, E = unknown>(
 	};
 };
 
-export const createFetch = <Error = unknown>(config?: CreateFetchOption) => {
-	return async <T = any, E = undefined>(url: string, option?: FetchOption) => {
-		type ResponseError = E extends undefined ? Error : E;
-		return await betterFetch<T, ResponseError>(url, {
+export const createFetch = (config?: CreateFetchOption) => {
+	const $fetch = async <T = any, E = unknown>(
+		url: string | URL,
+		options?: FetchOption,
+	): Promise<FetchResponse<T, E>> => {
+		return await betterFetch<T, E>(url, {
 			...config,
-			...option,
+			...options,
 		});
 	};
+	$fetch.native = fetch;
+	return $fetch;
 };
 
 betterFetch.native = fetch;
+
 export type BetterFetch = typeof betterFetch;
 export type CreateFetch = typeof createFetch;
 export default betterFetch;

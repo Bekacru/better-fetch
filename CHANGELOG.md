@@ -19,3 +19,13 @@
 ### ❤️ Contributors
 
 - Bekacru <bekacru@gmail.com>
+
+## v1.1.2
+
+### Patch
+
+- createFetch return type is now similar to betterFetch
+
+### ❤️ Contributors
+
+- Bekacru <bekacru@gmail.com>
