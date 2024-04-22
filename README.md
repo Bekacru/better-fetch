@@ -1,6 +1,6 @@
 # Better Fetch
 
-A fetch wrapper for typescript that returns the data and the error object. Works on the browser, node (version 18+), workers, deno and bun. Some of the APIs are inspired by [ofetch](https://github.com/unjs/ofetch).
+A fetch wrapper for typescript that returns data and the error object. Works on the browser, node (version 18+), workers, deno and bun. Some of the APIs are inspired by [ofetch](https://github.com/unjs/ofetch).
 
 ## Installation
 
