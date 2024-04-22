@@ -1,5 +1,5 @@
 {
-  "name": "better-fetch",
+  "name": "@better-tools/fetch",
   "version": "0.0.1",
   "packageManager": "bun@1.1.4",
   "devDependencies": {
