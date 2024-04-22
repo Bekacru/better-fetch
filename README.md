@@ -64,7 +64,7 @@ const { data, error } = await fetch("/api/image.png");
 await ofetch("/ok");
 //custom parser
 const { data, error } = await fetch("/todos/1", {
-  parser: (text) => {
+  jsonParser: (text) => {
     return JSON.parse(text);
   },
 });
