@@ -115,7 +115,10 @@ export type FetchOption<T extends Record<string, unknown> = any> = (
 ) &
 	BetterFetchOptions;
 
-type FetchResponse<T, E extends Record<string, unknown> | unknown> =
+export type BetterFetchResponse<
+	T,
+	E extends Record<string, unknown> | unknown,
+> =
 	| {
 			data: T;
 			error: null;
@@ -132,7 +135,7 @@ type FetchResponse<T, E extends Record<string, unknown> | unknown> =
 export const betterFetch = async <T = any, E = unknown>(
 	url: string | URL,
 	options?: FetchOption,
-): Promise<FetchResponse<T, E>> => {
+): Promise<BetterFetchResponse<T, E>> => {
 	const controller = new AbortController();
 	const signal = controller.signal;
 
@@ -269,16 +272,26 @@ export const betterFetch = async <T = any, E = unknown>(
 	};
 };
 
-export const createFetch = (config?: CreateFetchOption) => {
-	const $fetch = async <T = any, E = unknown>(
+export const createFetch = <R = unknown, F = unknown>(
+	config?: CreateFetchOption,
+) => {
+	async function $fetch(
 		url: string | URL,
 		options?: FetchOption,
-	): Promise<FetchResponse<T, E>> => {
+	): Promise<BetterFetchResponse<R, F>>;
+	async function $fetch<T = unknown, E = unknown>(
+		url: string | URL,
+		options?: FetchOption,
+	): Promise<BetterFetchResponse<T, E>>;
+	async function $fetch<T = unknown, E = unknown>(
+		url: string | URL,
+		options?: FetchOption,
+	): Promise<BetterFetchResponse<T, E>> {
 		return await betterFetch<T, E>(url, {
 			...config,
 			...options,
 		});
-	};
+	}
 	$fetch.native = fetch;
 	return $fetch;
 };

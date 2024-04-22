@@ -47,6 +47,34 @@ const { data, error } = await $fetch<{
 }>("/todos/1");
 ```
 
+You can also pass default response and error types. Which will be used if you don't pass the types in the fetch call.
+
+```typescript
+import { createFetch } from "@better-tools/fetch";
+
+const $fetch = createFetch<{
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+}, {
+  message: string;
+}>({
+  baseUrl: "https://jsonplaceholder.typicode.com",
+  retry: 2,
+});
+
+const { data, error } = await $fetch("/todos/1");
+//data and error types are inferred from the default types
+
+const { data, error } = await $fetch<{
+  some: string;
+}, {
+  fields: string[]
+}>("/todos/1");
+//data and error types are inferred from fetch call
+```
+
 ### ♯ Parsing the response
 
 Better fetch will smartly parse JSON using JSON.parse and if it fails it will return the response as text.

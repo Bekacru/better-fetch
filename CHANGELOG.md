@@ -29,3 +29,13 @@
 ### ❤️ Contributors
 
 - Bekacru <bekacru@gmail.com>
+
+## v1.1.3
+
+### Features
+
+- Default types on createFetch
+
+### ❤️ Contributors
+
+- Bekacru <bekacru@gmail.com>
