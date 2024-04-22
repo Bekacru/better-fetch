@@ -1,0 +1,16 @@
+{
+  "name": "better-fetch",
+  "version": "0.0.1",
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "biome": "^0.3.3",
+    "tsup": "^8.0.2",
+    "@types/bun": "^1.1.0"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsup"
+  }
+}
