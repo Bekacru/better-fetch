@@ -1,0 +1,34 @@
+{
+  "name": "@better-tools/fetch",
+  "version": "1.1.0",
+  "packageManager": "bun@1.1.4",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "react-native": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "devDependencies": {
+    "@types/bun": "^1.1.0",
+    "@types/node": "^20.11.30",
+    "biome": "^0.3.3",
+    "semantic-release": "^23.0.8",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "lint": "biome check .",
+    "release": "bun run build && npm publish --access public",
+    "lint:fix": "biome check . --apply",
+    "typecheck": "tsc --noEmit"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module"
+}

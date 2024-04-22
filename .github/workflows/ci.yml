@@ -1,0 +1,23 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - uses: ./.github/setup
+
+      - name: Lint
+        run: bun lint
+
+      - name: Typecheck
+        run: bun typecheck
+
+      - name: Test
+        run: bun test
