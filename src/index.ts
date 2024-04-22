@@ -298,6 +298,6 @@ export const createFetch = <R = unknown, F = unknown>(
 
 betterFetch.native = fetch;
 
-export type BetterFetch = typeof betterFetch;
+export type BetterFetch<T = any, E = unknown> = typeof betterFetch<T, E>;
 export type CreateFetch = typeof createFetch;
 export default betterFetch;

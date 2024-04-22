@@ -39,3 +39,13 @@
 ### ❤️ Contributors
 
 - Bekacru <bekacru@gmail.com>
+
+## v1.1.4
+
+### Path
+
+- BetterFetch is now generic
+
+### ❤️ Contributors
+
+- Bekacru <bekacru@gmail.com>
