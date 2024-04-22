@@ -1,6 +1,10 @@
 # Better Fetch
 
-A fetch wrapper for typescript that returns data and error object instead of `Response`. Works on the browser, node (version 18+), workers, deno and bun. Some of the APIs are inspired by [ofetch](https://github.com/unjs/ofetch).
+A fetch wrapper for typescript that returns the data and the error object. Works on the browser, node (version 18+), workers, deno and bun. Some of the APIs are inspired by [ofetch](https://github.com/unjs/ofetch).
+
+## Why?
+
+While working on a project, I began using ofetch. I appreciated many of its features, but I was particularly drawn to the concept of receiving both data and error objects with each call. This led me to create a fetch wrapper that incorporated this functionality , along with some features borrowed from ofetch.
 
 ## Installation
 
@@ -11,13 +15,11 @@ pnpm install @better-tools/fetch
 ## Usage
 
 ```typescript
-import fetch from "@better-tools/fetch"
-
 const { data, error } = await fetch<{
   userId: number;
   id: number;
   title: string;
-  completed: boolean;
+  completed"
 }>("https://jsonplaceholder.typicode.com/todos/1");
 if (error) {
   // handle the error
@@ -32,7 +34,7 @@ if (data) {
 You can create a custom fetch with default options.
 
 ```typescript
-import { createFetch } from "better-auth";
+import { createFetch } from "@better-tools/fetch";
 
 const $fetch = createFetch({
   baseUrl: "https://jsonplaceholder.typicode.com",
@@ -64,7 +66,7 @@ const { data, error } = await fetch("/api/image.png");
 await ofetch("/ok");
 //custom parser
 const { data, error } = await fetch("/todos/1", {
-  jsonParser: (text) => {
+  parser: (text) => {
     return JSON.parse(text);
   },
 });
