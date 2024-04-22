@@ -49,3 +49,13 @@
 ### ❤️ Contributors
 
 - Bekacru <bekacru@gmail.com>
+  
+## v1.1.5
+
+### Path
+
+- Better type exports
+
+### ❤️ Contributors
+
+- Bekacru <bekacru@gmail.com>

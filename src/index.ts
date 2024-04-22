@@ -132,10 +132,7 @@ export type BetterFetchResponse<
 			} & E;
 	  };
 
-export const betterFetch = async <T = any, E = unknown>(
-	url: string | URL,
-	options?: FetchOption,
-): Promise<BetterFetchResponse<T, E>> => {
+export const betterFetch: BetterFetch = async (url, options) => {
 	const controller = new AbortController();
 	const signal = controller.signal;
 
@@ -210,7 +207,7 @@ export const betterFetch = async <T = any, E = unknown>(
 	if (!hasBody) {
 		await options?.onSuccess?.(responseContext);
 		return {
-			data: {} as T,
+			data: {},
 			error: null,
 		};
 	}
@@ -227,7 +224,7 @@ export const betterFetch = async <T = any, E = unknown>(
 			};
 		} else {
 			return {
-				data: (await response[responseType]()) as T,
+				data: await response[responseType](),
 				error: null,
 			};
 		}
@@ -265,7 +262,7 @@ export const betterFetch = async <T = any, E = unknown>(
 	return {
 		data: null,
 		error: {
-			...({} as E),
+			...{},
 			status: response.status,
 			statusText: response.statusText,
 		},
@@ -274,30 +271,24 @@ export const betterFetch = async <T = any, E = unknown>(
 
 export const createFetch = <R = unknown, F = unknown>(
 	config?: CreateFetchOption,
-) => {
-	async function $fetch(
-		url: string | URL,
-		options?: FetchOption,
-	): Promise<BetterFetchResponse<R, F>>;
-	async function $fetch<T = unknown, E = unknown>(
-		url: string | URL,
-		options?: FetchOption,
-	): Promise<BetterFetchResponse<T, E>>;
-	async function $fetch<T = unknown, E = unknown>(
-		url: string | URL,
-		options?: FetchOption,
-	): Promise<BetterFetchResponse<T, E>> {
-		return await betterFetch<T, E>(url, {
+): BetterFetch<R, F> => {
+	const $fetch: BetterFetch = async (url, options) => {
+		return await betterFetch(url, {
 			...config,
 			...options,
 		});
-	}
+	};
 	$fetch.native = fetch;
 	return $fetch;
 };
 
 betterFetch.native = fetch;
 
-export type BetterFetch<T = any, E = unknown> = typeof betterFetch<T, E>;
+export interface BetterFetch<BaseT = any, BaseE = unknown> {
+	<T = BaseT, E = BaseE>(url: string | URL, options?: FetchOption): Promise<
+		BetterFetchResponse<T, E>
+	>;
+	native: typeof fetch;
+}
 export type CreateFetch = typeof createFetch;
 export default betterFetch;
