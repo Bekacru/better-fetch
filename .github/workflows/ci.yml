@@ -41,7 +41,7 @@ jobs:
 
       - name: Create Release
         id: semantic
-        run: bun semantic-release --branches main
+        run: bunx semantic-release --branches main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
