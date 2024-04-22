@@ -11,6 +11,8 @@ pnpm install @better-tools/fetch
 ## Usage
 
 ```typescript
+import fetch from "@better-tools/fetch"
+
 const { data, error } = await fetch<{
   userId: number;
   id: number;
