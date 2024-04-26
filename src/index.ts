@@ -2,6 +2,8 @@ import { Readable } from "stream";
 import { FetchError } from "./error";
 import {
 	detectResponseType,
+	FetchEsque,
+	getFetch,
 	isJSONParsable,
 	isJSONSerializable,
 	jsonParse,
@@ -84,40 +86,95 @@ export interface BetterFetchOptions extends Omit<RequestInit, "body"> {
 	 * Query parameters
 	 */
 	query?: Record<string, string | number | boolean | undefined>;
+	/**
+	 * Custom fetch implementation
+	 */
+	customFetchImpl?: FetchEsque;
 }
 
 // biome-ignore lint/suspicious/noEmptyInterface: <explanation>
 export interface CreateFetchOption extends BetterFetchOptions {}
+
+interface Routes {
+	"/": {
+		request: {
+			body: {
+				foo: string;
+			};
+		};
+		response: {
+			body: {
+				foo: string;
+			};
+		};
+	};
+	"/signin": {
+		request: {
+			body: {
+				email: string;
+				password: string;
+			};
+		};
+		response: {
+			body: {
+				token: string;
+			};
+		};
+	};
+	"/get": {
+		response: {
+			body: {
+				foo: string;
+			};
+		};
+	};
+}
+
+async function callWithRoute<K extends keyof Routes>(
+	url: K,
+	...options: Routes[K] extends { request: any }
+		? [Routes[K]["request"]]
+		: [undefined?]
+): Promise<BetterFetchResponse<Routes[K]["response"]["body"]>> {
+	const res = {} as Routes[K]["response"]["body"];
+	return {
+		data: res,
+		error: null,
+	};
+}
+
+const { data } = await callWithRoute("/signin", {
+	body: {
+		email: "foo",
+		password: "bar",
+	},
+});
+
+// callWithRoute("/", {
+// 	body: "",
+// });
+
+export type PayloadMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+export type NonPayloadMethod = "GET" | "HEAD" | "OPTIONS";
 
 export type FetchOption<T extends Record<string, unknown> = any> = (
 	| {
 			body?: never;
 	  }
 	| {
-			method: "POST";
-			body: T;
-	  }
-	| {
-			method: "GET";
-			body?: never;
-	  }
-	| {
-			method:
-				| "PUT"
-				| "DELETE"
-				| "PATCH"
-				| "HEAD"
-				| "OPTIONS"
-				| "CONNECT"
-				| "TRACE";
+			method: PayloadMethod;
 			body?: T;
+	  }
+	| {
+			method: NonPayloadMethod;
+			body?: never;
 	  }
 ) &
 	BetterFetchOptions;
 
 export type BetterFetchResponse<
 	T,
-	E extends Record<string, unknown> | unknown,
+	E extends Record<string, unknown> | unknown = unknown,
 > =
 	| {
 			data: T;
@@ -133,6 +190,7 @@ export type BetterFetchResponse<
 	  };
 
 export const betterFetch: BetterFetch = async (url, options) => {
+	const fetch = getFetch(options?.customFetchImpl);
 	const controller = new AbortController();
 	const signal = controller.signal;
 
@@ -141,8 +199,6 @@ export const betterFetch: BetterFetch = async (url, options) => {
 
 	const shouldStringifyBody =
 		options?.body &&
-		!(options.body instanceof FormData) &&
-		!(options.body instanceof URLSearchParams) &&
 		isJSONSerializable(options.body) &&
 		(!headers.has("content-type") ||
 			headers.get("content-type") === "application/json");
@@ -195,7 +251,7 @@ export const betterFetch: BetterFetch = async (url, options) => {
 	}
 
 	await options?.onRequest?.(context);
-	const response = await fetch(context.request);
+	const response = await fetch(_url.toString(), _options);
 	const responseContext: ResponseContext = {
 		response,
 	};

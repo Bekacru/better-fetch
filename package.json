@@ -7,9 +7,13 @@
   "react-native": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "devDependencies": {
+    "@happy-dom/global-registrator": "^14.7.1",
+    "@testing-library/react": "^15.0.3",
     "@types/bun": "^1.1.0",
     "@types/node": "^20.11.30",
+    "@types/react": "^18.2.79",
     "biome": "^0.3.3",
+    "react": "^18.2.0",
     "tsup": "^8.0.2",
     "typescript": "^5.4.5"
   },
@@ -21,6 +25,7 @@
   },
   "scripts": {
     "build": "tsup",
+    "test": "vitest",
     "lint": "biome check .",
     "release": "bun run build && npm publish --access public",
     "lint:fix": "biome check . --apply",
@@ -29,5 +34,17 @@
   "files": [
     "dist"
   ],
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@testing-library/dom": "^10.0.0",
+    "defu": "^6.1.4",
+    "global-jsdom": "^24.0.0",
+    "h3": "^1.11.1",
+    "jsdom": "^24.0.0",
+    "listhen": "^1.7.2",
+    "mocha": "^10.4.0",
+    "node-fetch": "^3.3.2",
+    "react-dom": "^18.2.0",
+    "vitest": "^1.5.0"
+  }
 }
