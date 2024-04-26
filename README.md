@@ -75,6 +75,58 @@ const { data, error } = await $fetch<{
 //data and error types are inferred from fetch call
 ```
 
+
+### ♯ Using with React
+To use better fetch with React hooks, you have the option to import createReactFetch. This allows you to create hooks with custom defaults. Alternatively, you can directly import each individual hook.
+
+
+With createReactFetch, you can create hooks with custom defaults.
+```typescript
+import {  createReactFetch  } from "@better-tools/fetch/react";
+
+//create hooks with custom defaults
+const { useFetch, useMutate } = createReactFetch({
+  baseUrl: "https://jsonplaceholder.typicode.com",
+  retry: 2,
+});
+
+function App() {
+  const { data, error } = useFetch<{
+    userId: number;
+    id: number;
+    title: string;
+    completed: boolean;
+  }>("/todos/1");
+  if (error) {
+    // handle the error
+  }
+  if (data) {
+    // handle the data
+  }
+}
+```
+
+Alternatively, you can directly import each individual hook.
+```typescript
+import { useFetch, useMutate } from "@better-tools/fetch/react";
+
+function App() {
+  const { data, error } = useFetch<{
+    userId: number;
+    id: number;
+    title: string;
+    completed: boolean;
+  }>("https://jsonplaceholder.typicode.com/todos/1");
+  if (error) {
+    // handle the error
+  }
+  if (data) {
+    // handle the data
+  }
+}
+```
+
+
 ### ♯ Parsing the response
 
 Better fetch will smartly parse JSON using JSON.parse and if it fails it will return the response as text.
