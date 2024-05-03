@@ -4,7 +4,6 @@ export default defineConfig({
 	entry: {
 		index: "./src/index.ts",
 		react: "./src/react.ts",
-		plugins: "./src/plugins/index.ts",
 		typed: "./src/typed.ts",
 	},
 	splitting: false,
