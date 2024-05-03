@@ -15,7 +15,16 @@
     "biome": "^0.3.3",
     "react": "^18.2.0",
     "tsup": "^8.0.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "h3": "^1.11.1",
+    "@sinclair/typebox": "^0.32.27",
+    "@testing-library/dom": "^10.0.0",
+    "global-jsdom": "^24.0.0",
+    "jsdom": "^24.0.0",
+    "listhen": "^1.7.2",
+    "mocha": "^10.4.0",
+    "react-dom": "^18.2.0",
+    "vitest": "^1.5.0"
   },
   "exports": {
     ".": {
@@ -31,11 +40,6 @@
       "import": "./dist/react.js",
       "require": "./dist/react.cjs",
       "types": "./dist/react.d.ts"
-    },
-    "./plugin": {
-      "import": "./dist/plugin.js",
-      "require": "./dist/plugins.cjs",
-      "types": "./dist/plugins.d.ts"
     }
   },
   "scripts": {
@@ -50,18 +54,5 @@
   "files": [
     "dist"
   ],
-  "type": "module",
-  "dependencies": {
-    "@sinclair/typebox": "^0.32.27",
-    "@testing-library/dom": "^10.0.0",
-    "defu": "^6.1.4",
-    "global-jsdom": "^24.0.0",
-    "h3": "^1.11.1",
-    "jsdom": "^24.0.0",
-    "listhen": "^1.7.2",
-    "mocha": "^10.4.0",
-    "node-fetch": "^3.3.2",
-    "react-dom": "^18.2.0",
-    "vitest": "^1.5.0"
-  }
+  "type": "module"
 }
