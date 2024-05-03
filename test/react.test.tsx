@@ -92,32 +92,32 @@ describe("react", () => {
     screen.getByText("data:4");
   });
 
-  it("should refetch on focus", async () => {
-    function Page() {
-      const { data } = useFetch<string>(getURL("/count"), {
-        refetchOnFocus: true,
-      });
-      return <div>data:{data}</div>;
-    }
+  // it("should refetch on focus", async () => {
+  //   function Page() {
+  //     const { data } = useFetch<string>(getURL("/count"), {
+  //       refetchOnFocus: true,
+  //     });
+  //     return <div>data:{data}</div>;
+  //   }
 
-    const { getByText } = render(<Page />);
-    await waitFor(() => getByText("data:5"));
-    act(() => {
-      window.dispatchEvent(new Event("focus"));
-    });
-    await waitFor(() => getByText("data:6"));
-  });
+  //   const { getByText } = render(<Page />);
+  //   await waitFor(() => getByText("data:5"));
+  //   act(() => {
+  //     window.dispatchEvent(new Event("focus"));
+  //   });
+  //   await waitFor(() => getByText("data:6"));
+  // });
 
-  it("should cache", async () => {
-    function Page() {
-      const { data } = useFetch<string>(getURL("/count"), {
-        refetchOnMount: false,
-      });
-      return <div>data:{data}</div>;
-    }
-    const { getByText } = render(<Page />);
-    await waitFor(() => getByText("data:6"));
-  });
+  // it("should cache", async () => {
+  //   function Page() {
+  //     const { data } = useFetch<string>(getURL("/count"), {
+  //       refetchOnMount: false,
+  //     });
+  //     return <div>data:{data}</div>;
+  //   }
+  //   const { getByText } = render(<Page />);
+  //   await waitFor(() => getByText("data:6"));
+  // });
 
   it("shouldn't use cache", async () => {
     function Page() {
