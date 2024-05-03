@@ -75,7 +75,12 @@ describe("typed router", (it) => {
 	});
 
 	it("should infer default response and error types", () => {
-		const f = createFetch<DefaultSchema, { data: string }, { error: string }>();
+		const f = createFetch<DefaultSchema, { data: string }, { error: string }>({
+			baseURL: "http://localhost:3000",
+			customFetchImpl: async (url, req) => {
+				return new Response();
+			},
+		});
 		expectTypeOf(f("/")).toMatchTypeOf<
 			Promise<
 				BetterFetchResponse<
