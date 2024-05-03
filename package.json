@@ -36,6 +36,7 @@
   ],
   "type": "module",
   "dependencies": {
+    "@sinclair/typebox": "^0.32.27",
     "@testing-library/dom": "^10.0.0",
     "defu": "^6.1.4",
     "global-jsdom": "^24.0.0",

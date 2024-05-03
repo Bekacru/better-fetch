@@ -6,6 +6,8 @@ import {
 	PayloadMethod,
 } from ".";
 import { isPayloadMethod } from "./utils";
+import { DefaultSchema, Static, T, TNever, TObject } from "./types";
+import { FetchSchema } from "./types";
 
 const cache = (storage: Storage, disable?: boolean) => {
 	return {
@@ -55,12 +57,20 @@ const defaultOptions: ReactFetchOptions = {
 	disableCache: false,
 };
 
-export const createReactFetch = <R = unknown, F = unknown>(
+export const createReactFetch = <
+	Routes extends FetchSchema = DefaultSchema,
+	R = unknown,
+	F = unknown,
+>(
 	config?: ReactFetchOptions,
 ) => {
-	const betterFetch = createFetch<R, F>(config);
-	const useFetch = <R = unknown, E = unknown>(
-		url: string,
+	const betterFetch = createFetch<Routes, R, F>(config);
+	const useFetch = <
+		R = unknown,
+		E = unknown,
+		K extends keyof Routes = keyof Routes,
+	>(
+		url: K | URL | Omit<string, K>,
 		opts?: ReactFetchOptions<R>,
 	) => {
 		const options = {
@@ -79,13 +89,16 @@ export const createReactFetch = <R = unknown, F = unknown>(
 				: { status: 404, statusText: "Not Found" },
 		} as any;
 
-		const [res, setRes] = useState<BetterFetchResponse<R, E>>(initial);
+		const [res, setRes] =
+			useState<BetterFetchResponse<Static<NonNullable<Routes[K]["output"]>>>>(
+				initial,
+			);
 		const [isLoading, setIsLoading] = useState(false);
 		const fetchData = async () => {
 			setIsLoading(true);
-			const response = await betterFetch(url, options);
+			const response = await betterFetch(url.toString(), options as any);
 			if (!response.error) {
-				_cache.set(url, response);
+				_cache.set(url.toString(), response);
 			}
 			setIsLoading(false);
 			setRes(response as any);
@@ -107,7 +120,7 @@ export const createReactFetch = <R = unknown, F = unknown>(
 			const refetchInterval = options?.refetchInterval
 				? setInterval(fetchData, options?.refetchInterval)
 				: null;
-			const cached = _cache.get<BetterFetchResponse<R>>(url);
+			const cached = _cache.get<BetterFetchResponse<R>>(url.toString());
 			if (cached && !options.refetchOnMount) {
 				setRes(cached as any);
 			} else {
@@ -129,21 +142,29 @@ export const createReactFetch = <R = unknown, F = unknown>(
 		};
 	};
 
-	const useMutate = <T = undefined>(
-		url: string,
+	const useMutate = <T = undefined, K extends keyof Routes = keyof Routes>(
+		url: K | URL | Omit<string, keyof Routes>,
 		options?: ReactMutateOptions,
 	) => {
 		if (options?.method && !isPayloadMethod(options?.method)) {
 			throw new Error("Method must be a payload method");
 		}
 
-		async function mutate(...args: T extends undefined ? [undefined?] : [T]) {
-			const res = await betterFetch(url, {
+		async function mutate(
+			...args: T extends undefined
+				? Routes[K]["input"] extends TObject
+					? [Static<NonNullable<Routes[K]["input"]>>]
+					: [undefined?]
+				: [T]
+		) {
+			const res = await betterFetch<Routes>(url.toString(), {
 				...options,
 				body: args[0],
 				method: (options?.method as PayloadMethod) || "POST",
-			});
-			return res;
+			} as any);
+			return res as BetterFetchResponse<
+				Static<NonNullable<Routes[K]["output"]>>
+			>;
 		}
 		return {
 			mutate,
@@ -157,4 +178,22 @@ export const createReactFetch = <R = unknown, F = unknown>(
 	};
 };
 
-export const { useFetch, useMutate, betterFetch } = createReactFetch();
+// const routes = {
+// 	"/signin": {
+// 		input: T.Object({
+// 			username: T.String(),
+// 			password: T.String(),
+// 		}),
+// 		output: T.Object({
+// 			token: T.String(),
+// 		}),
+// 	},
+// 	"/another": {
+// 		output: T.Object({
+// 			message: T.String(),
+// 		}),
+// 	},
+// } satisfies FetchSchema;
+
+export const { useFetch, betterFetch, useMutate } =
+	createReactFetch<DefaultSchema>();

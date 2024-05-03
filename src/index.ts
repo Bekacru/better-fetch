@@ -8,6 +8,9 @@ import {
 	isJSONSerializable,
 	jsonParse,
 } from "./utils";
+import { FetchSchema, Static, T, TNever } from "./types";
+import { TObject, Type } from "@sinclair/typebox";
+// import { Static, TNever, TObject, Type } from "@sinclair/typebox";
 
 interface RequestContext {
 	request: Request;
@@ -90,87 +93,33 @@ export interface BetterFetchOptions extends Omit<RequestInit, "body"> {
 	 * Custom fetch implementation
 	 */
 	customFetchImpl?: FetchEsque;
+	/**
+	 * Plugins
+	 */
+	plugins?: Plugin[];
+}
+
+/**
+ * A plugin that can be used to modify the url and options.
+ * All plugins will be called before the request is made.
+ */
+export interface Plugin {
+	(url: string, options?: FetchOption): Promise<{
+		url: string;
+		options?: FetchOption;
+	}>;
 }
 
 // biome-ignore lint/suspicious/noEmptyInterface: <explanation>
 export interface CreateFetchOption extends BetterFetchOptions {}
 
-interface Routes {
-	"/": {
-		request: {
-			body: {
-				foo: string;
-			};
-		};
-		response: {
-			body: {
-				foo: string;
-			};
-		};
-	};
-	"/signin": {
-		request: {
-			body: {
-				email: string;
-				password: string;
-			};
-		};
-		response: {
-			body: {
-				token: string;
-			};
-		};
-	};
-	"/get": {
-		response: {
-			body: {
-				foo: string;
-			};
-		};
-	};
-}
-
-async function callWithRoute<K extends keyof Routes>(
-	url: K,
-	...options: Routes[K] extends { request: any }
-		? [Routes[K]["request"]]
-		: [undefined?]
-): Promise<BetterFetchResponse<Routes[K]["response"]["body"]>> {
-	const res = {} as Routes[K]["response"]["body"];
-	return {
-		data: res,
-		error: null,
-	};
-}
-
-const { data } = await callWithRoute("/signin", {
-	body: {
-		email: "foo",
-		password: "bar",
-	},
-});
-
-// callWithRoute("/", {
-// 	body: "",
-// });
-
 export type PayloadMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 export type NonPayloadMethod = "GET" | "HEAD" | "OPTIONS";
 
-export type FetchOption<T extends Record<string, unknown> = any> = (
-	| {
-			body?: never;
-	  }
-	| {
-			method: PayloadMethod;
-			body?: T;
-	  }
-	| {
-			method: NonPayloadMethod;
-			body?: never;
-	  }
-) &
-	BetterFetchOptions;
+export type FetchOption<T extends Record<string, unknown> = any> =
+	T extends Record<string, any>
+		? BetterFetchOptions & { body: T }
+		: BetterFetchOptions & { body?: T };
 
 export type BetterFetchResponse<
 	T,
@@ -194,14 +143,23 @@ export const betterFetch: BetterFetch = async (url, options) => {
 	const controller = new AbortController();
 	const signal = controller.signal;
 
-	const _url = new URL(`${options?.baseURL ?? ""}${url}`);
+	//run plugins first
+	// const fetcher = createFetch(options);
+	for (const plugin of options?.plugins || []) {
+		const pluginRes = await plugin(url.toString(), options);
+		url = pluginRes.url;
+		options = pluginRes.options;
+	}
+
+	const _url = new URL(`${options?.baseURL ?? ""}${url.toString()}`);
 	const headers = new Headers(options?.headers);
 
 	const shouldStringifyBody =
 		options?.body &&
 		isJSONSerializable(options.body) &&
 		(!headers.has("content-type") ||
-			headers.get("content-type") === "application/json");
+			headers.get("content-type") === "application/json") &&
+		typeof options?.body !== "string";
 
 	if (shouldStringifyBody) {
 		!headers.has("content-type") &&
@@ -218,11 +176,16 @@ export const betterFetch: BetterFetch = async (url, options) => {
 		signal,
 		...options,
 		body: shouldStringifyBody
-			? JSON.stringify(options.body)
+			? JSON.stringify(options?.body)
 			: options?.body
 			? options.body
 			: undefined,
 		headers,
+		method: options?.method?.length
+			? options.method
+			: options?.body
+			? "POST"
+			: "GET",
 	};
 
 	if (
@@ -251,7 +214,9 @@ export const betterFetch: BetterFetch = async (url, options) => {
 	}
 
 	await options?.onRequest?.(context);
+
 	const response = await fetch(_url.toString(), _options);
+
 	const responseContext: ResponseContext = {
 		response,
 	};
@@ -315,6 +280,7 @@ export const betterFetch: BetterFetch = async (url, options) => {
 			},
 		};
 	}
+
 	return {
 		data: null,
 		error: {
@@ -325,9 +291,13 @@ export const betterFetch: BetterFetch = async (url, options) => {
 	};
 };
 
-export const createFetch = <R = unknown, F = unknown>(
+export const createFetch = <
+	Routes extends FetchSchema = any,
+	R = unknown,
+	F = unknown,
+>(
 	config?: CreateFetchOption,
-): BetterFetch<R, F> => {
+): BetterFetch<Routes, R, F> => {
 	const $fetch: BetterFetch = async (url, options) => {
 		return await betterFetch(url, {
 			...config,
@@ -340,11 +310,28 @@ export const createFetch = <R = unknown, F = unknown>(
 
 betterFetch.native = fetch;
 
-export interface BetterFetch<BaseT = any, BaseE = unknown> {
-	<T = BaseT, E = BaseE>(url: string | URL, options?: FetchOption): Promise<
-		BetterFetchResponse<T, E>
+export interface BetterFetch<
+	Routes extends FetchSchema = {
+		[key in string]: {
+			output: any;
+		};
+	},
+	BaseT = any,
+	BaseE = unknown,
+> {
+	<T = BaseT, E = BaseE, K extends keyof Routes = keyof Routes>(
+		url: K | URL | Omit<string, keyof Routes>,
+		...options: Routes[K]["input"] extends TObject
+			? [FetchOption<Static<Routes[K]["input"]>>]
+			: [FetchOption?]
+	): Promise<
+		BetterFetchResponse<
+			Routes[K]["output"] extends TObject ? Static<Routes[K]["output"]> : T,
+			E
+		>
 	>;
 	native: typeof fetch;
 }
+
 export type CreateFetch = typeof createFetch;
 export default betterFetch;
