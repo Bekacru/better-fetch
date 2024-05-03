@@ -8,9 +8,8 @@ import {
 	isJSONSerializable,
 	jsonParse,
 } from "./utils";
-import { FetchSchema, Static, T, TNever } from "./typed";
-import { TObject, Type } from "@sinclair/typebox";
-// import { Static, TNever, TObject, Type } from "@sinclair/typebox";
+import { FetchSchema, Static } from "./typed";
+import { TNever, TObject } from "@sinclair/typebox";
 
 interface RequestContext {
 	request: Request;
@@ -22,7 +21,7 @@ interface ResponseContext {
 	response: Response;
 }
 
-export interface BetterFetchOptions extends Omit<RequestInit, "body"> {
+export type BetterFetchOptions<B extends Record<string, any> = any> = {
 	/**
 	 * a base url that will be prepended to the url
 	 */
@@ -86,9 +85,9 @@ export interface BetterFetchOptions extends Omit<RequestInit, "body"> {
 	 */
 	duplex?: "full" | "half";
 	/**
-	 * Query parameters
+	 * HTTP method
 	 */
-	query?: Record<string, string | number | boolean | undefined>;
+	method?: PayloadMethod | NonPayloadMethod;
 	/**
 	 * Custom fetch implementation
 	 */
@@ -97,7 +96,7 @@ export interface BetterFetchOptions extends Omit<RequestInit, "body"> {
 	 * Plugins
 	 */
 	plugins?: Plugin[];
-}
+} & Omit<RequestInit, "body">;
 
 /**
  * A plugin that can be used to modify the url and options.
@@ -116,10 +115,15 @@ export interface CreateFetchOption extends BetterFetchOptions {}
 export type PayloadMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 export type NonPayloadMethod = "GET" | "HEAD" | "OPTIONS";
 
-export type FetchOption<T extends Record<string, unknown> = any> =
-	T extends Record<string, any>
-		? BetterFetchOptions & { body: T }
-		: BetterFetchOptions & { body?: T };
+export type FetchOption<
+	T extends Record<string, unknown> = any,
+	Q extends Record<string, unknown> = any,
+> = InferBody<T> & InferQuery<Q> & BetterFetchOptions;
+
+type InferBody<T> = T extends Record<string, any> ? { body: T } : { body?: T };
+type InferQuery<Q> = Q extends Record<string, any>
+	? { query: Q }
+	: { query?: Q };
 
 export type BetterFetchResponse<
 	T,
@@ -294,10 +298,10 @@ export const betterFetch: BetterFetch = async (url, options) => {
 export const createFetch = <
 	Routes extends FetchSchema = any,
 	R = unknown,
-	F = unknown,
+	E = unknown,
 >(
 	config?: CreateFetchOption,
-): BetterFetch<Routes, R, F> => {
+): BetterFetch<Routes, R, E> => {
 	const $fetch: BetterFetch = async (url, options) => {
 		return await betterFetch(url, {
 			...config,
@@ -313,7 +317,7 @@ betterFetch.native = fetch;
 export interface BetterFetch<
 	Routes extends FetchSchema = {
 		[key in string]: {
-			output: any;
+			output: TNever;
 		};
 	},
 	BaseT = any,
@@ -322,7 +326,16 @@ export interface BetterFetch<
 	<T = BaseT, E = BaseE, K extends keyof Routes = keyof Routes>(
 		url: K | URL | Omit<string, keyof Routes>,
 		...options: Routes[K]["input"] extends TObject
-			? [FetchOption<Static<Routes[K]["input"]>>]
+			? [
+					FetchOption<
+						Static<Routes[K]["input"]>,
+						Routes[K]["query"] extends TObject
+							? Static<Routes[K]["query"]>
+							: any
+					>,
+			  ]
+			: Routes[K]["query"] extends TObject
+			? [FetchOption<any, Static<Routes[K]["query"]>>]
 			: [FetchOption?]
 	): Promise<
 		BetterFetchResponse<

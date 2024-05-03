@@ -126,7 +126,6 @@ describe("react", () => {
       }>(getURL("/get"), {
         refetchOnMount: false,
       });
-      console.log({ data });
       return <div>data:{data?.foo}</div>;
     }
     const { getByText } = render(<Page />);

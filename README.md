@@ -1,6 +1,6 @@
 # Better Fetch
 
-A fetch wrapper for typescript that returns data and error object. Works on the browser, node (version 18+), workers, deno and bun. Some of the APIs are inspired by [ofetch](https://github.com/unjs/ofetch).
+A fetch wrapper for typescript that returns data and error object, supports defined route schemas, plugins and more. Works on the browser, node (version 18+), workers, deno and bun.
 
 ## Installation
 
@@ -8,12 +8,12 @@ A fetch wrapper for typescript that returns data and error object. Works on the 
 pnpm install @better-tools/fetch
 ```
 
-## Usage
+## Basic Usage
 
 ```typescript
-import fetch from "@better-tools/fetch"
+import betterFetch from "@better-tools/fetch"
 
-const { data, error } = await fetch<{
+const { data, error } = await betterFetch<{
   userId: number;
   id: number;
   title: string;
@@ -47,12 +47,52 @@ const { data, error } = await $fetch<{
 }>("/todos/1");
 ```
 
+### ♯ Typed Fetch
+
+Better fetch allows you to define schema that will be used to infer request body, query parameters, response data and error types.
+
+```typescript
+import { createFetch } from "@better-tools/fetch";
+import { T, FetchSchema } from "@better-tools/fetch/typed";
+
+const routes = {
+	"/": {
+		output: T.Object({
+			message: T.String(),
+		}),
+	},
+	"/signin": {
+		input: T.Object({
+			username: T.String(),
+			password: T.String(),
+		}),
+		output: T.Object({
+			token: T.String(),
+		}),
+	},
+	"/signup": {
+		input: T.Object({
+			username: T.String(),
+			password: T.String(),
+			optional: T.Optional(T.String()),
+		}),
+		output: T.Object({
+			message: T.String(),
+		}),
+	},
+} satisfies FetchSchema;
+
+const $fetch = createFetch<typeof routes>()
+```
+
+
 You can also pass default response and error types. Which will be used if you don't pass the types in the fetch call.
 
 ```typescript
 import { createFetch } from "@better-tools/fetch";
+import { DefaultSchema } from "@better-tools/fetch/typed";
 
-const $fetch = createFetch<{
+const $fetch = createFetch<DefaultSchema,{
   userId: number;
   id: number;
   title: string;
@@ -91,18 +131,26 @@ const { useFetch, useMutate } = createReactFetch({
 });
 
 function App() {
-  const { data, error } = useFetch<{
+  type Todo = {
     userId: number;
     id: number;
     title: string;
     completed: boolean;
-  }>("/todos/1");
+  };
+  const { data, error, isPending } = useFetch<Todo>("/todos/1");
   if (error) {
     // handle the error
   }
   if (data) {
     // handle the data
   }
+  const { mutate, isPending } = useMutate<Todo>("/todos")
+  await mutate({
+    userId: 1,
+    id: 1,
+    title: "delectus aut autem",
+    completed: false 
+  })
 }
 ```
 
@@ -127,43 +175,21 @@ function App() {
 ```
 
 
-### ♯ Typed Fetch
-Better fetch allows you to define schema that will be used to infer request body, query parameters, response data and error types.
+### ♯ Plugins
 
+Plugins are functions that can be used to modify the request, response, error and other parts of the request lifecycle.
+
+Example:
 ```typescript
 import { createFetch } from "@better-tools/fetch";
-import { T, FetchSchema } from "@better-tools/fetch/typed";
+import { csrfProtection } from "./plugins/csrfProtection"
 
-const routes = {
-	"/": {
-		output: T.Object({
-			message: T.String(),
-		}),
-	},
-	"/signin": {
-		input: T.Object({
-			username: T.String(),
-			password: T.String(),
-		}),
-		output: T.Object({
-			token: T.String(),
-		}),
-	},
-	"/signup": {
-		input: T.Object({
-			username: T.String(),
-			password: T.String(),
-			optional: T.Optional(T.String()),
-		}),
-		output: T.Object({
-			message: T.String(),
-		}),
-	},
-} satisfies FetchSchema;
-
-const $fetch = createFetch<typeof routes>()
+const $fetch = createFetch({
+  baseUrl: "https://jsonplaceholder.typicode.com",
+  retry: 2,
+  plugins: [csrfProtection()]
+});
 ```
-
 
 
 ### ♯ Parsing the response

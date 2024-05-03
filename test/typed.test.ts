@@ -1,5 +1,5 @@
 import { describe, expectTypeOf } from "vitest";
-import { FetchSchema, T } from "../src/typed";
+import { DefaultSchema, FetchSchema, T } from "../src/typed";
 import { BetterFetchResponse, createFetch } from "../src";
 import { createReactFetch } from "../src/react";
 
@@ -26,6 +26,11 @@ const routes = {
 		}),
 		output: T.Object({
 			message: T.String(),
+		}),
+	},
+	"/query": {
+		query: T.Object({
+			term: T.String(),
 		}),
 	},
 } satisfies FetchSchema;
@@ -61,6 +66,28 @@ describe("typed router", (it) => {
 				},
 			}),
 		).toMatchTypeOf<Promise<BetterFetchResponse<{ message: string }>>>();
+	});
+
+	it("should require query param", () => {
+		expectTypeOf($fetch("/query", { query: { term: "" } })).toMatchTypeOf<
+			Promise<BetterFetchResponse<unknown>>
+		>();
+	});
+
+	it("should infer default response and error types", () => {
+		const f = createFetch<DefaultSchema, { data: string }, { error: string }>();
+		expectTypeOf(f("/")).toMatchTypeOf<
+			Promise<
+				BetterFetchResponse<
+					{
+						data: string;
+					},
+					{
+						error: string;
+					}
+				>
+			>
+		>();
 	});
 });
 

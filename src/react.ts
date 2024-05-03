@@ -90,9 +90,11 @@ export const createReactFetch = <
 		} as any;
 
 		const [res, setRes] =
-			useState<BetterFetchResponse<Static<NonNullable<Routes[K]["output"]>>>>(
-				initial,
-			);
+			useState<
+				Routes[K]["output"] extends TObject
+					? BetterFetchResponse<Static<Routes[K]["output"]>>
+					: BetterFetchResponse<R>
+			>(initial);
 		const [isLoading, setIsLoading] = useState(false);
 		const fetchData = async () => {
 			setIsLoading(true);
@@ -134,7 +136,9 @@ export const createReactFetch = <
 			};
 		}, []);
 		return {
-			data: res?.data,
+			data: res?.data as Routes[K]["output"] extends TObject
+				? Static<Routes[K]["output"]>
+				: R,
 			error: isLoading ? null : res?.error,
 			isError: res?.error && !isLoading,
 			isLoading,
