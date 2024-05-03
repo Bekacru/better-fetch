@@ -5,6 +5,7 @@ export default defineConfig({
 		index: "./src/index.ts",
 		react: "./src/react.ts",
 		plugins: "./src/plugins/index.ts",
+		typed: "./src/typed.ts",
 	},
 	splitting: false,
 	sourcemap: true,

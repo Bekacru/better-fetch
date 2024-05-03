@@ -21,6 +21,21 @@
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./typed": {
+      "import": "./dist/typed.js",
+      "require": "./dist/typed.cjs",
+      "types": "./dist/typed.d.ts"
+    },
+    "./react": {
+      "import": "./dist/react.js",
+      "require": "./dist/react.cjs",
+      "types": "./dist/react.d.ts"
+    },
+    "./plugin": {
+      "import": "./dist/plugin.js",
+      "require": "./dist/plugins.cjs",
+      "types": "./dist/plugins.d.ts"
     }
   },
   "scripts": {

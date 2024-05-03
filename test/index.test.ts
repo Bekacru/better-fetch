@@ -9,7 +9,7 @@ import {
 } from "h3";
 import { listen, Listener } from "listhen";
 import { IncomingHttpHeaders } from "http";
-import { DefaultSchema } from "../src/types";
+import { DefaultSchema } from "../src/typed";
 
 describe("fetch", () => {
 	const getURL = (path?: string) =>

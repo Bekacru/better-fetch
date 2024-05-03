@@ -8,7 +8,7 @@ import {
 	isJSONSerializable,
 	jsonParse,
 } from "./utils";
-import { FetchSchema, Static, T, TNever } from "./types";
+import { FetchSchema, Static, T, TNever } from "./typed";
 import { TObject, Type } from "@sinclair/typebox";
 // import { Static, TNever, TObject, Type } from "@sinclair/typebox";
 

@@ -6,8 +6,8 @@ import {
 	PayloadMethod,
 } from ".";
 import { isPayloadMethod } from "./utils";
-import { DefaultSchema, Static, T, TNever, TObject } from "./types";
-import { FetchSchema } from "./types";
+import { DefaultSchema, Static, T, TNever, TObject } from "./typed";
+import { FetchSchema } from "./typed";
 
 const cache = (storage: Storage, disable?: boolean) => {
 	return {
@@ -177,23 +177,6 @@ export const createReactFetch = <
 		useMutate,
 	};
 };
-
-// const routes = {
-// 	"/signin": {
-// 		input: T.Object({
-// 			username: T.String(),
-// 			password: T.String(),
-// 		}),
-// 		output: T.Object({
-// 			token: T.String(),
-// 		}),
-// 	},
-// 	"/another": {
-// 		output: T.Object({
-// 			message: T.String(),
-// 		}),
-// 	},
-// } satisfies FetchSchema;
 
 export const { useFetch, betterFetch, useMutate } =
 	createReactFetch<DefaultSchema>();

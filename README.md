@@ -127,6 +127,45 @@ function App() {
 ```
 
 
+### ♯ Typed Fetch
+Better fetch allows you to define schema that will be used to infer request body, query parameters, response data and error types.
+
+```typescript
+import { createFetch } from "@better-tools/fetch";
+import { T, FetchSchema } from "@better-tools/fetch/typed";
+
+const routes = {
+	"/": {
+		output: T.Object({
+			message: T.String(),
+		}),
+	},
+	"/signin": {
+		input: T.Object({
+			username: T.String(),
+			password: T.String(),
+		}),
+		output: T.Object({
+			token: T.String(),
+		}),
+	},
+	"/signup": {
+		input: T.Object({
+			username: T.String(),
+			password: T.String(),
+			optional: T.Optional(T.String()),
+		}),
+		output: T.Object({
+			message: T.String(),
+		}),
+	},
+} satisfies FetchSchema;
+
+const $fetch = createFetch<typeof routes>()
+```
+
+
+
 ### ♯ Parsing the response
 
 Better fetch will smartly parse JSON using JSON.parse and if it fails it will return the response as text.
