@@ -40,7 +40,8 @@
   },
   "scripts": {
     "build": "tsup",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
     "lint": "biome check .",
     "release": "bun run build && npm publish --access public",
     "lint:fix": "biome check . --apply",
