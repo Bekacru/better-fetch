@@ -60,6 +60,9 @@ const routes = {
 		output: T.Object({
 			message: T.String(),
 		}),
+    query: T.Object({
+      page: T.Number(),
+    }),
 	},
 	"/signin": {
 		input: T.Object({
