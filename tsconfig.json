@@ -4,11 +4,13 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "outDir": "dist",
     "strict": true,
     "declaration": true,
     "types": ["node"],
     "jsx": "react-jsx"
   },
-  "include": ["src", "test"]
+  "include": ["src", "test"],
+  "exclude": ["node_modules", "dist"]
 }
