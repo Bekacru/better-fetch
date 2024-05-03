@@ -43,8 +43,7 @@
     "test": "vitest run",
     "test:watch": "vitest watch",
     "lint": "biome check .",
-    "release": "bun run build && npm publish --access public",
-    "prerelease": "bun run build && npm publish --access public --tag beta",
+    "release": "bun run build && npm publish",
     "lint:fix": "biome check . --apply",
     "typecheck": "tsc --noEmit"
   },
