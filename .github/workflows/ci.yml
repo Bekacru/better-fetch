@@ -34,10 +34,7 @@ jobs:
 
       - uses: ./.github/setup
 
-      - name: Build
-        run: bun run build
-
       - name: Publish to NPM
-        run:  npm publish
+        run: bun run release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

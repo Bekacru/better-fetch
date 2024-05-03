@@ -65,4 +65,5 @@
 ### 🚀 Release
 
 - typed routes. Now you can create typed routes with betterFetch.
+- better fetch react hooks
 - custom fetch implementation now supports node-fetch
