@@ -22,7 +22,7 @@ jobs:
         run: bun typecheck
 
       - name: Test
-        run: bun test
+        run: bun run test
   release: 
     name: release
     needs: test
