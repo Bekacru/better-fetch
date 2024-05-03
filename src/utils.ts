@@ -64,3 +64,32 @@ export function jsonParse(text: string) {
 		return text;
 	}
 }
+
+export interface FetchEsque {
+	(input: RequestInfo, init?: RequestInit): Promise<Response>;
+}
+
+function isFunction(value: any): value is Function {
+	return typeof value === "function";
+}
+
+export function getFetch(customFetchImpl?: FetchEsque) {
+	if (customFetchImpl) {
+		return customFetchImpl;
+	}
+	if (typeof globalThis !== "undefined" && isFunction(globalThis.fetch)) {
+		return globalThis.fetch;
+	}
+	if (typeof window !== "undefined" && isFunction(window.fetch)) {
+		return window.fetch;
+	}
+	throw new Error("No fetch implementation found");
+}
+
+export function isPayloadMethod(method?: string) {
+	if (!method) {
+		return false;
+	}
+	const payloadMethod = ["POST", "PUT", "PATCH", "DELETE"];
+	return payloadMethod.includes(method.toUpperCase());
+}

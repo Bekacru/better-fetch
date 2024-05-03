@@ -59,3 +59,10 @@
 ### ❤️ Contributors
 
 - Bekacru <bekacru@gmail.com>
+
+## v.1.2.0
+
+### 🚀 Release
+
+- typed routes. Now you can create typed routes with betterFetch.
+- custom fetch implementation now supports node-fetch

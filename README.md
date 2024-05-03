@@ -1,6 +1,6 @@
 # Better Fetch
 
-A fetch wrapper for typescript that returns data and error object. Works on the browser, node (version 18+), workers, deno and bun. Some of the APIs are inspired by [ofetch](https://github.com/unjs/ofetch).
+A fetch wrapper for typescript that returns data and error object, supports defined route schemas, plugins and more. Works on the browser, node (version 18+), workers, deno and bun.
 
 ## Installation
 
@@ -8,12 +8,12 @@ A fetch wrapper for typescript that returns data and error object. Works on the 
 pnpm install @better-tools/fetch
 ```
 
-## Usage
+## Basic Usage
 
 ```typescript
-import fetch from "@better-tools/fetch"
+import betterFetch from "@better-tools/fetch"
 
-const { data, error } = await fetch<{
+const { data, error } = await betterFetch<{
   userId: number;
   id: number;
   title: string;
@@ -47,12 +47,52 @@ const { data, error } = await $fetch<{
 }>("/todos/1");
 ```
 
+### ♯ Typed Fetch
+
+Better fetch allows you to define schema that will be used to infer request body, query parameters, response data and error types.
+
+```typescript
+import { createFetch } from "@better-tools/fetch";
+import { T, FetchSchema } from "@better-tools/fetch/typed";
+
+const routes = {
+	"/": {
+		output: T.Object({
+			message: T.String(),
+		}),
+	},
+	"/signin": {
+		input: T.Object({
+			username: T.String(),
+			password: T.String(),
+		}),
+		output: T.Object({
+			token: T.String(),
+		}),
+	},
+	"/signup": {
+		input: T.Object({
+			username: T.String(),
+			password: T.String(),
+			optional: T.Optional(T.String()),
+		}),
+		output: T.Object({
+			message: T.String(),
+		}),
+	},
+} satisfies FetchSchema;
+
+const $fetch = createFetch<typeof routes>()
+```
+
+
 You can also pass default response and error types. Which will be used if you don't pass the types in the fetch call.
 
 ```typescript
 import { createFetch } from "@better-tools/fetch";
+import { DefaultSchema } from "@better-tools/fetch/typed";
 
-const $fetch = createFetch<{
+const $fetch = createFetch<DefaultSchema,{
   userId: number;
   id: number;
   title: string;
@@ -74,6 +114,83 @@ const { data, error } = await $fetch<{
 }>("/todos/1");
 //data and error types are inferred from fetch call
 ```
+
+
+### ♯ Using with React
+To use better fetch with React hooks, you have the option to import createReactFetch. This allows you to create hooks with custom defaults. Alternatively, you can directly import each individual hook.
+
+
+With createReactFetch, you can create hooks with custom defaults.
+```typescript
+import {  createReactFetch  } from "@better-tools/fetch/react";
+
+//create hooks with custom defaults
+const { useFetch, useMutate } = createReactFetch({
+  baseUrl: "https://jsonplaceholder.typicode.com",
+  retry: 2,
+});
+
+function App() {
+  type Todo = {
+    userId: number;
+    id: number;
+    title: string;
+    completed: boolean;
+  };
+  const { data, error, isPending } = useFetch<Todo>("/todos/1");
+  if (error) {
+    // handle the error
+  }
+  if (data) {
+    // handle the data
+  }
+  const { mutate, isPending } = useMutate<Todo>("/todos")
+  await mutate({
+    userId: 1,
+    id: 1,
+    title: "delectus aut autem",
+    completed: false 
+  })
+}
+```
+
+Alternatively, you can directly import each individual hook.
+```typescript
+import { useFetch, useMutate } from "@better-tools/fetch/react";
+
+function App() {
+  const { data, error } = useFetch<{
+    userId: number;
+    id: number;
+    title: string;
+    completed: boolean;
+  }>("https://jsonplaceholder.typicode.com/todos/1");
+  if (error) {
+    // handle the error
+  }
+  if (data) {
+    // handle the data
+  }
+}
+```
+
+
+### ♯ Plugins
+
+Plugins are functions that can be used to modify the request, response, error and other parts of the request lifecycle.
+
+Example:
+```typescript
+import { createFetch } from "@better-tools/fetch";
+import { csrfProtection } from "./plugins/csrfProtection"
+
+const $fetch = createFetch({
+  baseUrl: "https://jsonplaceholder.typicode.com",
+  retry: 2,
+  plugins: [csrfProtection()]
+});
+```
+
 
 ### ♯ Parsing the response
 

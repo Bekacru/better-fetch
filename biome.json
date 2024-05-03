@@ -15,6 +15,9 @@
             },
             "suspicious": {
                 "noExplicitAny": "off"
+            },
+            "style": {
+                "noParameterAssign": "off"
             }
         }
     }

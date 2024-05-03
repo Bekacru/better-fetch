@@ -1,28 +1,53 @@
 {
   "name": "@better-tools/fetch",
-  "version": "1.1.5",
+  "version": "1.2.0",
   "packageManager": "bun@1.1.4",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "react-native": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "devDependencies": {
+    "@happy-dom/global-registrator": "^14.7.1",
+    "@testing-library/react": "^15.0.3",
     "@types/bun": "^1.1.0",
     "@types/node": "^20.11.30",
+    "@types/react": "^18.2.79",
     "biome": "^0.3.3",
+    "react": "^18.2.0",
     "tsup": "^8.0.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "h3": "^1.11.1",
+    "@sinclair/typebox": "^0.32.27",
+    "@testing-library/dom": "^10.0.0",
+    "global-jsdom": "^24.0.0",
+    "jsdom": "^24.0.0",
+    "listhen": "^1.7.2",
+    "mocha": "^10.4.0",
+    "react-dom": "^18.2.0",
+    "vitest": "^1.5.0"
   },
   "exports": {
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./typed": {
+      "import": "./dist/typed.js",
+      "require": "./dist/typed.cjs",
+      "types": "./dist/typed.d.ts"
+    },
+    "./react": {
+      "import": "./dist/react.js",
+      "require": "./dist/react.cjs",
+      "types": "./dist/react.d.ts"
     }
   },
   "scripts": {
     "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
     "lint": "biome check .",
-    "release": "bun run build && npm publish --access public",
+    "release": "bun run build && npm publish",
     "lint:fix": "biome check . --apply",
     "typecheck": "tsc --noEmit"
   },
