@@ -51,6 +51,11 @@ const { data, error } = await $fetch<{
 
 Better fetch allows you to define schema that will be used to infer request body, query parameters, response data and error types.
 
+Better fetch uses typebox to define json schema. So, First install typebox.
+```bash 
+  pnpm install @sinclair/typebox
+```
+
 ```typescript
 import { createFetch } from "@better-tools/fetch";
 import { FetchSchema } from "@better-tools/fetch/typed";
@@ -61,9 +66,6 @@ const routes = {
 		output: T.Object({
 			message: T.String(),
 		}),
-    query: T.Object({
-      page: T.Number(),
-    }),
 	},
 	"/signin": {
 		input: T.Object({
