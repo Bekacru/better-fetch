@@ -2,9 +2,9 @@ import { z } from "zod";
 
 export type DefaultSchema = {
 	[key: string]: {
-		input?: any;
-		output?: any;
-		query?: any;
+		input?: z.ZodAny;
+		output?: z.ZodAny;
+		query?: z.ZodAny;
 	};
 };
 
@@ -15,8 +15,3 @@ export type FetchSchema = {
 		query?: z.ZodSchema;
 	};
 };
-
-// const LoginSchema = v.object({
-// 	email: v.string(),
-// 	password: v.string(),
-// });

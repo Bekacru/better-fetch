@@ -11,5 +11,5 @@ export default defineConfig({
 	format: ["esm", "cjs"],
 	dts: true,
 	clean: true,
-	external: ["react", "@sinclair/typebox"],
+	external: ["react", "zod"],
 });
