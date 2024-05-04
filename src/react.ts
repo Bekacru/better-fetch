@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import {
 	BetterFetchResponse,
 	createFetch,
-	FetchOption,
+	BetterFetchOption,
 	PayloadMethod,
 } from ".";
 import { isPayloadMethod } from "./utils";
@@ -47,9 +47,9 @@ export type ReactFetchOptions<T = any> = {
 	 * @default false
 	 */
 	disableCache?: boolean;
-} & FetchOption;
+} & BetterFetchOption;
 
-export type ReactMutateOptions = {} & FetchOption;
+export type ReactMutateOptions = {} & BetterFetchOption;
 
 const defaultOptions: ReactFetchOptions = {
 	refetchInterval: 0,

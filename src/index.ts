@@ -14,14 +14,14 @@ import { z } from "zod";
 interface RequestContext {
 	request: Request;
 	controller: AbortController;
-	options: FetchOption;
+	options: BetterFetchOption;
 }
 
 interface ResponseContext {
 	response: Response;
 }
 
-export type BetterFetchOptions<B extends Record<string, any> = any> = {
+export type BaseFetchOptions<B extends Record<string, any> = any> = {
 	/**
 	 * a base url that will be prepended to the url
 	 */
@@ -103,22 +103,22 @@ export type BetterFetchOptions<B extends Record<string, any> = any> = {
  * All plugins will be called before the request is made.
  */
 export interface Plugin {
-	(url: string, options?: FetchOption): Promise<{
+	(url: string, options?: BetterFetchOption): Promise<{
 		url: string;
-		options?: FetchOption;
+		options?: BetterFetchOption;
 	}>;
 }
 
 // biome-ignore lint/suspicious/noEmptyInterface: <explanation>
-export interface CreateFetchOption extends BetterFetchOptions {}
+export interface CreateFetchOption extends BaseFetchOptions {}
 
 export type PayloadMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 export type NonPayloadMethod = "GET" | "HEAD" | "OPTIONS";
 
-export type FetchOption<
+export type BetterFetchOption<
 	T extends Record<string, unknown> = any,
 	Q extends Record<string, unknown> = any,
-> = InferBody<T> & InferQuery<Q> & BetterFetchOptions;
+> = InferBody<T> & InferQuery<Q> & BaseFetchOptions;
 
 type InferBody<T> = T extends Record<string, any> ? { body: T } : { body?: T };
 type InferQuery<Q> = Q extends Record<string, any>
@@ -176,7 +176,7 @@ export const betterFetch: BetterFetch = async (url, options) => {
 			_url.searchParams.append(key, String(value));
 		}
 	}
-	const _options: FetchOption = {
+	const _options: BetterFetchOption = {
 		signal,
 		...options,
 		body: shouldStringifyBody
@@ -327,7 +327,7 @@ export interface BetterFetch<
 		url: K | URL | Omit<string, keyof Routes>,
 		...options: Routes[K]["input"] extends z.Schema
 			? [
-					FetchOption<
+					BetterFetchOption<
 						z.infer<Routes[K]["input"]>,
 						Routes[K]["query"] extends z.ZodSchema
 							? z.infer<Routes[K]["query"]>
@@ -335,8 +335,8 @@ export interface BetterFetch<
 					>,
 			  ]
 			: Routes[K]["query"] extends z.ZodSchema
-			? [FetchOption<any, z.infer<Routes[K]["query"]>>]
-			: [FetchOption?]
+			? [BetterFetchOption<any, z.infer<Routes[K]["query"]>>]
+			: [BetterFetchOption?]
 	): Promise<
 		BetterFetchResponse<
 			Routes[K]["output"] extends z.ZodSchema
