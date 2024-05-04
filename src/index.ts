@@ -8,8 +8,9 @@ import {
 	isJSONSerializable,
 	jsonParse,
 } from "./utils";
-import { FetchSchema, Static } from "./typed";
-import { TNever, TObject } from "@sinclair/typebox";
+import { FetchSchema } from "./typed";
+import * as v from "valibot";
+import { z } from "zod";
 
 interface RequestContext {
 	request: Request;
@@ -317,7 +318,7 @@ betterFetch.native = fetch;
 export interface BetterFetch<
 	Routes extends FetchSchema = {
 		[key in string]: {
-			output: TNever;
+			output: any;
 		};
 	},
 	BaseT = any,
@@ -325,21 +326,23 @@ export interface BetterFetch<
 > {
 	<T = BaseT, E = BaseE, K extends keyof Routes = keyof Routes>(
 		url: K | URL | Omit<string, keyof Routes>,
-		...options: Routes[K]["input"] extends TObject
+		...options: Routes[K]["input"] extends z.Schema
 			? [
 					FetchOption<
-						Static<Routes[K]["input"]>,
-						Routes[K]["query"] extends TObject
-							? Static<Routes[K]["query"]>
+						z.infer<Routes[K]["input"]>,
+						Routes[K]["query"] extends z.ZodSchema
+							? z.infer<Routes[K]["query"]>
 							: any
 					>,
 			  ]
-			: Routes[K]["query"] extends TObject
-			? [FetchOption<any, Static<Routes[K]["query"]>>]
+			: Routes[K]["query"] extends z.ZodSchema
+			? [FetchOption<any, z.infer<Routes[K]["query"]>>]
 			: [FetchOption?]
 	): Promise<
 		BetterFetchResponse<
-			Routes[K]["output"] extends TObject ? Static<Routes[K]["output"]> : T,
+			Routes[K]["output"] extends z.ZodSchema
+				? z.infer<Routes[K]["output"]>
+				: T,
 			E
 		>
 	>;

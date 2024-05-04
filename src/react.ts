@@ -6,8 +6,9 @@ import {
 	PayloadMethod,
 } from ".";
 import { isPayloadMethod } from "./utils";
-import { DefaultSchema, Static, T, TNever, TObject } from "./typed";
+import { DefaultSchema } from "./typed";
 import { FetchSchema } from "./typed";
+import { z, ZodSchema } from "zod";
 
 const cache = (storage: Storage, disable?: boolean) => {
 	return {
@@ -91,8 +92,8 @@ export const createReactFetch = <
 
 		const [res, setRes] =
 			useState<
-				Routes[K]["output"] extends TObject
-					? BetterFetchResponse<Static<Routes[K]["output"]>>
+				Routes[K]["output"] extends ZodSchema
+					? BetterFetchResponse<z.infer<Routes[K]["output"]>>
 					: BetterFetchResponse<R>
 			>(initial);
 		const [isLoading, setIsLoading] = useState(false);
@@ -136,8 +137,8 @@ export const createReactFetch = <
 			};
 		}, []);
 		return {
-			data: res?.data as Routes[K]["output"] extends TObject
-				? Static<Routes[K]["output"]>
+			data: res?.data as Routes[K]["output"] extends ZodSchema
+				? z.infer<Routes[K]["output"]>
 				: R,
 			error: isLoading ? null : res?.error,
 			isError: res?.error && !isLoading,
@@ -156,8 +157,8 @@ export const createReactFetch = <
 
 		async function mutate(
 			...args: T extends undefined
-				? Routes[K]["input"] extends TObject
-					? [Static<NonNullable<Routes[K]["input"]>>]
+				? Routes[K]["input"] extends ZodSchema
+					? [z.infer<NonNullable<Routes[K]["input"]>>]
 					: [undefined?]
 				: [T]
 		) {
@@ -167,7 +168,7 @@ export const createReactFetch = <
 				method: (options?.method as PayloadMethod) || "POST",
 			} as any);
 			return res as BetterFetchResponse<
-				Static<NonNullable<Routes[K]["output"]>>
+				z.infer<NonNullable<Routes[K]["output"]>>
 			>;
 		}
 		return {

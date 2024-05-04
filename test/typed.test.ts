@@ -1,36 +1,37 @@
 import { describe, expectTypeOf } from "vitest";
-import { DefaultSchema, FetchSchema, T } from "../src/typed";
+import { DefaultSchema, FetchSchema } from "../src/typed";
 import { BetterFetchResponse, createFetch } from "../src";
 import { createReactFetch } from "../src/react";
+import { z } from "zod";
 
 const routes = {
 	"/": {
-		output: T.Object({
-			message: T.String(),
+		output: z.object({
+			message: z.string(),
 		}),
 	},
 	"/signin": {
-		input: T.Object({
-			username: T.String(),
-			password: T.String(),
+		input: z.object({
+			username: z.string(),
+			password: z.string(),
 		}),
-		output: T.Object({
-			token: T.String(),
+		output: z.object({
+			token: z.string(),
 		}),
 	},
 	"/signup": {
-		input: T.Object({
-			username: T.String(),
-			password: T.String(),
-			optional: T.Optional(T.String()),
+		input: z.object({
+			username: z.string(),
+			password: z.string(),
+			optional: z.optional(z.string()),
 		}),
-		output: T.Object({
-			message: T.String(),
+		output: z.object({
+			message: z.string(),
 		}),
 	},
 	"/query": {
-		query: T.Object({
-			term: T.String(),
+		query: z.object({
+			term: z.string(),
 		}),
 	},
 } satisfies FetchSchema;
@@ -48,11 +49,12 @@ describe("typed router", (it) => {
 		>();
 	});
 	it("should required body and return token", () => {
-		//TODO: Check if we can fix excessively deep type error
 		expectTypeOf(
 			$fetch("/signin", {
-				//@ts-ignore
-				body: { username: "", password: "" },
+				body: {
+					username: "",
+					password: "",
+				},
 			}),
 		).toMatchTypeOf<Promise<BetterFetchResponse<{ token: string }>>>();
 	});

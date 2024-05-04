@@ -1,6 +1,6 @@
 {
   "name": "@better-tools/fetch",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "packageManager": "bun@1.1.4",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -8,23 +8,24 @@
   "types": "./dist/index.d.ts",
   "devDependencies": {
     "@happy-dom/global-registrator": "^14.7.1",
+    "@sinclair/typebox": "^0.32.28",
+    "@testing-library/dom": "^10.0.0",
     "@testing-library/react": "^15.0.3",
     "@types/bun": "^1.1.0",
     "@types/node": "^20.11.30",
     "@types/react": "^18.2.79",
     "biome": "^0.3.3",
-    "react": "^18.2.0",
-    "tsup": "^8.0.2",
-    "typescript": "^5.4.5",
-    "h3": "^1.11.1",
-    "@sinclair/typebox": "^0.32.27",
-    "@testing-library/dom": "^10.0.0",
     "global-jsdom": "^24.0.0",
+    "h3": "^1.11.1",
     "jsdom": "^24.0.0",
     "listhen": "^1.7.2",
     "mocha": "^10.4.0",
+    "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "vitest": "^1.5.0"
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5",
+    "vitest": "^1.5.0",
+    "zod": "^3.23.6"
   },
   "exports": {
     ".": {
@@ -54,5 +55,8 @@
   "files": [
     "dist"
   ],
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "valibot": "^0.30.0"
+  }
 }
