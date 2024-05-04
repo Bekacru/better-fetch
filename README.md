@@ -49,41 +49,44 @@ const { data, error } = await $fetch<{
 
 ### ♯ Typed Fetch
 
-Better fetch allows you to define schema that will be used to infer request body, query parameters, response data and error types.
+Better fetch allows you to define zod schema that will be used to infer request body, query parameters, response data and error types.
 
-Better fetch uses typebox to define json schema. So, First install typebox.
 ```bash 
-  pnpm install @sinclair/typebox
+  pnpm install zod
 ```
 
 ```typescript
 import { createFetch } from "@better-tools/fetch";
 import { FetchSchema } from "@better-tools/fetch/typed";
-import { Type as T } from "@sinclair/typebox";
-
+import { z } from "zod";
 const routes = {
 	"/": {
-		output: T.Object({
-			message: T.String(),
+		output: z.object({
+			message: z.string(),
 		}),
 	},
 	"/signin": {
-		input: T.Object({
-			username: T.String(),
-			password: T.String(),
+		input: z.object({
+			username: z.string(),
+			password: z.string(),
 		}),
-		output: T.Object({
-			token: T.String(),
+		output: z.object({
+			token: z.string(),
 		}),
 	},
 	"/signup": {
-		input: T.Object({
-			username: T.String(),
-			password: T.String(),
-			optional: T.Optional(T.String()),
+		input: z.object({
+			username: z.string(),
+			password: z.string(),
+			optional: z.optional(z.string()),
 		}),
-		output: T.Object({
-			message: T.String(),
+		output: z.object({
+			message: z.string(),
+		}),
+	},
+	"/query": {
+		query: z.object({
+			term: z.string(),
 		}),
 	},
 } satisfies FetchSchema;

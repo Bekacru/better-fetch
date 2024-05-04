@@ -67,3 +67,8 @@
 - typed routes. Now you can create typed routes with betterFetch.
 - better fetch react hooks
 - custom fetch implementation now supports node-fetch
+
+## v1.3.0
+
+### 🚀 Release
+- Typed routes now use zod schema instead of typebox.

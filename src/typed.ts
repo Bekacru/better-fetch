@@ -1,22 +1,22 @@
-import { TNever, TObject, Type } from "@sinclair/typebox";
-
-export const T = Type;
-
-export * from "@sinclair/typebox";
+import { z } from "zod";
 
 export type DefaultSchema = {
 	[key: string]: {
-		input?: TNever;
-		output?: TNever;
-		query?: TNever;
+		input?: any;
+		output?: any;
+		query?: any;
 	};
 };
 
-export type FetchSchema = Record<
-	string,
-	{
-		input?: TObject | TNever;
-		output?: TObject | TNever;
-		query?: TObject | TNever;
-	}
->;
+export type FetchSchema = {
+	[key: string]: {
+		input?: z.ZodSchema;
+		output?: z.ZodSchema;
+		query?: z.ZodSchema;
+	};
+};
+
+// const LoginSchema = v.object({
+// 	email: v.string(),
+// 	password: v.string(),
+// });
