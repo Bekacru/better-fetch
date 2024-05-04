@@ -9,7 +9,6 @@ import {
 	jsonParse,
 } from "./utils";
 import { FetchSchema } from "./typed";
-import * as v from "valibot";
 import { z } from "zod";
 
 interface RequestContext {
