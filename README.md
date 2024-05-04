@@ -53,7 +53,8 @@ Better fetch allows you to define schema that will be used to infer request body
 
 ```typescript
 import { createFetch } from "@better-tools/fetch";
-import { T, FetchSchema } from "@better-tools/fetch/typed";
+import { FetchSchema } from "@better-tools/fetch/typed";
+import { Type as T } from "@sinclair/typebox";
 
 const routes = {
 	"/": {
