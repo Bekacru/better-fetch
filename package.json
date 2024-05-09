@@ -1,6 +1,6 @@
 {
   "name": "@better-fetch/fetch",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "packageManager": "bun@1.1.4",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -47,7 +47,7 @@
     "test": "vitest run",
     "test:watch": "vitest watch",
     "lint": "biome check .",
-    "release": "bun run build && npm publish",
+    "release": "bun run build && npm publish --public",
     "lint:fix": "biome check . --apply",
     "typecheck": "tsc --noEmit"
   },
