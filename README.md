@@ -5,13 +5,13 @@ A fetch wrapper for typescript that returns data and error object, supports defi
 ## Installation
 
 ```bash
-pnpm install @better-tools/fetch
+pnpm install @better-fetch/fetch
 ```
 
 ## Basic Usage
 
 ```typescript
-import betterFetch from "@better-tools/fetch"
+import betterFetch from "@better-fetch/fetch"
 
 const { data, error } = await betterFetch<{
   userId: number;
@@ -32,7 +32,7 @@ if (data) {
 You can create a custom fetch with default options.
 
 ```typescript
-import { createFetch } from "@better-tools/fetch";
+import { createFetch } from "@better-fetch/fetch";
 
 const $fetch = createFetch({
   baseUrl: "https://jsonplaceholder.typicode.com",
@@ -56,8 +56,8 @@ Better fetch allows you to define zod schema that will be used to infer request 
 ```
 
 ```typescript
-import { createFetch } from "@better-tools/fetch";
-import { FetchSchema } from "@better-tools/fetch/typed";
+import { createFetch } from "@better-fetch/fetch";
+import { FetchSchema } from "@better-fetch/fetch/typed";
 import { z } from "zod";
 const routes = {
 	"/": {
@@ -98,8 +98,8 @@ const $fetch = createFetch<typeof routes>()
 You can also pass default response and error types. Which will be used if you don't pass the types in the fetch call.
 
 ```typescript
-import { createFetch } from "@better-tools/fetch";
-import { DefaultSchema } from "@better-tools/fetch/typed";
+import { createFetch } from "@better-fetch/fetch";
+import { DefaultSchema } from "@better-fetch/fetch/typed";
 
 const $fetch = createFetch<DefaultSchema,{
   userId: number;
@@ -131,7 +131,7 @@ To use better fetch with React hooks, you have the option to import createReactF
 
 With createReactFetch, you can create hooks with custom defaults.
 ```typescript
-import {  createReactFetch  } from "@better-tools/fetch/react";
+import {  createReactFetch  } from "@better-fetch/fetch/react";
 
 //create hooks with custom defaults
 const { useFetch, useMutate } = createReactFetch({
@@ -165,7 +165,7 @@ function App() {
 
 Alternatively, you can directly import each individual hook.
 ```typescript
-import { useFetch, useMutate } from "@better-tools/fetch/react";
+import { useFetch, useMutate } from "@better-fetch/fetch/react";
 
 function App() {
   const { data, error } = useFetch<{
@@ -190,7 +190,7 @@ Plugins are functions that can be used to modify the request, response, error an
 
 Example:
 ```typescript
-import { createFetch } from "@better-tools/fetch";
+import { createFetch } from "@better-fetch/fetch";
 import { csrfProtection } from "./plugins/csrfProtection"
 
 const $fetch = createFetch({
