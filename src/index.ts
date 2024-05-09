@@ -8,7 +8,7 @@ import {
 	isJSONSerializable,
 	jsonParse,
 } from "./utils";
-import { FetchSchema } from "./typed";
+import { DefaultSchema, FetchSchema, Strict } from "./typed";
 import { z } from "zod";
 
 interface RequestContext {
@@ -151,7 +151,7 @@ export const betterFetch: BetterFetch = async (url, options) => {
 	// const fetcher = createFetch(options);
 	for (const plugin of options?.plugins || []) {
 		const pluginRes = await plugin(url.toString(), options);
-		url = pluginRes.url;
+		url = pluginRes.url as any;
 		options = pluginRes.options;
 	}
 
@@ -296,7 +296,7 @@ export const betterFetch: BetterFetch = async (url, options) => {
 };
 
 export const createFetch = <
-	Routes extends FetchSchema = any,
+	Routes extends FetchSchema | Strict<FetchSchema> = FetchSchema,
 	R = unknown,
 	E = unknown,
 >(
@@ -309,13 +309,35 @@ export const createFetch = <
 		});
 	};
 	$fetch.native = fetch;
-	return $fetch;
+	return $fetch as any;
 };
 
 betterFetch.native = fetch;
 
+export type InferOptions<
+	T extends FetchSchema,
+	K extends keyof T,
+> = T[K]["input"] extends z.ZodSchema
+	? [
+			BetterFetchOption<
+				z.infer<T[K]["input"]>,
+				T[K]["query"] extends z.ZodSchema ? z.infer<T[K]["query"]> : any
+			>,
+	  ]
+	: T[K]["query"] extends z.ZodSchema
+	? [BetterFetchOption<any, z.infer<T[K]["query"]>>]
+	: [BetterFetchOption?];
+
+export type InferResponse<
+	T extends FetchSchema,
+	K extends keyof T,
+> = T[K]["output"] extends z.ZodSchema ? z.infer<T[K]["output"]> : never;
+
+export type InferSchema<Routes extends FetchSchema | Strict<FetchSchema>> =
+	Routes extends FetchSchema ? Routes : Routes["schema"];
+
 export interface BetterFetch<
-	Routes extends FetchSchema = {
+	Routes extends FetchSchema | Strict<FetchSchema> = {
 		[key in string]: {
 			output: any;
 		};
@@ -323,24 +345,29 @@ export interface BetterFetch<
 	BaseT = any,
 	BaseE = unknown,
 > {
-	<T = BaseT, E = BaseE, K extends keyof Routes = keyof Routes>(
-		url: K | URL | Omit<string, keyof Routes>,
-		...options: Routes[K]["input"] extends z.Schema
-			? [
-					BetterFetchOption<
-						z.infer<Routes[K]["input"]>,
-						Routes[K]["query"] extends z.ZodSchema
-							? z.infer<Routes[K]["query"]>
-							: any
-					>,
-			  ]
-			: Routes[K]["query"] extends z.ZodSchema
-			? [BetterFetchOption<any, z.infer<Routes[K]["query"]>>]
+	<
+		T = undefined,
+		E = BaseE,
+		K extends keyof InferSchema<Routes> = keyof InferSchema<Routes>,
+	>(
+		url: Routes extends Strict<any> ? K : Omit<string, keyof Routes> | K | URL,
+		...options: Routes extends FetchSchema
+			? InferOptions<InferSchema<Routes>, K>
+			: Routes extends Strict<FetchSchema>
+			? K extends keyof Routes["schema"]
+				? InferOptions<Routes["schema"], K>
+				: [BetterFetchOption?]
 			: [BetterFetchOption?]
 	): Promise<
 		BetterFetchResponse<
-			Routes[K]["output"] extends z.ZodSchema
-				? z.infer<Routes[K]["output"]>
+			T extends undefined
+				? Routes extends Strict<any>
+					? InferResponse<Routes["schema"], K>
+					: Routes extends FetchSchema
+					? InferResponse<InferSchema<Routes>, K> extends never
+						? BaseT
+						: InferResponse<InferSchema<Routes>, K>
+					: BaseT
 				: T,
 			E
 		>
@@ -350,3 +377,35 @@ export interface BetterFetch<
 
 export type CreateFetch = typeof createFetch;
 export default betterFetch;
+
+const routes = {
+	"/": {
+		output: z.object({
+			message: z.string(),
+		}),
+	},
+	"/signin": {
+		input: z.object({
+			username: z.string(),
+			password: z.string(),
+		}),
+		output: z.object({
+			token: z.string(),
+		}),
+	},
+	"/signup": {
+		input: z.object({
+			username: z.string(),
+			password: z.string(),
+			optional: z.optional(z.string()),
+		}),
+		output: z.object({
+			message: z.string(),
+		}),
+	},
+	"/query": {
+		query: z.object({
+			term: z.string(),
+		}),
+	},
+} satisfies FetchSchema;

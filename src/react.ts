@@ -4,11 +4,13 @@ import {
 	createFetch,
 	BetterFetchOption,
 	PayloadMethod,
+	InferResponse,
+	InferSchema,
 } from ".";
 import { isPayloadMethod } from "./utils";
-import { DefaultSchema } from "./typed";
+import { DefaultSchema, Strict } from "./typed";
 import { FetchSchema } from "./typed";
-import { z, ZodSchema } from "zod";
+import { z } from "zod";
 
 const cache = (storage: Storage, disable?: boolean) => {
 	return {
@@ -59,7 +61,7 @@ const defaultOptions: ReactFetchOptions = {
 };
 
 export const createReactFetch = <
-	Routes extends FetchSchema = DefaultSchema,
+	Routes extends FetchSchema | Strict<FetchSchema> = DefaultSchema,
 	R = unknown,
 	F = unknown,
 >(
@@ -92,14 +94,19 @@ export const createReactFetch = <
 
 		const [res, setRes] =
 			useState<
-				Routes[K]["output"] extends ZodSchema
-					? BetterFetchResponse<z.infer<Routes[K]["output"]>>
-					: BetterFetchResponse<R>
+				BetterFetchResponse<
+					Routes extends Strict<any>
+						? InferResponse<Routes["schema"], K>
+						: Routes extends FetchSchema
+						? InferResponse<Routes, K>
+						: R
+				>
 			>(initial);
 		const [isLoading, setIsLoading] = useState(false);
 		const fetchData = async () => {
 			setIsLoading(true);
-			const response = await betterFetch(url.toString(), options as any);
+			// @ts-expect-error
+			const response = await betterFetch(url.toString() as any, options);
 			if (!response.error) {
 				_cache.set(url.toString(), response);
 			}
@@ -137,9 +144,7 @@ export const createReactFetch = <
 			};
 		}, []);
 		return {
-			data: res?.data as Routes[K]["output"] extends ZodSchema
-				? z.infer<Routes[K]["output"]>
-				: R,
+			data: res?.data as typeof res.data,
 			error: isLoading ? null : res?.error,
 			isError: res?.error && !isLoading,
 			isLoading,
@@ -147,8 +152,11 @@ export const createReactFetch = <
 		};
 	};
 
-	const useMutate = <T = undefined, K extends keyof Routes = keyof Routes>(
-		url: K | URL | Omit<string, keyof Routes>,
+	const useMutate = <
+		T = undefined,
+		K extends keyof InferSchema<Routes> = keyof InferSchema<Routes>,
+	>(
+		url: Routes extends Strict<any> ? K : K | URL | Omit<string, K>,
 		options?: ReactMutateOptions,
 	) => {
 		if (options?.method && !isPayloadMethod(options?.method)) {
@@ -157,18 +165,34 @@ export const createReactFetch = <
 
 		async function mutate(
 			...args: T extends undefined
-				? Routes[K]["input"] extends ZodSchema
-					? [z.infer<NonNullable<Routes[K]["input"]>>]
+				? Routes extends FetchSchema
+					? K extends keyof Routes
+						? [z.infer<NonNullable<Routes[K]["input"]>>]
+						: [undefined?]
+					: Routes extends Strict<FetchSchema>
+					? K extends keyof Routes["schema"]
+						? [z.infer<NonNullable<Routes["schema"][K]["input"]>>]
+						: [undefined?]
 					: [undefined?]
 				: [T]
 		) {
-			const res = await betterFetch<Routes>(url.toString(), {
-				...options,
-				body: args[0],
-				method: (options?.method as PayloadMethod) || "POST",
-			} as any);
+			const res = await betterFetch<Routes>(
+				url.toString() as any,
+				// @ts-expect-error
+				{
+					...options,
+					body: args[0],
+					method: (options?.method as PayloadMethod) || "POST",
+				},
+			);
 			return res as BetterFetchResponse<
-				z.infer<NonNullable<Routes[K]["output"]>>
+				Routes extends Strict<any>
+					? InferResponse<Routes["schema"], K>
+					: Routes extends FetchSchema
+					? K extends string | number
+						? InferResponse<Routes, K>
+						: R
+					: R
 			>;
 		}
 		return {

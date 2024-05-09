@@ -72,3 +72,8 @@
 
 ### 🚀 Release
 - Typed routes now use zod schema instead of typebox.
+
+## v1.3.3
+### Patch
+- Added Strict helper for typed fetch. To strict calls to specific routes.
+- Bug fixed where route schema will make the instance type any.

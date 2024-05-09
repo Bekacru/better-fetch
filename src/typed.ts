@@ -2,9 +2,7 @@ import { z } from "zod";
 
 export type DefaultSchema = {
 	[key: string]: {
-		input?: z.ZodAny;
-		output?: z.ZodAny;
-		query?: z.ZodAny;
+		output?: any;
 	};
 };
 
@@ -14,4 +12,8 @@ export type FetchSchema = {
 		output?: z.ZodSchema;
 		query?: z.ZodSchema;
 	};
+};
+
+export type Strict<T extends FetchSchema> = {
+	schema: T;
 };

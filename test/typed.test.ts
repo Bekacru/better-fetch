@@ -1,5 +1,5 @@
 import { describe, expectTypeOf } from "vitest";
-import { DefaultSchema, FetchSchema } from "../src/typed";
+import { DefaultSchema, FetchSchema, Strict } from "../src/typed";
 import { BetterFetchResponse, createFetch } from "../src";
 import { createReactFetch } from "../src/react";
 import { z } from "zod";
@@ -95,6 +95,11 @@ describe("typed router", (it) => {
 				>
 			>
 		>();
+	});
+
+	it("should strictly allow only specified keys as url", () => {
+		const f = createFetch<Strict<typeof routes>>();
+		expectTypeOf(f).parameter(0).toMatchTypeOf<keyof typeof routes>();
 	});
 });
 
