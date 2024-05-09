@@ -94,6 +94,19 @@ const routes = {
 const $fetch = createFetch<typeof routes>()
 ```
 
+By default if you define schema better fetch still allows you to make a call to other routes that's not defined on the schema. If you want to enforce only the keys defined to be inferred as valid you can use the `Strict` helper.
+
+```typescript
+import { createFetch } from "@better-fetch/fetch";
+import { FetchSchema, Strict } from "@better-fetch/fetch/typed";
+const schema = {
+  "/": {}
+} satisfies FetchSchema
+const $fetch = createFetch<Strict<typeof schema>>()
+
+//this will type error
+$fetch("/custom")
+```
 
 You can also pass default response and error types. Which will be used if you don't pass the types in the fetch call.
 
