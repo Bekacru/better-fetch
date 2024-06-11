@@ -93,3 +93,11 @@ export function isPayloadMethod(method?: string) {
 	const payloadMethod = ["POST", "PUT", "PATCH", "DELETE"];
 	return payloadMethod.includes(method.toUpperCase());
 }
+
+export function isRouteMethod(method?: string) {
+	const routeMethod = ["GET", "POST", "PUT", "PATCH", "DELETE"];
+	if (!method) {
+		return false;
+	}
+	return routeMethod.includes(method.toUpperCase());
+}

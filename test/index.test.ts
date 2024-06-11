@@ -70,6 +70,12 @@ describe("fetch", () => {
 				eventHandler((event) => {
 					return event.node.req.url?.toString();
 				}),
+			)
+			.use(
+				"/method",
+				eventHandler((event) => {
+					return event.node.req.method;
+				}),
 			);
 		const app = createApp().use(router);
 		listener = await listen(toNodeListener(app), {
@@ -229,5 +235,24 @@ describe("fetch", () => {
 			params: ["2"],
 		});
 		expect(response.data).toBe("/param/2");
+	});
+
+	it("should work with params", async () => {
+		const response = await betterFetch(getURL("param/:id"), {
+			params: ["2"],
+		});
+		expect(response.data).toBe("/param/2");
+	});
+
+	it("should work with method modifier string", async () => {
+		const url = getURL();
+		const response = await betterFetch("@post/method", {
+			baseURL: url,
+		});
+		expect(response.data).toBe("POST");
+		const response2 = await betterFetch("@get/method", {
+			baseURL: url,
+		});
+		expect(response2.data).toBe("GET");
 	});
 });

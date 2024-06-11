@@ -47,7 +47,7 @@ const { data, error } = await $fetch<{
 }>("/todos/1");
 ```
 
-### ♯ Typed Fetch
+### ♯ Typed Fetch (Route Schema)
 
 Better fetch allows you to define zod schema that will be used to infer request body, query parameters, response data and error types.
 
@@ -110,6 +110,20 @@ const routes = {
           name: z.string()
       }
   },
+  /**
+   * You can define same route with different methods using 
+   * `@method` modifier.
+   */
+  "@get/method": {
+      output: z.object({
+          message: z.string()
+      })
+  }
+  "@post/method": {
+      output: z.object({
+          message: z.string()
+      })
+  }
 } satisfies FetchSchema;
 
 const $fetch = createFetch({

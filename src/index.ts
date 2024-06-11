@@ -6,6 +6,7 @@ import {
 	getFetch,
 	isJSONParsable,
 	isJSONSerializable,
+	isRouteMethod,
 	jsonParse,
 } from "./utils";
 import { FetchSchema, ParameterSchema, Strict } from "./typed";
@@ -181,6 +182,8 @@ export const betterFetch = async <T = any, E = unknown>(
 		throw new BetterFetchError(`Cannot find any path matching ${path}.`);
 	}
 
+	const pMethod = url.split("@")[1]?.split("/")[0];
+
 	/**
 	 * Dynamic Parameters.
 	 * If more than one they are going to be an array else they'll be an object
@@ -190,7 +193,9 @@ export const betterFetch = async <T = any, E = unknown>(
 			? `/${options.params.join("/")}`
 			: `/${Object.values(options.params).join("/")}`
 		: "";
-	const u = url.toString().split("/:")[0];
+	let u = url.toString().split("/:")[0];
+
+	u = u.replace(`@${pMethod}`, "");
 
 	const _url = new URL(`${options?.baseURL ?? ""}${u}${params}`);
 	const headers = new Headers(options?.headers);
@@ -216,13 +221,20 @@ export const betterFetch = async <T = any, E = unknown>(
 		}
 	}
 	const body = route?.input ? route.input.parse(options?.body) : options?.body;
+
+	const method = url.startsWith("@")
+		? isRouteMethod(pMethod)
+			? pMethod
+			: options?.method
+		: options?.method;
+
 	const _options: BetterFetchOption = {
 		signal,
 		...options,
 		body: shouldStringifyBody ? JSON.stringify(body) : body ? body : undefined,
 		headers,
-		method: options?.method?.length
-			? options.method
+		method: method
+			? (method as "POST" | "GET")
 			: options?.body
 			? "POST"
 			: "GET",
