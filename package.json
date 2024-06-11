@@ -1,6 +1,6 @@
 {
   "name": "@better-fetch/fetch",
-  "version": "0.0.1",
+  "version": "0.0.2-0",
   "packageManager": "bun@1.1.4",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
