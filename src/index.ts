@@ -365,7 +365,7 @@ type InferParam<S, Z> = Z extends Record<string, ParameterSchema>
 
 export type InferOptions<
 	T extends FetchSchema,
-	K extends keyof T,
+	K extends string,
 > = T[K]["input"] extends z.ZodSchema
 	? T[K]["input"] extends ZodOptional<ZodObject<any>>
 		? [
@@ -412,25 +412,33 @@ export interface BetterFetch<
 	<
 		T = undefined,
 		E = BaseE,
-		K extends keyof InferSchema<Routes> = keyof InferSchema<Routes>,
+		K extends Routes extends Strict<any>
+			? keyof InferSchema<Routes>
+			:
+					| Omit<string, keyof Routes>
+					| keyof InferSchema<Routes>
+					| URL = Routes extends Strict<any>
+			? keyof InferSchema<Routes>
+			: Omit<string, keyof Routes> | keyof InferSchema<Routes> | URL,
+		Key extends string = K extends string ? K : never,
 	>(
-		url: Routes extends Strict<any> ? K : Omit<string, keyof Routes> | K | URL,
+		url: K,
 		...options: Routes extends FetchSchema
-			? InferOptions<InferSchema<Routes>, K>
+			? InferOptions<InferSchema<Routes>, Key>
 			: Routes extends Strict<any>
 			? K extends keyof Routes["schema"]
-				? InferOptions<Routes["schema"], K>
+				? InferOptions<Routes["schema"], Key>
 				: [BetterFetchOption?]
 			: [BetterFetchOption?]
 	): Promise<
 		BetterFetchResponse<
 			T extends undefined
 				? Routes extends Strict<any>
-					? InferResponse<Routes["schema"], K>
+					? InferResponse<Routes["schema"], Key>
 					: Routes extends FetchSchema
-					? InferResponse<InferSchema<Routes>, K> extends never
+					? InferResponse<InferSchema<Routes>, Key> extends never
 						? BaseT
-						: InferResponse<InferSchema<Routes>, K>
+						: InferResponse<InferSchema<Routes>, Key>
 					: BaseT
 				: T,
 			E
