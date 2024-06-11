@@ -115,6 +115,9 @@ describe("typed router", (it) => {
 		const f = createFetch({
 			routes: strict(routes),
 			baseURL: "http://localhost:3000",
+			customFetchImpl: async (url, req) => {
+				return new Response();
+			},
 		});
 		expectTypeOf(f("/user", { params: { id: 1 } })).toMatchTypeOf<
 			Promise<BetterFetchResponse<unknown>>
