@@ -45,6 +45,9 @@ jobs:
           else
             echo "::set-output name=tag::latest"
           fi
+
+      - name: Build
+        run: bun run build
           
       - name: Publish to npm
         run: npm publish --access public --no-git-checks --tag ${{steps.check_version.outputs.tag}}
