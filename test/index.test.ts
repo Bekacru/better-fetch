@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import betterFetch, { createFetch } from "../src";
 import {
 	createApp,
+	createRouter,
 	eventHandler,
 	readBody,
 	readRawBody,
@@ -16,7 +17,7 @@ describe("fetch", () => {
 		path ? `http://localhost:4000/${path}` : "http://localhost:4000";
 	let listener: Listener;
 	beforeAll(async () => {
-		const app = createApp()
+		const router = createRouter()
 			.use(
 				"/ok",
 				eventHandler(() => "ok"),
@@ -63,7 +64,14 @@ describe("fetch", () => {
 			.use(
 				"/204",
 				eventHandler(() => null),
+			)
+			.use(
+				"/param/:id",
+				eventHandler((event) => {
+					return event.node.req.url?.toString();
+				}),
 			);
+		const app = createApp().use(router);
 		listener = await listen(toNodeListener(app), {
 			port: 4000,
 		});
@@ -94,10 +102,10 @@ describe("fetch", () => {
 	});
 
 	it("baseURL", async () => {
-		const { data } = await betterFetch("/x?foo=123", {
-			baseURL: getURL("url"),
+		const { data } = await betterFetch("/ok", {
+			baseURL: getURL(),
 		});
-		expect(data).to.equal("/x?foo=123");
+		expect(data).to.equal("ok");
 	});
 
 	it("stringifies posts body automatically", async () => {
@@ -214,5 +222,12 @@ describe("fetch", () => {
 			console.log("response", response);
 		}
 		expect(abortHandle()).rejects.toThrow(/aborted/);
+	});
+
+	it("should work with params", async () => {
+		const response = await betterFetch(getURL("param/:id"), {
+			params: ["2"],
+		});
+		expect(response.data).toBe("/param/2");
 	});
 });

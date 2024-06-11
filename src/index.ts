@@ -1,5 +1,5 @@
 import { Readable } from "stream";
-import { FetchError } from "./error";
+import { BetterFetchError, FetchError } from "./error";
 import {
 	detectResponseType,
 	FetchEsque,
@@ -8,8 +8,8 @@ import {
 	isJSONSerializable,
 	jsonParse,
 } from "./utils";
-import { DefaultSchema, FetchSchema, Strict } from "./typed";
-import { z } from "zod";
+import { FetchSchema, ParameterSchema, Strict } from "./typed";
+import { z, ZodObject, ZodOptional } from "zod";
 
 interface RequestContext {
 	request: Request;
@@ -21,7 +21,8 @@ interface ResponseContext {
 	response: Response;
 }
 
-export type BaseFetchOptions<B extends Record<string, any> = any> = {
+export type BaseFetchOptions = {
+	routes?: FetchSchema | Strict<FetchSchema>;
 	/**
 	 * a base url that will be prepended to the url
 	 */
@@ -109,8 +110,10 @@ export interface Plugin {
 	}>;
 }
 
-// biome-ignore lint/suspicious/noEmptyInterface: <explanation>
-export interface CreateFetchOption extends BaseFetchOptions {}
+export type CreateFetchOption<R extends FetchSchema | Strict<FetchSchema>> =
+	BaseFetchOptions & {
+		routes?: R;
+	};
 
 export type PayloadMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 export type NonPayloadMethod = "GET" | "HEAD" | "OPTIONS";
@@ -118,7 +121,16 @@ export type NonPayloadMethod = "GET" | "HEAD" | "OPTIONS";
 export type BetterFetchOption<
 	T extends Record<string, unknown> = any,
 	Q extends Record<string, unknown> = any,
-> = InferBody<T> & InferQuery<Q> & BaseFetchOptions;
+	P extends Record<string, unknown> | false = false,
+> = InferBody<T> & InferQuery<Q> & BaseFetchOptions & InferParams<P>;
+
+type InferParams<P> = P extends Record<string, any> | Array<any>
+	? {
+			params: P;
+	  }
+	: {
+			params?: string[];
+	  };
 
 type InferBody<T> = T extends Record<string, any> ? { body: T } : { body?: T };
 type InferQuery<Q> = Q extends Record<string, any>
@@ -142,20 +154,42 @@ export type BetterFetchResponse<
 			} & E;
 	  };
 
-export const betterFetch: BetterFetch = async (url, options) => {
+export const betterFetch = async <T = any, E = unknown>(
+	url: string,
+	options?: BetterFetchOption,
+): Promise<BetterFetchResponse<T, E>> => {
 	const fetch = getFetch(options?.customFetchImpl);
 	const controller = new AbortController();
 	const signal = controller.signal;
 
-	//run plugins first
-	// const fetcher = createFetch(options);
 	for (const plugin of options?.plugins || []) {
 		const pluginRes = await plugin(url.toString(), options);
 		url = pluginRes.url as any;
 		options = pluginRes.options;
 	}
 
-	const _url = new URL(`${options?.baseURL ?? ""}${url.toString()}`);
+	const routes = options?.routes;
+	const schema = routes
+		? (("schema" in routes ? routes.schema : routes) as FetchSchema)
+		: null;
+	const path = options?.baseURL ? url.replace(options.baseURL, "") : url;
+	const route = schema ? schema[path] : null;
+	if (!route && routes?.strict) {
+		throw new BetterFetchError(`Cannot find any path matching ${path}.`);
+	}
+
+	/**
+	 * Dynamic Parameters.
+	 * If more than one they are going to be an array else they'll be an object
+	 */
+	const params = options?.params
+		? Array.isArray(options.params)
+			? `/${options.params.join("/")}`
+			: `/${Object.values(options.params).join("/")}`
+		: "";
+	const u = url.toString().split("/:")[0];
+
+	const _url = new URL(`${options?.baseURL ?? ""}${u}${params}`);
 	const headers = new Headers(options?.headers);
 
 	const shouldStringifyBody =
@@ -170,20 +204,19 @@ export const betterFetch: BetterFetch = async (url, options) => {
 			headers.set("content-type", "application/json");
 		!headers.has("accept") && headers.set("accept", "application/json");
 	}
-	const query = options?.query;
+	const query = route?.query
+		? route.query.parse(options?.query)
+		: options?.query;
 	if (query) {
 		for (const [key, value] of Object.entries(query)) {
 			_url.searchParams.append(key, String(value));
 		}
 	}
+	const body = route?.input ? route.input.parse(options?.body) : options?.body;
 	const _options: BetterFetchOption = {
 		signal,
 		...options,
-		body: shouldStringifyBody
-			? JSON.stringify(options?.body)
-			: options?.body
-			? options.body
-			: undefined,
+		body: shouldStringifyBody ? JSON.stringify(body) : body ? body : undefined,
 		headers,
 		method: options?.method?.length
 			? options.method
@@ -232,7 +265,7 @@ export const betterFetch: BetterFetch = async (url, options) => {
 	if (!hasBody) {
 		await options?.onSuccess?.(responseContext);
 		return {
-			data: {},
+			data: {} as any,
 			error: null,
 		};
 	}
@@ -241,15 +274,16 @@ export const betterFetch: BetterFetch = async (url, options) => {
 		if (responseType === "json" || responseType === "text") {
 			const parser = options?.jsonParser ?? jsonParse;
 			const text = await response.text();
-			const json = await parser(text);
+			const json = isJSONParsable(text) ? await parser(text) : text;
+			const routeOutput = route?.output ? route.output.parse(json) : json;
 			await options?.onSuccess?.(responseContext);
 			return {
-				data: json,
+				data: routeOutput,
 				error: null,
 			};
 		} else {
 			return {
-				data: await response[responseType](),
+				data: (await response[responseType]()) as any,
 				error: null,
 			};
 		}
@@ -288,21 +322,20 @@ export const betterFetch: BetterFetch = async (url, options) => {
 	return {
 		data: null,
 		error: {
-			...{},
 			status: response.status,
 			statusText: response.statusText,
-		},
+		} as any,
 	};
 };
 
 export const createFetch = <
-	Routes extends FetchSchema | Strict<FetchSchema> = FetchSchema,
 	R = unknown,
 	E = unknown,
+	Routes extends FetchSchema | Strict<FetchSchema> = FetchSchema,
 >(
-	config?: CreateFetchOption,
-): BetterFetch<Routes, R, E> => {
-	const $fetch: BetterFetch = async (url, options) => {
+	config?: CreateFetchOption<Routes>,
+): BetterFetch<R, E, Routes> => {
+	const $fetch = async (url: string, options: BetterFetchOption) => {
 		return await betterFetch(url, {
 			...config,
 			...options,
@@ -314,18 +347,45 @@ export const createFetch = <
 
 betterFetch.native = fetch;
 
+type InferParam<S, Z> = Z extends Record<string, ParameterSchema>
+	? {
+			[key in keyof Z]: z.infer<Z[key]>;
+	  }
+	: S extends `${infer _}:${infer P}`
+	? P extends `${infer _2}:${infer _P}`
+		? Array<string>
+		: {
+				[key in P]: string;
+		  }
+	: false;
+
 export type InferOptions<
 	T extends FetchSchema,
 	K extends keyof T,
 > = T[K]["input"] extends z.ZodSchema
-	? [
-			BetterFetchOption<
-				z.infer<T[K]["input"]>,
-				T[K]["query"] extends z.ZodSchema ? z.infer<T[K]["query"]> : any
-			>,
-	  ]
+	? T[K]["input"] extends ZodOptional<ZodObject<any>>
+		? [
+				BetterFetchOption<
+					z.infer<T[K]["input"]>,
+					T[K]["query"] extends z.ZodSchema ? z.infer<T[K]["query"]> : any,
+					InferParam<K, T[K]["params"]>
+				>?,
+		  ]
+		: [
+				BetterFetchOption<
+					z.infer<T[K]["input"]>,
+					T[K]["query"] extends z.ZodSchema ? z.infer<T[K]["query"]> : any,
+					InferParam<K, T[K]["params"]>
+				>,
+		  ]
 	: T[K]["query"] extends z.ZodSchema
 	? [BetterFetchOption<any, z.infer<T[K]["query"]>>]
+	: T[K]["params"] extends {
+			[key: string]: ParameterSchema;
+	  }
+	? [BetterFetchOption<any, any, InferParam<K, T[K]["params"]>>]
+	: K extends `${infer _}/:${infer __}`
+	? [BetterFetchOption<any, any, InferParam<K, T[K]["params"]>>]
 	: [BetterFetchOption?];
 
 export type InferResponse<
@@ -337,13 +397,13 @@ export type InferSchema<Routes extends FetchSchema | Strict<FetchSchema>> =
 	Routes extends FetchSchema ? Routes : Routes["schema"];
 
 export interface BetterFetch<
+	BaseT = any,
+	BaseE = unknown,
 	Routes extends FetchSchema | Strict<FetchSchema> = {
 		[key in string]: {
 			output: any;
 		};
 	},
-	BaseT = any,
-	BaseE = unknown,
 > {
 	<
 		T = undefined,
@@ -353,7 +413,7 @@ export interface BetterFetch<
 		url: Routes extends Strict<any> ? K : Omit<string, keyof Routes> | K | URL,
 		...options: Routes extends FetchSchema
 			? InferOptions<InferSchema<Routes>, K>
-			: Routes extends Strict<FetchSchema>
+			: Routes extends Strict<any>
 			? K extends keyof Routes["schema"]
 				? InferOptions<Routes["schema"], K>
 				: [BetterFetchOption?]
@@ -377,35 +437,3 @@ export interface BetterFetch<
 
 export type CreateFetch = typeof createFetch;
 export default betterFetch;
-
-const routes = {
-	"/": {
-		output: z.object({
-			message: z.string(),
-		}),
-	},
-	"/signin": {
-		input: z.object({
-			username: z.string(),
-			password: z.string(),
-		}),
-		output: z.object({
-			token: z.string(),
-		}),
-	},
-	"/signup": {
-		input: z.object({
-			username: z.string(),
-			password: z.string(),
-			optional: z.optional(z.string()),
-		}),
-		output: z.object({
-			message: z.string(),
-		}),
-	},
-	"/query": {
-		query: z.object({
-			term: z.string(),
-		}),
-	},
-} satisfies FetchSchema;

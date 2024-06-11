@@ -1,5 +1,5 @@
 import { describe, expectTypeOf } from "vitest";
-import { DefaultSchema, FetchSchema, Strict } from "../src/typed";
+import { FetchSchema, strict } from "../src/typed";
 import { BetterFetchResponse, createFetch } from "../src";
 import { createReactFetch } from "../src/react";
 import { z } from "zod";
@@ -34,14 +34,21 @@ const routes = {
 			term: z.string(),
 		}),
 	},
+	"/user": {
+		params: {
+			id: z.number(),
+		},
+	},
+	"/user/:id": {},
 } satisfies FetchSchema;
 
 describe("typed router", (it) => {
-	const $fetch = createFetch<typeof routes>({
+	const $fetch = createFetch({
 		baseURL: "https://example.com",
 		customFetchImpl: async (url, req) => {
 			return new Response();
 		},
+		routes,
 	});
 	it("should not required body and return message", () => {
 		expectTypeOf($fetch("/")).toMatchTypeOf<
@@ -77,7 +84,7 @@ describe("typed router", (it) => {
 	});
 
 	it("should infer default response and error types", () => {
-		const f = createFetch<DefaultSchema, { data: string }, { error: string }>({
+		const f = createFetch<{ data: string }, { error: string }>({
 			baseURL: "http://localhost:3000",
 			customFetchImpl: async (url, req) => {
 				return new Response();
@@ -98,8 +105,24 @@ describe("typed router", (it) => {
 	});
 
 	it("should strictly allow only specified keys as url", () => {
-		const f = createFetch<Strict<typeof routes>>();
+		const f = createFetch({
+			routes: strict(routes),
+		});
 		expectTypeOf(f).parameter(0).toMatchTypeOf<keyof typeof routes>();
+	});
+
+	it("should infer params", () => {
+		const f = createFetch({
+			routes: strict(routes),
+			baseURL: "http://localhost:3000",
+		});
+		expectTypeOf(f("/user", { params: { id: 1 } })).toMatchTypeOf<
+			Promise<BetterFetchResponse<unknown>>
+		>();
+
+		expectTypeOf(f("/user/:id", { params: { id: "1" } })).toMatchTypeOf<
+			Promise<BetterFetchResponse<unknown>>
+		>();
 	});
 });
 

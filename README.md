@@ -89,20 +89,45 @@ const routes = {
 			term: z.string(),
 		}),
 	},
+  /**
+   * You can also define params. The params will be inferred as 
+   * prams with the key id.
+   */
+  "/param/:id": {},
+  /**
+   * You can also define params with multiple keys. The params 
+   * will be inferred as string array in the order defined.
+   */
+  "/multi-params/:id/:id": {
+  },
+  /**
+   * You can also define params like query. The params will be
+   * inferred as object with the keys defined.
+   */
+  "/multi-params": {
+      params: {
+          id: z.string(),
+          name: z.string()
+      }
+  },
 } satisfies FetchSchema;
 
-const $fetch = createFetch<typeof routes>()
+const $fetch = createFetch({
+  routes: routes,
+})
 ```
 
-By default if you define schema better fetch still allows you to make a call to other routes that's not defined on the schema. If you want to enforce only the keys defined to be inferred as valid you can use the `Strict` helper.
+By default if you define schema better fetch still allows you to make a call to other routes that's not defined on the schema. If you want to enforce only the keys defined to be inferred as valid you can use the `strict` helper.
 
 ```typescript
 import { createFetch } from "@better-fetch/fetch";
-import { FetchSchema, Strict } from "@better-fetch/fetch/typed";
+import { FetchSchema, strict } from "@better-fetch/fetch/typed";
 const schema = {
   "/": {}
 } satisfies FetchSchema
-const $fetch = createFetch<Strict<typeof schema>>()
+const $fetch = createFetch({
+  routes: strict(schema)
+})
 
 //this will type error
 $fetch("/custom")
