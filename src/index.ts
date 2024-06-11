@@ -21,8 +21,10 @@ interface ResponseContext {
 	response: Response;
 }
 
-export type BaseFetchOptions = {
-	routes?: FetchSchema | Strict<FetchSchema>;
+export type BaseFetchOptions<
+	R extends FetchSchema | Strict<FetchSchema> = any,
+> = {
+	routes?: R;
 	/**
 	 * a base url that will be prepended to the url
 	 */
@@ -122,6 +124,7 @@ export type BetterFetchOption<
 	T extends Record<string, unknown> = any,
 	Q extends Record<string, unknown> = any,
 	P extends Record<string, unknown> | false = false,
+	R extends FetchSchema | Strict<FetchSchema> = any,
 > = InferBody<T> & InferQuery<Q> & BaseFetchOptions & InferParams<P>;
 
 type InferParams<P> = P extends Record<string, any> | Array<any>
@@ -342,6 +345,7 @@ export const createFetch = <
 		});
 	};
 	$fetch.native = fetch;
+	$fetch.routes = config?.routes;
 	return $fetch as any;
 };
 
@@ -433,6 +437,7 @@ export interface BetterFetch<
 		>
 	>;
 	native: typeof fetch;
+	routes: Routes;
 }
 
 export type CreateFetch = typeof createFetch;

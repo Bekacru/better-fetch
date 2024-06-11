@@ -26,7 +26,10 @@ const cache = (storage: Storage, disable?: boolean) => {
 	};
 };
 
-export type ReactFetchOptions<T = any> = {
+export type ReactFetchOptions<
+	T = any,
+	R extends FetchSchema | Strict<any> = any,
+> = {
 	storage?: Storage;
 	/**
 	 * Interval to refetch data in milliseconds
@@ -49,7 +52,7 @@ export type ReactFetchOptions<T = any> = {
 	 * @default false
 	 */
 	disableCache?: boolean;
-} & BetterFetchOption;
+} & BetterFetchOption<R>;
 
 export type ReactMutateOptions = {} & BetterFetchOption;
 
@@ -61,16 +64,16 @@ const defaultOptions: ReactFetchOptions = {
 };
 
 export const createReactFetch = <
-	Routes extends FetchSchema | Strict<FetchSchema> = DefaultSchema,
 	R = unknown,
 	F = unknown,
+	Routes extends FetchSchema | Strict<FetchSchema> = any,
 >(
-	config?: ReactFetchOptions,
+	config?: ReactFetchOptions<any, Routes>,
 ) => {
-	const betterFetch = createFetch<Routes, R, F>(config);
+	const betterFetch = createFetch(config);
 	const useFetch = <
-		R = unknown,
-		E = unknown,
+		R = undefined,
+		E = undefined,
 		K extends keyof Routes = keyof Routes,
 	>(
 		url: K | URL | Omit<string, K>,
@@ -95,17 +98,16 @@ export const createReactFetch = <
 		const [res, setRes] =
 			useState<
 				BetterFetchResponse<
-					Routes extends Strict<any>
-						? InferResponse<Routes["schema"], K>
-						: Routes extends FetchSchema
-						? InferResponse<Routes, K>
-						: R
+					typeof betterFetch["routes"] extends Strict<any>
+						? InferResponse<typeof betterFetch["routes"]["schema"], K>
+						: typeof betterFetch["routes"] extends FetchSchema
+						? unknown
+						: any
 				>
 			>(initial);
 		const [isLoading, setIsLoading] = useState(false);
 		const fetchData = async () => {
 			setIsLoading(true);
-			// @ts-expect-error
 			const response = await betterFetch(url.toString() as any, options);
 			if (!response.error) {
 				_cache.set(url.toString(), response);
@@ -144,7 +146,7 @@ export const createReactFetch = <
 			};
 		}, []);
 		return {
-			data: res?.data as typeof res.data,
+			data: res?.data as R extends undefined ? typeof res.data : R,
 			error: isLoading ? null : res?.error,
 			isError: res?.error && !isLoading,
 			isLoading,
@@ -176,15 +178,11 @@ export const createReactFetch = <
 					: [undefined?]
 				: [T]
 		) {
-			const res = await betterFetch<Routes>(
-				url.toString() as any,
-				// @ts-expect-error
-				{
-					...options,
-					body: args[0],
-					method: (options?.method as PayloadMethod) || "POST",
-				},
-			);
+			const res = await betterFetch<Routes>(url.toString() as any, {
+				...options,
+				body: args[0],
+				method: (options?.method as PayloadMethod) || "POST",
+			});
 			return res as BetterFetchResponse<
 				Routes extends Strict<any>
 					? InferResponse<Routes["schema"], K>

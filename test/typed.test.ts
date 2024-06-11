@@ -127,7 +127,9 @@ describe("typed router", (it) => {
 });
 
 describe("react typed router", (it) => {
-	const { useFetch, useMutate } = createReactFetch<typeof routes>();
+	const { useFetch, useMutate } = createReactFetch({
+		routes,
+	});
 	it("use fetch", () => {
 		function _() {
 			expectTypeOf(useFetch("/").data).toMatchTypeOf<{
