@@ -31,7 +31,7 @@ if (data) {
 
 `error` object will be the response error by default it has the `status` and `statusText` properties.
 
-If the api returns a json error object it will be parsed and returned as the error object. By default `error` includes `message` property that can be string or undefined. You can pass a custom error type to be inferred as a second generic argument.
+If the api returns a json error object it will be parsed and returned with the error object. By default `error` includes `message` property that can be string or undefined. You can pass a custom error type to be inferred as a second generic argument.
 
 ### ♯ Create a custom fetch
 
