@@ -13,12 +13,19 @@ pnpm install @better-fetch/fetch
 ```typescript
 import betterFetch from "@better-fetch/fetch"
 
-const { data, error } = await betterFetch<{
+
+type ResponseData = {
   userId: number;
   id: number;
   title: string;
-  completed;
-}>("https://jsonplaceholder.typicode.com/todos/1");
+  completed: boolean;
+}
+
+type ResponseError = {
+  message: string;
+}
+ 
+const { data, error } = await betterFetch<ResponseData, ResponseError>("https://jsonplaceholder.typicode.com/todos/1");
 if (error) {
   // handle the error
 }
@@ -26,6 +33,11 @@ if (data) {
   // handle the data
 }
 ```
+`data` will be the response data inferred from the generic type.
+
+`error` object will be the response error by default it has the `status` and `statusText` properties.
+
+If the api returns a json error object it will be parsed and returned as the error object. By default `error` includes `message` property that can be string or undefined. You can pass a custom error type to be inferred.
 
 ### ♯ Create a custom fetch
 
@@ -282,28 +294,6 @@ const $fetch = createFetch({
 - plugins are called in the order they are defined.
 
 
-### ♯ Parsing the response
-
-Better fetch will smartly parse JSON using JSON.parse and if it fails it will return the response as text.
-
-For binary content types, better fetch will instead return a Blob object.
-
-You can also pass custom parser.
-
-```typescript
-//parsed as JSON
-const { data, error } = await fetch("/todos/1");
-// Get the blob version of the response
-const { data, error } = await fetch("/api/image.png");
-// Return text as is
-await ofetch("/ok");
-//custom parser
-const { data, error } = await fetch("/todos/1", {
-  parser: (text) => {
-    return JSON.parse(text);
-  },
-});
-```
 
 ### ♯ Handling Errors
 
@@ -336,6 +326,30 @@ const { data, error } = await fetch<{
   completed;
 }>("https://jsonplaceholder.typicode.com/todos/1", {
   throw: true,
+});
+```
+
+
+### ♯ Parsing the response
+
+Better fetch will smartly parse JSON using JSON.parse and if it fails it will return the response as text.
+
+For binary content types, better fetch will instead return a Blob object.
+
+You can also pass custom parser.
+
+```typescript
+//parsed as JSON
+const { data, error } = await fetch("/todos/1");
+// Get the blob version of the response
+const { data, error } = await fetch("/api/image.png");
+// Return text as is
+await ofetch("/ok");
+//custom parser
+const { data, error } = await fetch("/todos/1", {
+  parser: (text) => {
+    return JSON.parse(text);
+  },
 });
 ```
 

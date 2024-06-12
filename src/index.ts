@@ -186,7 +186,8 @@ export const betterFetch = async <T = any, E = unknown>(
 
 	/**
 	 * Dynamic Parameters.
-	 * If more than one they are going to be an array else they'll be an object
+	 * If more than one they are going to be an array else
+	 * they'll be an object
 	 */
 	const params = options?.params
 		? Array.isArray(options.params)
