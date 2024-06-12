@@ -1,6 +1,6 @@
 # Better Fetch
 
-A fetch wrapper for typescript that returns data and error object, supports defined route schemas, plugins and more. Works on the browser, node (version 18+), workers, deno and bun.
+A fetch wrapper for typescript that returns data and error object, supports defined routes with zod schemas, callbacks, plugins, react hooks and more. Works on the browser, node (version 18+), workers, deno and bun.
 
 ## Installation
 
