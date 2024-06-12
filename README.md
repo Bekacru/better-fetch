@@ -14,18 +14,18 @@ pnpm install @better-fetch/fetch
 import betterFetch from "@better-fetch/fetch"
 
 
-type ResponseData = {
+type Data = {
   userId: number;
   id: number;
   title: string;
   completed: boolean;
 }
 
-type ResponseError = {
+type Error = {
   message: string;
 }
  
-const { data, error } = await betterFetch<ResponseData, ResponseError>("https://jsonplaceholder.typicode.com/todos/1");
+const { data, error } = await betterFetch<Data, Error>("https://jsonplaceholder.typicode.com/todos/1");
 if (error) {
   // handle the error
 }
