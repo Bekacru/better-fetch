@@ -113,13 +113,15 @@ const routes = {
   /**
    * You can define same route with different methods using 
    * `@method` modifier.
+   * When you call the route `@method` modifier will be ignored from the path 
+   * and the method will be used.
    */
-  "@get/method": {
+  "@get/path": {
       output: z.object({
           message: z.string()
       })
   }
-  "@post/method": {
+  "@post/path": {
       output: z.object({
           message: z.string()
       })
