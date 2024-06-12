@@ -189,7 +189,7 @@ const { data, error } = await $fetch<{
 
 
 ### ♯ Using with React
-To use better fetch with React hooks, you have the option to import createReactFetch. This allows you to create hooks with custom defaults. Alternatively, you can directly import each individual hook.
+To use better fetch with React hooks, you have the option to import createReactFetch. This allows you to create hooks with custom defaults like createFetch and returns two hooks `useFetch` and `useMutate`. Alternatively, you can directly import each individual hook.
 
 
 With createReactFetch, you can create hooks with custom defaults.
@@ -251,7 +251,19 @@ function App() {
 
 Plugins are functions that can be used to modify the request, response, error and other parts of the request lifecycle.
 
-Example:
+Example: a plugin that adds csrf token to the request body
+```typescript
+const csrfProtection = async (url, options) => {
+				if (options?.method !== "GET") {
+					options.body = {
+						...options?.body,
+						csrfToken: await getCSRFToken(),
+					};
+				}
+				return { url, options };
+}
+```
+
 ```typescript
 import { createFetch } from "@better-fetch/fetch";
 import { csrfProtection } from "./plugins/csrfProtection"
@@ -262,6 +274,12 @@ const $fetch = createFetch({
   plugins: [csrfProtection()]
 });
 ```
+
+- Plugin should be a function that returns a promise that resolves to an object with url and options.
+- The options object should be the same as the fetch options object. 
+- They'll be called before the request is made. 
+- If you want the hook into a request lifecycle you can add callbacks to the options object.
+- plugins are called in the order they are defined.
 
 
 ### ♯ Parsing the response
