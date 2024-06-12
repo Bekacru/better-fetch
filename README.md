@@ -254,13 +254,13 @@ Plugins are functions that can be used to modify the request, response, error an
 Example: a plugin that adds csrf token to the request body
 ```typescript
 const csrfProtection = async (url, options) => {
-				if (options?.method !== "GET") {
-					options.body = {
-						...options?.body,
-						csrfToken: await getCSRFToken(),
-					};
-				}
-				return { url, options };
+  if (options?.method !== "GET") {
+    options.body = {
+      ...options?.body,
+      csrfToken: await getCSRFToken(),
+    };
+  }
+  return { url, options };
 }
 ```
 
