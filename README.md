@@ -62,39 +62,43 @@ import { z } from "zod";
 const routes = {
   /**
    * 
-   * You can define a route with output schema. The output schema will be used to infer the response data.
-   * If no input schema is defined, by default the get method will be used.
+   * You can define a route with output schema. The output schema 
+   * will be used to infer the response data.
+   * If no input schema is defined, by default the get method 
+   * will be used.
    */
-	"/": {
-		output: z.object({
-			message: z.string(),
-		}),
-	},
+  "/": {
+      output: z.object({
+      message: z.string(),
+    }),
+  },
   /**
-   * You can define a route with input schema. The input schema will be used to infer the request body.
+   * You can define a route with input schema. The input schema 
+   * will be used to infer the request body.
    * And by default the post method will be used. 
    * see `@method` modifier to define other methods.
    */
-	"/signin": {
-		input: z.object({
-			username: z.string(),
-			password: z.string(),
-		}),
-		output: z.object({
-			token: z.string(),
-		}),
-	},
+  "/signin": {
+    input: z.object({
+      username: z.string(),
+      password: z.string(),
+    }),
+    output: z.object({
+      token: z.string(),
+    }),
+  },
   /**
-   * You can define a route with query schema. The query schema will be used to infer the query parameters.
+   * You can define a route with query schema. The query schema w
+   * ill be used to infer the query parameters.
    */
-	"/query": {
-		query: z.object({
-			term: z.string(),
-		}),
-	},
+  "/query": {
+    query: z.object({
+      term: z.string(),
+    }),
+  },
   /**
-   * You can define dynamic parameters. The params will be inferred as 
-   * prams with the key id.
+   * You can define dynamic parameters. The params will be 
+   * inferred as prams with the key id.
    */
   "/param/:id": {},
   /**
@@ -116,8 +120,9 @@ const routes = {
   /**
    * You can define same route with different methods using 
    * `@method` modifier.
-   * When you call the route `@method` modifier will be ignored from the path 
-   * and the method will be used.
+   * 
+   * When you call the route `@method` modifier will be ignored 
+   * from the path  and the method will be used.
    */
   "@get/path": {
       output: z.object({
