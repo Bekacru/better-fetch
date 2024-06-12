@@ -147,13 +147,14 @@ const $fetch = createFetch({
 $fetch("/custom")
 ```
 
+### ♯ Default Response and Error Type
 You can also pass default response and error types. Which will be used if you don't pass the types in the fetch call.
 
 ```typescript
 import { createFetch } from "@better-fetch/fetch";
 import { DefaultSchema } from "@better-fetch/fetch/typed";
 
-const $fetch = createFetch<DefaultSchema,{
+const $fetch = createFetch<{
   userId: number;
   id: number;
   title: string;
