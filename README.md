@@ -60,11 +60,21 @@ import { createFetch } from "@better-fetch/fetch";
 import { FetchSchema } from "@better-fetch/fetch/typed";
 import { z } from "zod";
 const routes = {
+  /**
+   * 
+   * You can define a route with output schema. The output schema will be used to infer the response data.
+   * If no input schema is defined, by default the get method will be used.
+   */
 	"/": {
 		output: z.object({
 			message: z.string(),
 		}),
 	},
+  /**
+   * You can define a route with input schema. The input schema will be used to infer the request body.
+   * And by default the post method will be used. 
+   * see `@method` modifier to define other methods.
+   */
 	"/signin": {
 		input: z.object({
 			username: z.string(),
@@ -74,28 +84,21 @@ const routes = {
 			token: z.string(),
 		}),
 	},
-	"/signup": {
-		input: z.object({
-			username: z.string(),
-			password: z.string(),
-			optional: z.optional(z.string()),
-		}),
-		output: z.object({
-			message: z.string(),
-		}),
-	},
+  /**
+   * You can define a route with query schema. The query schema will be used to infer the query parameters.
+   */
 	"/query": {
 		query: z.object({
 			term: z.string(),
 		}),
 	},
   /**
-   * You can also define params. The params will be inferred as 
+   * You can define dynamic parameters. The params will be inferred as 
    * prams with the key id.
    */
   "/param/:id": {},
   /**
-   * You can also define params with multiple keys. The params 
+   * You can define params with multiple keys. The params 
    * will be inferred as string array in the order defined.
    */
   "/multi-params/:id/:id": {
