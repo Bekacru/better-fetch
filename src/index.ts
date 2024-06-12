@@ -1,4 +1,4 @@
-import { Readable } from "stream";
+import type { Readable } from "stream";
 import { BetterFetchError, FetchError } from "./error";
 import {
 	detectResponseType,
@@ -416,11 +416,7 @@ export type InferSchema<Routes extends FetchSchema | Strict<FetchSchema>> =
 export interface BetterFetch<
 	BaseT = any,
 	BaseE = unknown,
-	Routes extends FetchSchema | Strict<FetchSchema> = {
-		[key in string]: {
-			output: any;
-		};
-	},
+	Routes extends FetchSchema | Strict<FetchSchema> = any,
 > {
 	<
 		T = undefined,
