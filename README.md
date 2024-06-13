@@ -147,6 +147,19 @@ const $fetch = createFetch({
 })
 ```
 
+**♯ Using the schema only for typing**
+
+If you only want to use the schema for type inference only and not validating your input and outputs, you can instead pass it as a generic.
+
+- the first argument of the generic is default `data` type.
+- the second argument is default `error` type. Make sure to pass `unknown` if you're not passing an object for default type. Passing `any` will break the typing.
+- you pass the schema type in the 3rd argument of the generics.
+
+```ts
+const $fetch = createFetch<any, unknown, typeof routes>()
+```
+
+
 By default if you define schema better fetch still allows you to make a call to other routes that's not defined on the schema. If you want to enforce only the keys defined to be inferred as valid you can use the `strict` helper.
 
 ```typescript
