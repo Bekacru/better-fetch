@@ -1,16 +1,16 @@
 import type { Readable } from "stream";
+import type { ZodError, ZodObject, ZodOptional, z } from "zod";
 import { BetterFetchError, FetchError } from "./error";
+import type { FetchSchema, ParameterSchema, Strict } from "./typed";
 import {
 	detectResponseType,
-	FetchEsque,
 	getFetch,
 	isJSONParsable,
 	isJSONSerializable,
 	isRouteMethod,
 	jsonParse,
+	type FetchEsque,
 } from "./utils";
-import { FetchSchema, ParameterSchema, Strict } from "./typed";
-import { z, ZodObject, ZodOptional } from "zod";
 
 interface RequestContext {
 	request: Request;
@@ -106,12 +106,13 @@ export type BaseFetchOptions<
  * A plugin that can be used to modify the url and options.
  * All plugins will be called before the request is made.
  */
-export interface Plugin {
-	(url: string, options?: BetterFetchOption): Promise<{
-		url: string;
-		options?: BetterFetchOption;
-	}>;
-}
+export type Plugin = (
+	url: string,
+	options?: BetterFetchOption,
+) => Promise<{
+	url: string;
+	options?: BetterFetchOption;
+}>;
 
 export type CreateFetchOption<R extends FetchSchema | Strict<FetchSchema>> =
 	BaseFetchOptions & {
@@ -131,10 +132,10 @@ export type BetterFetchOption<
 type InferParams<P> = P extends Record<string, any> | Array<any>
 	? {
 			params: P;
-	  }
+		}
 	: {
 			params?: string[];
-	  };
+		};
 
 type InferBody<T> = T extends Record<string, any> ? { body: T } : { body?: T };
 type InferQuery<Q> = Q extends Record<string, any>
@@ -221,7 +222,22 @@ export const betterFetch = async <T = any, E = unknown>(
 			_url.searchParams.append(key, String(value));
 		}
 	}
-	const body = route?.input ? route.input.parse(options?.body) : options?.body;
+	const parsedBody = route?.input ? route.input.safeParse(options?.body) : null;
+	const body = parsedBody?.success ? parsedBody.data : options?.body;
+
+	if (parsedBody && !parsedBody.success) {
+		return {
+			data: null,
+			error: {
+				status: 400,
+				statusText: "Bad Request",
+				message: parsedBody.error.message,
+				validation: {
+					input: parsedBody.error,
+				},
+			} as any,
+		};
+	}
 
 	const method = url.startsWith("@")
 		? isRouteMethod(pMethod)
@@ -237,8 +253,8 @@ export const betterFetch = async <T = any, E = unknown>(
 		method: method
 			? (method as "POST" | "GET")
 			: options?.body
-			? "POST"
-			: "GET",
+				? "POST"
+				: "GET",
 	};
 
 	if (
@@ -291,7 +307,27 @@ export const betterFetch = async <T = any, E = unknown>(
 			const parser = options?.jsonParser ?? jsonParse;
 			const text = await response.text();
 			const json = isJSONParsable(text) ? await parser(text) : text;
-			const routeOutput = route?.output ? route.output.parse(json) : json;
+			const parsedRouteOutput = route?.output
+				? route.output.safeParse(json)
+				: null;
+			const routeOutput = parsedRouteOutput?.success
+				? parsedRouteOutput.data
+				: json;
+
+			if (parsedRouteOutput && !parsedRouteOutput.success) {
+				return {
+					data: null,
+					error: {
+						status: 400,
+						statusText: "Bad Request",
+						message: parsedRouteOutput.error.message,
+						validation: {
+							output: parsedRouteOutput.error,
+						},
+					} as any,
+				};
+			}
+
 			await options?.onSuccess?.(responseContext);
 			return {
 				data: routeOutput,
@@ -317,10 +353,10 @@ export const betterFetch = async <T = any, E = unknown>(
 	const errorObject = isJSONParsable(text)
 		? await parser(text)
 		: text
-		? {
-				message: text,
-		  }
-		: undefined;
+			? {
+					message: text,
+				}
+			: undefined;
 	if (options?.throw) {
 		throw new FetchError(response.status, response.statusText, errorObject);
 	}
@@ -345,7 +381,7 @@ export const betterFetch = async <T = any, E = unknown>(
 };
 
 export const createFetch = <
-	R = unknown,
+	R extends FetchSchema | Strict<FetchSchema> = any,
 	E = unknown,
 	Routes extends FetchSchema | Strict<FetchSchema> = FetchSchema,
 >(
@@ -367,14 +403,14 @@ betterFetch.native = fetch;
 type InferParam<S, Z> = Z extends Record<string, ParameterSchema>
 	? {
 			[key in keyof Z]: z.infer<Z[key]>;
-	  }
+		}
 	: S extends `${infer _}:${infer P}`
-	? P extends `${infer _2}:${infer _P}`
-		? Array<string>
-		: {
-				[key in P]: string;
-		  }
-	: false;
+		? P extends `${infer _2}:${infer _P}`
+			? Array<string>
+			: {
+					[key in P]: string;
+				}
+		: false;
 
 export type InferOptions<
 	T extends FetchSchema,
@@ -387,23 +423,23 @@ export type InferOptions<
 					T[K]["query"] extends z.ZodSchema ? z.infer<T[K]["query"]> : any,
 					InferParam<K, T[K]["params"]>
 				>?,
-		  ]
+			]
 		: [
 				BetterFetchOption<
 					z.infer<T[K]["input"]>,
 					T[K]["query"] extends z.ZodSchema ? z.infer<T[K]["query"]> : any,
 					InferParam<K, T[K]["params"]>
 				>,
-		  ]
+			]
 	: T[K]["query"] extends z.ZodSchema
-	? [BetterFetchOption<any, z.infer<T[K]["query"]>>]
-	: T[K]["params"] extends {
-			[key: string]: ParameterSchema;
-	  }
-	? [BetterFetchOption<any, any, InferParam<K, T[K]["params"]>>]
-	: K extends `${infer _}/:${infer __}`
-	? [BetterFetchOption<any, any, InferParam<K, T[K]["params"]>>]
-	: [BetterFetchOption?];
+		? [BetterFetchOption<any, z.infer<T[K]["query"]>>]
+		: T[K]["params"] extends {
+					[key: string]: ParameterSchema;
+				}
+			? [BetterFetchOption<any, any, InferParam<K, T[K]["params"]>>]
+			: K extends `${infer _}/:${infer __}`
+				? [BetterFetchOption<any, any, InferParam<K, T[K]["params"]>>]
+				: [BetterFetchOption?];
 
 export type InferResponse<
 	T extends FetchSchema,
@@ -435,22 +471,29 @@ export interface BetterFetch<
 		...options: Routes extends FetchSchema
 			? InferOptions<InferSchema<Routes>, Key>
 			: Routes extends Strict<any>
-			? K extends keyof Routes["schema"]
-				? InferOptions<Routes["schema"], Key>
+				? K extends keyof Routes["schema"]
+					? InferOptions<Routes["schema"], Key>
+					: [BetterFetchOption?]
 				: [BetterFetchOption?]
-			: [BetterFetchOption?]
 	): Promise<
 		BetterFetchResponse<
 			T extends undefined
 				? Routes extends Strict<any>
 					? InferResponse<Routes["schema"], Key>
 					: Routes extends FetchSchema
-					? InferResponse<InferSchema<Routes>, Key> extends never
-						? BaseT
-						: InferResponse<InferSchema<Routes>, Key>
-					: BaseT
+						? InferResponse<InferSchema<Routes>, Key> extends never
+							? BaseT
+							: InferResponse<InferSchema<Routes>, Key>
+						: BaseT
 				: T,
-			E
+			E & Routes extends FetchSchema
+				? {
+						validation?: {
+							input?: ZodError;
+							output?: ZodError;
+						};
+					}
+				: {}
 		>
 	>;
 	native: typeof fetch;
