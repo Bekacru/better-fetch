@@ -11,6 +11,7 @@ import {
 } from "./utils";
 import { FetchSchema, ParameterSchema, Strict } from "./typed";
 import { z, ZodError, ZodObject, ZodOptional } from "zod";
+import { getAuthHeader, type Auth } from "./auth";
 
 interface RequestContext {
 	request: Request;
@@ -100,6 +101,10 @@ export type BaseFetchOptions<
 	 * Plugins
 	 */
 	plugins?: Plugin[];
+	/**
+	 * Authentication
+	 */
+	auth?: Auth;
 } & Omit<RequestInit, "body">;
 
 /**
@@ -198,7 +203,12 @@ export const betterFetch = async <T = any, E = unknown>(
 	u = u.replace(`@${pMethod}`, "");
 
 	const _url = new URL(`${options?.baseURL ?? ""}${u}${params}`);
-	const headers = new Headers(options?.headers);
+
+	const authHeader = getAuthHeader(options);
+	const headers = new Headers({
+		...options?.headers,
+		...authHeader,
+	});
 
 	const shouldStringifyBody =
 		options?.body &&
@@ -464,21 +474,3 @@ export interface BetterFetch<
 
 export type CreateFetch = typeof createFetch;
 export default betterFetch;
-
-const f = createFetch({
-	routes: {
-		schema: {
-			"/": {
-				input: z.object({
-					name: z.string(),
-				}),
-			},
-			"/an": {
-				output: z.object({
-					name: z.string(),
-				}),
-			},
-		},
-		strict: true,
-	} satisfies Strict<FetchSchema>,
-});
