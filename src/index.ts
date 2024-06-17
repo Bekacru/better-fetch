@@ -10,7 +10,7 @@ import {
 	jsonParse,
 } from "./utils";
 import { FetchSchema, ParameterSchema, Strict } from "./typed";
-import { z, ZodObject, ZodOptional } from "zod";
+import { z, ZodError, ZodObject, ZodOptional } from "zod";
 
 interface RequestContext {
 	request: Request;
@@ -125,7 +125,6 @@ export type BetterFetchOption<
 	T extends Record<string, unknown> = any,
 	Q extends Record<string, unknown> = any,
 	P extends Record<string, unknown> | false = false,
-	R extends FetchSchema | Strict<FetchSchema> = any,
 > = InferBody<T> & InferQuery<Q> & BaseFetchOptions & InferParams<P>;
 
 type InferParams<P> = P extends Record<string, any> | Array<any>
@@ -334,7 +333,6 @@ export const betterFetch = async <T = any, E = unknown>(
 			},
 		};
 	}
-
 	return {
 		data: null,
 		error: {
@@ -345,9 +343,9 @@ export const betterFetch = async <T = any, E = unknown>(
 };
 
 export const createFetch = <
-	R = unknown,
-	E = unknown,
-	Routes extends FetchSchema | Strict<FetchSchema> = FetchSchema,
+	R,
+	E,
+	Routes extends FetchSchema | Strict<FetchSchema>,
 >(
 	config?: CreateFetchOption<Routes>,
 ): BetterFetch<R, E, Routes> => {
@@ -414,9 +412,9 @@ export type InferSchema<Routes extends FetchSchema | Strict<FetchSchema>> =
 	Routes extends FetchSchema ? Routes : Routes["schema"];
 
 export interface BetterFetch<
-	BaseT = any,
-	BaseE = unknown,
-	Routes extends FetchSchema | Strict<FetchSchema> = any,
+	BaseT,
+	BaseE,
+	Routes extends FetchSchema | Strict<FetchSchema>,
 > {
 	<
 		T = undefined,
@@ -450,7 +448,14 @@ export interface BetterFetch<
 						: InferResponse<InferSchema<Routes>, Key>
 					: BaseT
 				: T,
-			E
+			E & Routes extends FetchSchema | Strict<FetchSchema>
+				? {
+						validation?: {
+							input?: ZodError;
+							output?: ZodError;
+						};
+				  }
+				: {}
 		>
 	>;
 	native: typeof fetch;
@@ -459,3 +464,21 @@ export interface BetterFetch<
 
 export type CreateFetch = typeof createFetch;
 export default betterFetch;
+
+const f = createFetch({
+	routes: {
+		schema: {
+			"/": {
+				input: z.object({
+					name: z.string(),
+				}),
+			},
+			"/an": {
+				output: z.object({
+					name: z.string(),
+				}),
+			},
+		},
+		strict: true,
+	} satisfies Strict<FetchSchema>,
+});
