@@ -1,11 +1,12 @@
 name: CI
-on:
-  push:
-    branches:
-      - main
-  pull_request: 
-    branches: 
-      - main
+
+on: 
+  pull_request:  
+      branches: main
+  push: 
+      branches: main
+  merge_group: {}
+
 jobs:
   test:
     name: test, lint & typecheck
@@ -14,6 +15,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
       - uses: ./.github/setup
+      
+      - name: Build
+        run: bun run build
 
       - name: Lint
         run: bun lint
@@ -23,33 +27,3 @@ jobs:
 
       - name: Test
         run: bun run test
-  release: 
-    name: release
-    needs: test
-    if: ${{ !contains(github.event.head_commit.message, 'skip ci') && !contains(github.event.head_commit.message, 'skip release') && github.event_name != 'pull_request' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - uses: ./.github/setup
-      
-      - name: Check version
-        id: check_version
-        run: |
-          tag=$(echo ${GITHUB_REF#refs/tags/})
-          if [[ $tag == *"beta"* ]]; then
-            echo "::set-output name=tag::beta"
-          elif [[ $tag == *"alpha"* ]]; then
-            echo "::set-output name=tag::alpha"
-          else
-            echo "::set-output name=tag::latest"
-          fi
-
-      - name: Build
-        run: bun run build
-          
-      - name: Publish to npm
-        run: npm publish --access public --no-git-checks --tag ${{steps.check_version.outputs.tag}}
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
