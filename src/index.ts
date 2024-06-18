@@ -353,9 +353,9 @@ export const betterFetch = async <T = any, E = unknown>(
 };
 
 export const createFetch = <
-	R,
-	E,
-	Routes extends FetchSchema | Strict<FetchSchema>,
+	R = unknown,
+	E = unknown,
+	Routes extends FetchSchema | Strict<FetchSchema> = FetchSchema,
 >(
 	config?: CreateFetchOption<Routes>,
 ): BetterFetch<R, E, Routes> => {
@@ -458,14 +458,7 @@ export interface BetterFetch<
 						: InferResponse<InferSchema<Routes>, Key>
 					: BaseT
 				: T,
-			E & Routes extends FetchSchema | Strict<FetchSchema>
-				? {
-						validation?: {
-							input?: ZodError;
-							output?: ZodError;
-						};
-				  }
-				: {}
+			E
 		>
 	>;
 	native: typeof fetch;
