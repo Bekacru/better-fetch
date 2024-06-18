@@ -105,7 +105,22 @@ export type BaseFetchOptions<
 	 * header.
 	 */
 	authorization?: Auth;
-} & Omit<RequestInit, "body">;
+	/**
+	 * Headers
+	 */
+	headers?: CommonHeaders | Headers | HeadersInit;
+} & Omit<RequestInit, "body" | "headers">;
+
+type CommonHeaders = {
+	accept: "application/json" | "text/plain" | "application/octet-stream";
+	"content-type":
+		| "application/json"
+		| "text/plain"
+		| "application/x-www-form-urlencoded"
+		| "multipart/form-data"
+		| "application/octet-stream";
+	authorization: "Bearer" | "Basic";
+};
 
 /**
  * A plugin that can be used to modify the url and options.
