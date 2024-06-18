@@ -74,10 +74,6 @@ export type BaseFetchOptions<
 	 */
 	AbortController?: typeof AbortController;
 	/**
-	 * Headers
-	 */
-	Headers?: typeof Headers;
-	/**
 	 * a timeout that will be used to abort the request
 	 */
 	timeout?: number;
@@ -102,9 +98,13 @@ export type BaseFetchOptions<
 	 */
 	plugins?: Plugin[];
 	/**
-	 * Authentication
+	 * Authorization
+	 *
+	 * Supports Bearer and Basic auth. If you need another type of
+	 * auth, you can use the `headers` option to set the
+	 * header.
 	 */
-	auth?: Auth;
+	authorization?: Auth;
 } & Omit<RequestInit, "body">;
 
 /**

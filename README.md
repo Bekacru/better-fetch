@@ -407,6 +407,58 @@ const { data, error } = await fetch<{
 });
 ```
 
+### ♯ Headers
+
+You can pass the headers as an object.
+
+```typescript
+const { data, error } = await fetch<{
+  userId: number;
+  id: number;
+  title: string;
+  completed;
+}>("https://jsonplaceholder.typicode.com/todos/1", {
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+```
+
+### ♯ Authorization
+
+You can pass the authorization that will be added to the headers.
+
+Currently, supports `Bearer` and `Basic` authorization.
+
+```typescript
+const { data, error } = await fetch<{
+  userId: number;
+  id: number;
+  title: string;
+  completed;
+}>("https://jsonplaceholder.typicode.com/todos/1", {
+  authorization: {
+    type: "Bearer",
+    token: "token",
+  },
+});
+```
+
+### ♯ Method
+
+You can pass the method as a string.
+
+```typescript
+const { data, error } = await fetch<{
+  userId: number;
+  id: number;
+  title: string;
+  completed;
+}>("https://jsonplaceholder.typicode.com/todos/1", {
+  method: "POST",
+});
+```
+
 ### ♯ Callbacks
 
 You can pass callbacks for different events on the request lifecycle.

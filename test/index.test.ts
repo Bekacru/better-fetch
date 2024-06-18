@@ -259,27 +259,14 @@ describe("fetch", () => {
 	it("should set auth headers", async () => {
 		const url = getURL("post");
 		const res = await betterFetch(url, {
-			auth: {
-				type: "bearer",
+			authorization: {
+				type: "Bearer",
 				token: "test",
 			},
 			method: "POST",
 		});
 		expect(res.data.headers).to.include({
 			authorization: "Bearer test",
-		});
-
-		const customAuthReq = await betterFetch(url, {
-			auth: {
-				type: "custom",
-				custom: "header",
-				another: "header",
-			},
-			method: "POST",
-		});
-		expect(customAuthReq.data.headers).to.include({
-			custom: "header",
-			another: "header",
 		});
 	});
 });
