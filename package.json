@@ -1,6 +1,6 @@
 {
   "name": "@better-fetch/fetch",
-  "version": "0.0.4",
+  "version": "0.0.5-beta.1",
   "packageManager": "bun@1.1.4",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -14,6 +14,7 @@
     "@types/node": "^20.11.30",
     "@types/react": "^18.2.79",
     "biome": "^0.3.3",
+    "bumpp": "^9.4.1",
     "global-jsdom": "^24.0.0",
     "h3": "^1.11.1",
     "jsdom": "^24.0.0",
@@ -45,6 +46,7 @@
   "scripts": {
     "build": "tsup",
     "test": "vitest run",
+    "bump": "bun run bumpp",
     "test:watch": "vitest watch",
     "lint": "biome check .",
     "release": "bun run build && npm publish --access public",
