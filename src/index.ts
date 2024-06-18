@@ -10,7 +10,7 @@ import {
 	jsonParse,
 } from "./utils";
 import { FetchSchema, ParameterSchema, Strict } from "./typed";
-import { z, ZodError, ZodObject, ZodOptional } from "zod";
+import { z, ZodObject, ZodOptional } from "zod";
 import { getAuthHeader, type Auth } from "./auth";
 
 interface RequestContext {
@@ -205,9 +205,9 @@ export const betterFetch = async <T = any, E = unknown>(
 	const _url = new URL(`${options?.baseURL ?? ""}${u}${params}`);
 
 	const authHeader = getAuthHeader(options);
-	const headers = new Headers({
-		...options?.headers,
-		...authHeader,
+	const headers = new Headers(options?.headers);
+	Object.keys(authHeader).forEach((key) => {
+		headers.set(key, authHeader[key]);
 	});
 
 	const shouldStringifyBody =

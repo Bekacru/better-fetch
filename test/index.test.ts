@@ -255,4 +255,31 @@ describe("fetch", () => {
 		});
 		expect(response2.data).toBe("GET");
 	});
+
+	it("should set auth headers", async () => {
+		const url = getURL("post");
+		const res = await betterFetch(url, {
+			auth: {
+				type: "bearer",
+				token: "test",
+			},
+			method: "POST",
+		});
+		expect(res.data.headers).to.include({
+			authorization: "Bearer test",
+		});
+
+		const customAuthReq = await betterFetch(url, {
+			auth: {
+				type: "custom",
+				custom: "header",
+				another: "header",
+			},
+			method: "POST",
+		});
+		expect(customAuthReq.data.headers).to.include({
+			custom: "header",
+			another: "header",
+		});
+	});
 });
