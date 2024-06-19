@@ -19,7 +19,13 @@ export type Basic = {
 	password: string;
 };
 
-export type Auth = Bearer | Basic;
+export type Custom = {
+	type: "Custom";
+	prefix: string;
+	value: string;
+};
+
+export type Auth = Bearer | Basic | Custom;
 
 export const getAuthHeader = (options?: BetterFetchOption) => {
 	const headers: Record<string, string> = {};

@@ -301,7 +301,8 @@ export const betterFetch = async <T = any, E = unknown>(
 		clearTimeout(abortTimeout);
 	}
 	await options?.onResponse?.(responseContext);
-	const hasBody = response.body && context.options.method !== "HEAD";
+
+	const hasBody = context.options.method !== "HEAD";
 	if (!hasBody) {
 		await options?.onSuccess?.(responseContext);
 		return {
@@ -309,6 +310,7 @@ export const betterFetch = async <T = any, E = unknown>(
 			error: null,
 		};
 	}
+
 	const responseType = detectResponseType(response);
 	if (response.ok) {
 		if (responseType === "json" || responseType === "text") {
