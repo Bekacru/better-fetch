@@ -1,4 +1,6 @@
 import { BetterFetchOption } from ".";
+
+type stringOrReturning = string | (() => string);
 /**
  * Bearer token authentication
  *
@@ -7,7 +9,7 @@ import { BetterFetchOption } from ".";
  */
 export type Bearer = {
 	type: "Bearer";
-	token: string;
+	token: stringOrReturning;
 };
 
 /**
@@ -15,30 +17,53 @@ export type Bearer = {
  */
 export type Basic = {
 	type: "Basic";
-	username: string;
-	password: string;
+	username: stringOrReturning;
+	password: stringOrReturning;
 };
 
+/**
+ * Custom auth
+ *
+ * @param prefix - prefix of the header
+ * @param value - value of the header
+ *
+ * @example
+ * ```ts
+ * {
+ *  type: "Custom",
+ *  prefix: "Token",
+ *  value: "token"
+ * }
+ * ```
+ */
 export type Custom = {
 	type: "Custom";
-	prefix: string;
-	value: string;
+	prefix: stringOrReturning;
+	value: stringOrReturning;
 };
 
 export type Auth = Bearer | Basic | Custom;
 
 export const getAuthHeader = (options?: BetterFetchOption) => {
 	const headers: Record<string, string> = {};
-
+	const getValue = (value: stringOrReturning) =>
+		typeof value === "function" ? value() : value;
 	if (options?.authorization) {
 		if (options.authorization.type === "Bearer") {
-			headers["Authorization"] = `Bearer ${options.authorization.token}`;
+			headers["Authorization"] = `Bearer ${getValue(
+				options.authorization.token,
+			)}`;
 		} else if (options.authorization.type === "Basic") {
 			headers["Authorization"] = `Basic ${btoa(
-				`${options.authorization.username}:${options.authorization.password}`,
+				`${getValue(options.authorization.username)}:${getValue(
+					options.authorization.password,
+				)}`,
 			)}`;
+		} else if (options.authorization.type === "Custom") {
+			headers["Authorization"] = `${getValue(
+				options.authorization.prefix,
+			)} ${getValue(options.authorization.value)}`;
 		}
 	}
-
 	return headers;
 };
