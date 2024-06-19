@@ -43,12 +43,11 @@ const routes = {
 } satisfies FetchSchema;
 
 describe("typed router", (it) => {
-	const $fetch = createFetch({
+	const $fetch = createFetch<any, any, typeof routes>({
 		baseURL: "https://example.com",
 		customFetchImpl: async (url, req) => {
 			return new Response();
 		},
-		routes,
 	});
 	it("should not required body and return message", () => {
 		expectTypeOf($fetch("/")).toMatchTypeOf<

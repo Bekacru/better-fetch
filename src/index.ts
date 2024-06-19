@@ -320,7 +320,7 @@ export const betterFetch = async <T = any, E = unknown>(
 			const routeOutput = route?.output ? route.output.parse(json) : json;
 			await options?.onSuccess?.(responseContext);
 			return {
-				data: routeOutput,
+				data: routeOutput || {},
 				error: null,
 			};
 		} else {
