@@ -445,9 +445,9 @@ type InferK<Routes extends FetchSchema | Strict<any> | undefined> = Routes exten
 		| URL
 
 export interface BetterFetch<
-	BaseT,
-	BaseE,
-	Routes extends FetchSchema | Strict<FetchSchema> | undefined,
+	BaseT = any,
+	BaseE = unknown,
+	Routes extends FetchSchema | Strict<FetchSchema> | undefined = undefined,
 > {
 	<
 		T = undefined,
