@@ -133,7 +133,7 @@ export interface Plugin {
 	}>;
 }
 
-export type CreateFetchOption<R extends FetchSchema | Strict<FetchSchema>> =
+export type CreateFetchOption<R extends FetchSchema | Strict<FetchSchema> | undefined> =
 	BaseFetchOptions & {
 		routes?: R;
 	};
@@ -372,7 +372,7 @@ export const betterFetch = async <T = any, E = unknown>(
 export const createFetch = <
 	R = unknown,
 	E = unknown,
-	Routes extends FetchSchema | Strict<FetchSchema> = FetchSchema,
+	Routes extends FetchSchema | Strict<FetchSchema> | undefined = undefined ,
 >(
 	config?: CreateFetchOption<Routes>,
 ): BetterFetch<R, E, Routes> => {
@@ -438,22 +438,21 @@ export type InferResponse<
 export type InferSchema<Routes extends FetchSchema | Strict<FetchSchema>> =
 	Routes extends FetchSchema ? Routes : Routes["schema"];
 
+type InferK<Routes extends FetchSchema | Strict<any> | undefined> = Routes extends Strict<any>
+? keyof InferSchema<Routes>
+: | Omit<string, keyof Routes>
+		| keyof InferSchema<Routes extends undefined ? never : Routes> 
+		| URL
+
 export interface BetterFetch<
 	BaseT,
 	BaseE,
-	Routes extends FetchSchema | Strict<FetchSchema>,
+	Routes extends FetchSchema | Strict<FetchSchema> | undefined,
 > {
 	<
 		T = undefined,
 		E = BaseE,
-		K extends Routes extends Strict<any>
-			? keyof InferSchema<Routes>
-			:
-					| Omit<string, keyof Routes>
-					| keyof InferSchema<Routes>
-					| URL = Routes extends Strict<any>
-			? keyof InferSchema<Routes>
-			: Omit<string, keyof Routes> | keyof InferSchema<Routes> | URL,
+		K extends InferK<Routes> = InferK<Routes>,
 		Key extends string = K extends string ? K : never,
 	>(
 		url: K,
