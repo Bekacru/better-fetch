@@ -13,15 +13,12 @@
 		"@types/bun": "^1.1.0",
 		"@biomejs/biome": "1.7.3",
 		"@types/node": "^20.11.30",
-		"@types/react": "^18.2.79",
 		"bumpp": "^9.4.1",
 		"global-jsdom": "^24.0.0",
 		"h3": "^1.11.1",
 		"jsdom": "^24.0.0",
 		"listhen": "^1.7.2",
 		"mocha": "^10.4.0",
-		"react": "^18.2.0",
-		"react-dom": "^18.2.0",
 		"tsup": "^8.0.2",
 		"typescript": "^5.4.5",
 		"vitest": "^1.5.0",
@@ -53,6 +50,8 @@
 		"lint:fix": "biome check . --apply",
 		"typecheck": "tsc --noEmit"
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"type": "module"
 }
