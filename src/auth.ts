@@ -1,4 +1,4 @@
-import { BetterFetchOption } from ".";
+import type { BetterFetchOption } from ".";
 
 type stringOrReturning = string | (() => string);
 /**

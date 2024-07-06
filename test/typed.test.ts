@@ -1,8 +1,8 @@
 import { describe, expectTypeOf } from "vitest";
-import { FetchSchema, strict } from "../src/typed";
-import { BetterFetchResponse, createFetch } from "../src";
-import { createReactFetch } from "../src/react";
 import { z } from "zod";
+import { type BetterFetchResponse, createFetch } from "../src";
+import { createReactFetch } from "../src/react";
+import { type FetchSchema, strict } from "../src/typed";
 
 const routes = {
 	"/": {

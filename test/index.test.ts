@@ -1,5 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import betterFetch, { createFetch } from "../src";
+import type { IncomingHttpHeaders } from "http";
 import {
 	createApp,
 	createRouter,
@@ -8,9 +7,10 @@ import {
 	readRawBody,
 	toNodeListener,
 } from "h3";
-import { listen, Listener } from "listhen";
-import { IncomingHttpHeaders } from "http";
-import { DefaultSchema } from "../src/typed";
+import { type Listener, listen } from "listhen";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import betterFetch, { createFetch } from "../src";
+import type { DefaultSchema } from "../src/typed";
 
 describe("fetch", () => {
 	const getURL = (path?: string) =>
@@ -175,7 +175,9 @@ describe("fetch", () => {
 
 	it("404", async () => {
 		const { error, data } = await betterFetch<
-			{},
+			{
+				test: string;
+			},
 			{
 				statusCode: number;
 				stack: [];

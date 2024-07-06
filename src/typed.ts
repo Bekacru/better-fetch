@@ -1,4 +1,10 @@
-import { z, ZodBoolean, ZodNumber, ZodRecord, ZodString } from "zod";
+import {
+	type ZodBoolean,
+	type ZodNumber,
+	ZodRecord,
+	type ZodString,
+	type z,
+} from "zod";
 
 export type DefaultSchema = {
 	[key: string]: {

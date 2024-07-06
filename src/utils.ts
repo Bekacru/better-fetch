@@ -65,11 +65,12 @@ export function jsonParse(text: string) {
 	}
 }
 
-export interface FetchEsque {
-	(input: RequestInfo, init?: RequestInit): Promise<Response>;
-}
+export type FetchEsque = (
+	input: RequestInfo,
+	init?: RequestInit,
+) => Promise<Response>;
 
-function isFunction(value: any): value is Function {
+function isFunction(value: any): value is () => any {
 	return typeof value === "function";
 }
 
