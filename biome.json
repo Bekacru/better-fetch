@@ -1,25 +1,30 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.6.3/schema.json",
-	"organizeImports": {
-		"enabled": true
-	},
-	"linter": {
-		"enabled": true,
-		"rules": {
-			"recommended": true,
-			"complexity": {
-				"useLiteralKeys": "off"
-			},
-			"a11y": {
-				"useKeyWithClickEvents": "off"
-			},
-			"suspicious": {
-				"noExplicitAny": "off"
-			},
-			"style": {
-				"noParameterAssign": "off",
-				"useNodejsImportProtocol": "off"
-			}
-		}
-	}
+    "$schema": "https://biomejs.dev/schemas/1.6.3/schema.json",
+    "organizeImports": {
+        "enabled": true
+    },
+    "files": {
+        "ignore": [
+            "dist"
+        ]
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "complexity": {
+                "useLiteralKeys": "off"
+            },
+            "a11y": {
+                "useKeyWithClickEvents": "off"
+            },
+            "suspicious": {
+                "noExplicitAny": "off"
+            },
+            "style": {
+                "noParameterAssign": "off",
+                "useNodejsImportProtocol": "off"
+            }
+        }
+    }
 }
