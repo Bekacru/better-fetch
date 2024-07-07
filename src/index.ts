@@ -17,6 +17,7 @@ interface RequestContext {
 	request: Request;
 	controller: AbortController;
 	options: BetterFetchOption;
+	url: string;
 }
 
 interface ResponseContext {
@@ -35,22 +36,22 @@ export type BaseFetchOptions<
 	 * a callback function that will be called when a request is
 	 * made.
 	 */
-	onRequest?: (request: RequestContext) => Promise<void> | void;
+	onRequest?: (context: RequestContext) => Promise<void> | void;
 	/**
 	 * a callback function that will be called when a response is
 	 * successful.
 	 */
-	onSuccess?: (response: ResponseContext) => Promise<void> | void;
+	onSuccess?: (context: ResponseContext) => Promise<void> | void;
 	/**
 	 * a callback function that will be called when an error occurs
 	 */
-	onError?: (response: ResponseContext) => Promise<void> | void;
+	onError?: (context: ResponseContext) => Promise<void> | void;
 	/**
 	 * a callback function that will be called when a response is
 	 * received. This will be called before the response is parsed
 	 * and returned.
 	 */
-	onResponse?: (response: ResponseContext) => Promise<void> | void;
+	onResponse?: (context: ResponseContext) => Promise<void> | void;
 	/**
 	 * a callback function that will be called when a
 	 * request is retried.
@@ -282,6 +283,7 @@ export const betterFetch = async <T = any, E = unknown>(
 		request: new Request(_url.toString(), _options),
 		options: _options,
 		controller,
+		url: _url.toString(),
 	};
 
 	let abortTimeout: NodeJS.Timeout | undefined;
