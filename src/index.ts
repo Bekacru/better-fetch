@@ -166,19 +166,24 @@ type InferQuery<Q> = Q extends Record<string, any>
 export type BetterFetchResponse<
 	T,
 	E extends Record<string, unknown> | unknown = unknown,
-> =
-	| {
+	Throw extends boolean = false,
+> = Throw extends true
+	? {
 			data: T;
-			error: null;
-	  }
-	| {
-			data: null;
-			error: {
-				status: number;
-				statusText: string;
-				message?: string;
-			} & E;
-	  };
+		}
+	:
+			| {
+					data: T;
+					error: null;
+			  }
+			| {
+					data: null;
+					error: {
+						status: number;
+						statusText: string;
+						message?: string;
+					} & E;
+			  };
 
 export const betterFetch = async <T = any, E = unknown>(
 	url: string,
@@ -377,9 +382,10 @@ export const createFetch = <
 	R = unknown,
 	E = unknown,
 	Routes extends FetchSchema | Strict<FetchSchema> | undefined = undefined,
+	Config extends CreateFetchOption<Routes> = CreateFetchOption<Routes>,
 >(
-	config?: CreateFetchOption<Routes>,
-): BetterFetch<R, E, Routes> => {
+	config?: Config,
+): BetterFetch<R, E, Routes, Config["throw"] extends true ? true : false> => {
 	const $fetch = async (url: string, options: BetterFetchOption) => {
 		return await betterFetch(url, {
 			...config,
@@ -454,6 +460,7 @@ export interface BetterFetch<
 	BaseT = any,
 	BaseE = unknown,
 	Routes extends FetchSchema | Strict<FetchSchema> | undefined = undefined,
+	Throw extends boolean = false,
 > {
 	<
 		T = undefined,
@@ -480,7 +487,8 @@ export interface BetterFetch<
 							: InferResponse<InferSchema<Routes>, Key>
 						: BaseT
 				: T,
-			E
+			E,
+			Throw
 		>
 	>;
 	native: typeof fetch;
@@ -489,7 +497,3 @@ export interface BetterFetch<
 
 export type CreateFetch = typeof createFetch;
 export default betterFetch;
-
-export const f = createFetch({
-	throw: true,
-});
