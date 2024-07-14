@@ -24,7 +24,11 @@ export const betterFetch = async <
 	url: string,
 	options?: Option,
 ): Promise<
-	BetterFetchResponse<TRes, TErr, Option["throw"] extends true ? true : false>
+	BetterFetchResponse<
+		TRes,
+		TErr,
+		Option["throw"] extends true ? true : TErr extends false ? true : false
+	>
 > => {
 	const {
 		hooks,
