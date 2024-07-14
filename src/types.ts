@@ -1,8 +1,8 @@
-import type { FetchSchema } from "./create-fetch/schema";
-import type { Auth } from "./auth";
-import type { BetterFetchPlugin, FetchHooks } from "./plugins";
 import type { LiteralUnion } from "type-fest";
 import type { ZodSchema } from "zod";
+import type { Auth } from "./auth";
+import type { FetchSchema } from "./create-fetch/schema";
+import type { BetterFetchPlugin, FetchHooks } from "./plugins";
 
 type CommonHeaders = {
 	accept: "application/json" | "text/plain" | "application/octet-stream";

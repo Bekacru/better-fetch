@@ -1,4 +1,4 @@
-import { type z, ZodSchema } from "zod";
+import { ZodSchema, type z } from "zod";
 import { BetterFetchError } from "./error";
 import { initializePlugins } from "./plugins";
 import type { BetterFetchOption, BetterFetchResponse } from "./types";

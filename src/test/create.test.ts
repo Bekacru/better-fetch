@@ -1,16 +1,16 @@
+import { createApp, toNodeListener } from "h3";
+import { type Listener, listen } from "listhen";
 import { afterAll, beforeAll, describe, expect, expectTypeOf } from "vitest";
+import { ZodError, z } from "zod";
 import {
+	type FetchSchemaRoutes,
 	createFetch,
 	createFetchWithDefault,
 	createSchema,
 	methods,
-	type FetchSchemaRoutes,
 } from "../create-fetch";
-import { z, ZodError } from "zod";
 import type { BetterFetchResponse } from "../types";
-import { createApp, toNodeListener } from "h3";
 import { router } from "./test-router";
-import { listen, type Listener } from "listhen";
 
 const schema = {
 	"/": {

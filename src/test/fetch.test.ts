@@ -8,7 +8,7 @@ import {
 } from "h3";
 import { type Listener, listen } from "listhen";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createFetch, betterFetch } from "..";
+import { betterFetch, createFetch } from "..";
 import { router } from "./test-router";
 
 describe("fetch", () => {

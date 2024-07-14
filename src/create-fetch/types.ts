@@ -1,12 +1,12 @@
+import type { LiteralUnion } from "type-fest";
+import type { ZodSchema, z } from "zod";
+import type { BetterFetchOption, BetterFetchResponse } from "../types";
 import type {
 	FetchSchema,
 	IsOptionRequired,
 	RequiredOptionKeys,
 	Schema,
 } from "./schema";
-import type { BetterFetchOption, BetterFetchResponse } from "../types";
-import type { z, ZodSchema } from "zod";
-import type { LiteralUnion } from "type-fest";
 
 export interface CreateFetchOption extends BetterFetchOption {
 	schema?: Schema;

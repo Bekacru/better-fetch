@@ -1,5 +1,5 @@
 import type { LiteralUnion } from "type-fest";
-import type { z, ZodSchema } from "zod";
+import type { ZodSchema, z } from "zod";
 
 export type ParameterSchema = z.ZodString | z.ZodNumber;
 export type FetchSchema = {
