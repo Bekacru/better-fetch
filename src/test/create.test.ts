@@ -1,0 +1,228 @@
+import { afterAll, beforeAll, describe, expect, expectTypeOf } from "vitest";
+import {
+	createFetch,
+	createFetchWithDefault,
+	createSchema,
+	methods,
+	type FetchSchemaRoutes,
+} from "../create-fetch";
+import { z, ZodError } from "zod";
+import type { BetterFetchResponse } from "../types";
+import { createApp, toNodeListener } from "h3";
+import { router } from "./test-router";
+import { listen, type Listener } from "listhen";
+
+const schema = {
+	"/": {
+		output: z.object({
+			message: z.string(),
+		}),
+	},
+	"/signin": {
+		input: z.object({
+			username: z.string(),
+			password: z.string(),
+		}),
+		output: z.object({
+			token: z.string(),
+		}),
+	},
+	"/signup": {
+		input: z.object({
+			username: z.string(),
+			password: z.string(),
+			optional: z.optional(z.string()),
+		}),
+		output: z.object({
+			message: z.string(),
+		}),
+	},
+	"/query": {
+		query: z.object({
+			term: z.string(),
+		}),
+	},
+	"/user": {
+		params: z.object({
+			id: z.number(),
+		}),
+	},
+	"/user/:id": {},
+	"@post/method": {},
+	"@get/method": {},
+	"@delete/method": {},
+	"@put/method": {},
+	"@patch/method": {},
+} satisfies FetchSchemaRoutes;
+
+describe("create-fetch-runtime-test", (it) => {
+	const $fetch = createFetch({
+		baseURL: "http://localhost:4001",
+		schema: createSchema(schema),
+	});
+	let listener: Listener;
+	beforeAll(async () => {
+		const app = createApp().use(router);
+		listener = await listen(toNodeListener(app), {
+			port: 4001,
+		});
+	});
+	afterAll(() => {
+		listener.close().catch(console.error);
+	});
+
+	it("should validate response and throw if validation fails", async () => {
+		expect(
+			$fetch("/post", {
+				output: z.object({
+					id: z.number(),
+				}),
+				method: "POST",
+			}),
+		).rejects.toThrowError(ZodError);
+	});
+
+	it("should validate response and return data if validation passes", async () => {
+		const res = await $fetch("/echo", {
+			output: z.object({
+				path: z.any(),
+				body: z.object({ id: z.number().transform((v) => v + 1) }),
+				headers: z.any(),
+			}),
+			body: { id: 1 },
+		});
+
+		expect(res.data).toEqual({
+			path: "/echo",
+			body: { id: 2 },
+			headers: expect.any(Object),
+		});
+	});
+
+	it("should work with method modifiers", async () => {
+		for (const method of methods) {
+			const res = await $fetch(`@${method}/method`);
+			expect(res.data).toEqual(method.toUpperCase());
+		}
+	});
+});
+
+describe("create-fetch-type-test", (it) => {
+	const $fetch = createFetch({
+		baseURL: "http://localhost:4001",
+		customFetchImpl: async (req, init) => {
+			return new Response();
+		},
+		schema: createSchema(schema),
+		catchAllError: true,
+	});
+	it("should return unknown if no output is defined", () => {
+		const res = $fetch("/");
+		expectTypeOf(res).toMatchTypeOf<Promise<BetterFetchResponse<unknown>>>();
+	});
+
+	it("should not require option/body and return message", () => {
+		expectTypeOf($fetch("/")).toMatchTypeOf<
+			Promise<BetterFetchResponse<{ message: string }>>
+		>();
+	});
+
+	it("if output is defined it should be used", () => {
+		const res = $fetch("/", {
+			output: z.object({
+				somethingElse: z.string(),
+			}),
+		});
+		expectTypeOf(res).toMatchTypeOf<
+			Promise<
+				BetterFetchResponse<{
+					somethingElse: string;
+				}>
+			>
+		>();
+		expectTypeOf(res).not.toMatchTypeOf<
+			Promise<
+				BetterFetchResponse<{
+					message: string;
+				}>
+			>
+		>();
+	});
+
+	it("should required body and return token", () => {
+		expectTypeOf(
+			$fetch("/signin", {
+				body: {
+					username: "",
+					password: "",
+				},
+			}),
+		).toMatchTypeOf<Promise<BetterFetchResponse<{ token: string }>>>();
+	});
+
+	it("should not require optional fields and return message", () => {
+		expectTypeOf(
+			$fetch("/signup", {
+				body: {
+					username: "",
+					password: "",
+				},
+			}),
+		).toMatchTypeOf<Promise<BetterFetchResponse<{ message: string }>>>();
+	});
+
+	it("should require query param", () => {
+		expectTypeOf($fetch("/query", { query: { term: "" } })).toMatchTypeOf<
+			Promise<BetterFetchResponse<unknown>>
+		>();
+	});
+
+	it("should strictly allow only specified keys as url", () => {
+		const f = createFetch({
+			schema: createSchema(schema, {
+				strict: true,
+			}),
+		});
+		type SchemaKey = keyof typeof schema;
+		type FunctionKeys = typeof f extends (url: infer U) => any ? U : never;
+		expectTypeOf<FunctionKeys>().toEqualTypeOf<SchemaKey>();
+		expectTypeOf<FunctionKeys>().not.toEqualTypeOf<string>();
+	});
+
+	it("should infer params", () => {
+		const f = createFetch({
+			schema: createSchema(schema),
+			baseURL: "http://localhost:3000",
+			customFetchImpl: async (url, req) => {
+				return new Response();
+			},
+		});
+
+		expectTypeOf(
+			f("/user", {
+				params: { id: 1 },
+			}),
+		).toMatchTypeOf<Promise<BetterFetchResponse<unknown>>>();
+
+		expectTypeOf(
+			f("/user/:id", {
+				params: {
+					id: "1",
+				},
+			}),
+		).toMatchTypeOf<Promise<BetterFetchResponse<unknown>>>();
+	});
+
+	it("should infer default response and error types", () => {
+		const $fetch = createFetchWithDefault<{ data: any }>()({
+			baseURL: "http://localhost:3000",
+		});
+		expectTypeOf($fetch("/")).toMatchTypeOf<
+			Promise<
+				BetterFetchResponse<{
+					data: any;
+				}>
+			>
+		>();
+	});
+});

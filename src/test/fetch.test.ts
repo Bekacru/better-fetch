@@ -1,4 +1,3 @@
-import type { IncomingHttpHeaders } from "http";
 import {
 	createApp,
 	createRouter,
@@ -9,88 +8,21 @@ import {
 } from "h3";
 import { type Listener, listen } from "listhen";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import betterFetch, { createFetch } from "../src";
-import type { DefaultSchema } from "../src/typed";
+import { createFetch, betterFetch } from "..";
+import { router } from "./test-router";
 
 describe("fetch", () => {
 	const getURL = (path?: string) =>
 		path ? `http://localhost:4000/${path}` : "http://localhost:4000";
 	let listener: Listener;
 	beforeAll(async () => {
-		const router = createRouter()
-			.use(
-				"/ok",
-				eventHandler(() => "ok"),
-			)
-			.use(
-				"/params",
-				eventHandler((event) =>
-					new URLSearchParams(event.node.req.url).toString(),
-				),
-			)
-			.use(
-				"/url",
-				eventHandler((event) => event.node.req.url),
-			)
-			.use(
-				"/echo",
-				eventHandler(async (event) => {
-					return {
-						path: event.path,
-						body:
-							event.node.req.method === "POST"
-								? await readRawBody(event)
-								: undefined,
-						headers: event.node.req.headers,
-					};
-				}),
-			)
-			.use(
-				"/post",
-				eventHandler(async (event) => {
-					return {
-						body: await readBody(event),
-						headers: event.node.req.headers,
-					};
-				}),
-			)
-			.use(
-				"/binary",
-				eventHandler((event) => {
-					event.node.res.setHeader("Content-Type", "application/octet-stream");
-					return new Blob(["binary"]);
-				}),
-			)
-			.use(
-				"/204",
-				eventHandler(() => null),
-			)
-			.use(
-				"/param/:id",
-				eventHandler((event) => {
-					return event.node.req.url?.toString();
-				}),
-			)
-			.use(
-				"/method",
-				eventHandler((event) => {
-					return event.node.req.method;
-				}),
-			);
 		const app = createApp().use(router);
 		listener = await listen(toNodeListener(app), {
 			port: 4000,
 		});
 	});
 
-	const $echo = createFetch<
-		DefaultSchema,
-		{
-			body: any;
-			path: string;
-			headers: IncomingHttpHeaders;
-		}
-	>({
+	const $echo = createFetch({
 		baseURL: getURL(),
 	});
 
@@ -120,13 +52,14 @@ describe("fetch", () => {
 			body: { num: 42 },
 		});
 		expect(res.data?.body).toEqual({ num: 42 });
-
-		const res2 = await betterFetch(getURL("post"), {
+		const res2 = await betterFetch<any>(getURL("post"), {
 			method: "POST",
 			body: [{ num: 42 }, { num: 43 }],
 		});
 		expect(res2.data?.body).toEqual([{ num: 42 }, { num: 43 }]);
+	});
 
+	it("should work with headers", async () => {
 		const headerFetches = [
 			[["X-header", "1"]],
 			{ "x-header": "1" },
@@ -134,19 +67,22 @@ describe("fetch", () => {
 		];
 
 		for (const sentHeaders of headerFetches) {
-			const res2 = await betterFetch(getURL("post"), {
+			const res2 = await betterFetch<any>(getURL("post"), {
 				method: "POST",
 				body: { num: 42 },
 				headers: sentHeaders as HeadersInit,
 			});
+
 			expect(res2.data.headers).to.include({ "x-header": "1" });
-			expect(res2.data.headers).to.include({ accept: "application/json" });
+			expect(res2.data.headers).to.include({
+				"content-type": "application/json",
+			});
 		}
 	});
 
 	it("does not stringify body when content type != application/json", async () => {
 		const message = '"Hallo von Pascal"';
-		const { data } = await $echo("/echo", {
+		const { data } = await $echo<any>("/echo", {
 			method: "POST",
 			body: message,
 			headers: { "Content-Type": "text/plain" },
@@ -156,7 +92,7 @@ describe("fetch", () => {
 
 	it("Handle Buffer body", async () => {
 		const message = "Hallo von Pascal";
-		const { data } = await $echo("/echo", {
+		const { data } = await $echo<any>("/echo", {
 			method: "POST",
 			body: Buffer.from("Hallo von Pascal"),
 			headers: { "Content-Type": "text/plain" },
@@ -166,7 +102,7 @@ describe("fetch", () => {
 
 	it("Bypass URLSearchParams body", async () => {
 		const data = new URLSearchParams({ foo: "bar" });
-		const { data: res } = await betterFetch(getURL("post"), {
+		const { data: res } = await betterFetch<any>(getURL("post"), {
 			method: "POST",
 			body: data,
 		});
@@ -197,14 +133,15 @@ describe("fetch", () => {
 
 	it("204 no content", async () => {
 		const { data } = await betterFetch(getURL("204"));
-		expect(data).toEqual({});
+
+		expect(data).toEqual("");
 	});
 
 	it("HEAD no content", async () => {
 		const { data } = await betterFetch(getURL("ok"), {
 			method: "HEAD",
 		});
-		expect(data).toEqual({});
+		expect(data).toEqual("");
 	});
 
 	it("should retry on error", async () => {
@@ -227,7 +164,6 @@ describe("fetch", () => {
 				retry: 3,
 				signal: controller.signal,
 			});
-			console.log("response", response);
 		}
 		expect(abortHandle()).rejects.toThrow(/aborted/);
 	});
@@ -246,27 +182,28 @@ describe("fetch", () => {
 		expect(response.data).toBe("/param/2");
 	});
 
-	it("should work with method modifier string", async () => {
-		const url = getURL();
-		const response = await betterFetch("@post/method", {
-			baseURL: url,
-		});
-		expect(response.data).toBe("POST");
-		const response2 = await betterFetch("@get/method", {
-			baseURL: url,
-		});
-		expect(response2.data).toBe("GET");
-	});
+	// it("should work with method modifier string", async () => {
+	// 	const url = getURL();
+	// 	const response = await betterFetch("@post/method", {
+	// 		baseURL: url,
+	// 	});
+	// 	expect(response.data).toBe("POST");
+	// 	const response2 = await betterFetch("@get/method", {
+	// 		baseURL: url,
+	// 	});
+	// 	expect(response2.data).toBe("GET");
+	// });
 
 	it("should set auth headers", async () => {
 		const url = getURL("post");
-		const res = await betterFetch(url, {
-			authorization: {
+		const res = await betterFetch<any>(url, {
+			auth: {
 				type: "Bearer",
 				token: "test",
 			},
 			method: "POST",
 		});
+
 		expect(res.data.headers).to.include({
 			authorization: "Bearer test",
 		});

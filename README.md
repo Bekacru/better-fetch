@@ -1,11 +1,12 @@
 # Better Fetch
 
-Advanced fetch wrapper for typescript that returns data and error object, supports defined routes with zod schemas, callbacks, plugins, react hooks and more. Works on the browser, node (version 18+), workers, deno and bun.
+Advanced fetch wrapper for typescript, supports zod schema validations, pre-defined routes, callbacks, plugins and more. Works on the browser, node (version 18+), workers, deno and bun.
 
 ## Installation
 
 ```bash
 pnpm install @better-fetch/fetch
+pnpm install zod # optionally install zod if you want to use the schema validation
 ```
 
 ## Basic Usage
