@@ -15,9 +15,9 @@ import {
 	expectTypeOf,
 	it,
 } from "vitest";
-import { betterFetch, BetterFetchResponse, createFetch } from "..";
-import { router } from "./test-router";
 import { z } from "zod";
+import { BetterFetchResponse, betterFetch, createFetch } from "..";
+import { router } from "./test-router";
 
 describe("fetch", () => {
 	const getURL = (path?: string) =>

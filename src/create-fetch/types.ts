@@ -1,4 +1,5 @@
 import type { ZodSchema, z } from "zod";
+import type { StringLiteralUnion } from "../type-utils";
 import type { BetterFetchOption, BetterFetchResponse } from "../types";
 import type {
 	FetchSchema,
@@ -6,7 +7,6 @@ import type {
 	RequiredOptionKeys,
 	Schema,
 } from "./schema";
-import type { StringLiteralUnion } from "../type-utils";
 
 export interface CreateFetchOption extends BetterFetchOption {
 	schema?: Schema;
