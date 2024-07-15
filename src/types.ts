@@ -73,7 +73,7 @@ export type BetterFetchOption<
 			 */
 			body?: Body;
 			/**
-			 * Query parameters
+			 * Query parameters (key-value pairs)
 			 */
 			query?: Query;
 			/**
