@@ -15,6 +15,8 @@ export interface CreateFetchOption extends BetterFetchOption {
 	 * @default false
 	 */
 	catchAllError?: boolean;
+	defaultOutput?: ZodSchema;
+	defaultError?: ZodSchema;
 }
 
 type WithRequired<T, K extends keyof T | never> = T & { [P in K]-?: T[P] };
@@ -52,8 +54,12 @@ export type InferKey<S> = S extends Schema
 
 export type BetterFetch<
 	CreateOptions extends CreateFetchOption,
-	DefaultRes = unknown,
-	DefaultErr = unknown,
+	DefaultRes = CreateOptions["defaultOutput"] extends ZodSchema
+		? z.infer<CreateOptions["defaultOutput"]>
+		: unknown,
+	DefaultErr = CreateOptions["defaultError"] extends ZodSchema
+		? z.infer<CreateOptions["defaultError"]>
+		: unknown,
 	S extends CreateOptions["schema"] = CreateOptions["schema"],
 > = <
 	Res = DefaultRes,

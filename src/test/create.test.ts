@@ -5,7 +5,6 @@ import { ZodError, z } from "zod";
 import {
 	type FetchSchemaRoutes,
 	createFetch,
-	createFetchWithDefault,
 	createSchema,
 	methods,
 } from "../create-fetch";
@@ -215,14 +214,26 @@ describe("create-fetch-type-test", (it) => {
 	});
 
 	it("should infer default response and error types", () => {
-		const $fetch = createFetchWithDefault<{ data: any }>()({
+		const $fetch = createFetch({
 			baseURL: "http://localhost:3000",
+			defaultOutput: z.object({
+				data: z.string(),
+			}),
+			defaultError: z.object({
+				error: z.string(),
+			}),
 		});
+
 		expectTypeOf($fetch("/")).toMatchTypeOf<
 			Promise<
-				BetterFetchResponse<{
-					data: any;
-				}>
+				BetterFetchResponse<
+					{
+						data: string;
+					},
+					{
+						error: string;
+					}
+				>
 			>
 		>();
 	});
