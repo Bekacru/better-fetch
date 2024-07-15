@@ -149,10 +149,18 @@ export const betterFetch = async <
 			await onError(errorContext);
 		}
 	}
-	if (options?.retry) {
+	if (options?.retry && options.retry.count > 0) {
+		if (options.retry.interval) {
+			await new Promise((resolve) =>
+				setTimeout(resolve, options.retry?.interval),
+			);
+		}
 		return await betterFetch(url, {
 			...options,
-			retry: options.retry - 1,
+			retry: {
+				count: options.retry.count - 1,
+				interval: options.retry.interval,
+			},
 		});
 	}
 

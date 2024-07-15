@@ -34,7 +34,7 @@ export type BetterFetchOption<
 		FetchHooks & {
 			/**
 			 * a timeout that will be used to abort the
-			 * request
+			 * request. Should be in milliseconds.
 			 */
 			timeout?: number;
 			/**
@@ -43,7 +43,7 @@ export type BetterFetchOption<
 			customFetchImpl?: FetchEsque;
 			/**
 			 * Better fetch plugins
-			 * @see https://better-fetch.vercel.app/plugins
+			 * @see https://better-fetch.vercel.app/docs/plugins
 			 */
 			plugins?: BetterFetchPlugin[];
 			/**
@@ -85,13 +85,19 @@ export type BetterFetchOption<
 			 */
 			duplex?: "full" | "half";
 			/**
-			 * JSON parser
+			 * Custom JSON parser
 			 */
 			jsonParser?: <T>(text: string) => Promise<T | undefined>;
 			/**
 			 * Retry count
 			 */
-			retry?: number;
+			retry?: {
+				count: number;
+				/**
+				 * Retry interval in milliseconds
+				 */
+				interval?: number;
+			};
 			/**
 			 * HTTP method
 			 */

@@ -155,7 +155,10 @@ describe("fetch", () => {
 	it("should retry on error", async () => {
 		let count = 0;
 		await betterFetch(getURL("error"), {
-			retry: 3,
+			retry: {
+				count: 3,
+				interval: 0,
+			},
 			onError() {
 				count++;
 			},
@@ -169,7 +172,9 @@ describe("fetch", () => {
 			controller.abort();
 			const response = await betterFetch("", {
 				baseURL: getURL("ok"),
-				retry: 3,
+				retry: {
+					count: 3,
+				},
 				signal: controller.signal,
 			});
 		}
