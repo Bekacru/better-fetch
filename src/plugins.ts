@@ -72,7 +72,7 @@ export type BetterFetchPlugin = {
 	/**
 	 * Hooks for the plugin
 	 */
-	hooks: FetchHooks;
+	hooks?: FetchHooks;
 	/**
 	 * A function that will be called when the plugin is
 	 * initialized. This will be called before the any
@@ -119,10 +119,10 @@ export const initializePlugins = async (
 			opts = pluginRes.options || opts;
 			url = pluginRes.url;
 		}
-		hooks.onRequest.push(plugin.hooks.onRequest);
-		hooks.onResponse.push(plugin.hooks.onResponse);
-		hooks.onSuccess.push(plugin.hooks.onSuccess);
-		hooks.onError.push(plugin.hooks.onError);
+		hooks.onRequest.push(plugin.hooks?.onRequest);
+		hooks.onResponse.push(plugin.hooks?.onResponse);
+		hooks.onSuccess.push(plugin.hooks?.onSuccess);
+		hooks.onError.push(plugin.hooks?.onError);
 	}
 
 	return {
