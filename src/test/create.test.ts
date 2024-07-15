@@ -60,6 +60,7 @@ describe("create-fetch-runtime-test", (it) => {
 		baseURL: "http://localhost:4001",
 		schema: createSchema(schema),
 	});
+
 	let listener: Listener;
 	beforeAll(async () => {
 		const app = createApp().use(router);

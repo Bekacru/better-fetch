@@ -1,4 +1,3 @@
-import type { LiteralUnion } from "type-fest";
 import type { ZodSchema, z } from "zod";
 import type { BetterFetchOption, BetterFetchResponse } from "../types";
 import type {
@@ -7,6 +6,7 @@ import type {
 	RequiredOptionKeys,
 	Schema,
 } from "./schema";
+import type { StringLiteralUnion } from "../type-utils";
 
 export interface CreateFetchOption extends BetterFetchOption {
 	schema?: Schema;
@@ -45,7 +45,9 @@ export type InferOptions<T extends FetchSchema, Key> = WithRequired<
 export type InferKey<S> = S extends Schema
 	? S["config"]["strict"] extends true
 		? keyof S["schema"]
-		: LiteralUnion<keyof S["schema"], string>
+		: StringLiteralUnion<
+				keyof S["schema"] extends string ? keyof S["schema"] : never
+			>
 	: string;
 
 export type BetterFetch<

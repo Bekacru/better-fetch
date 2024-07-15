@@ -1,8 +1,7 @@
-import type { LiteralUnion } from "type-fest";
 import type { ZodSchema } from "zod";
 import type { Auth } from "./auth";
-import type { FetchSchema } from "./create-fetch/schema";
 import type { BetterFetchPlugin, FetchHooks } from "./plugins";
+import type { StringLiteralUnion } from "./type-utils";
 
 type CommonHeaders = {
 	accept: "application/json" | "text/plain" | "application/octet-stream";
@@ -96,7 +95,7 @@ export type BetterFetchOption<
 			/**
 			 * HTTP method
 			 */
-			method?: LiteralUnion<PayloadMethod | NonPayloadMethod, string>;
+			method?: StringLiteralUnion<PayloadMethod | NonPayloadMethod>;
 			/**
 			 * Expected output schema
 			 * You can use this to infer the response

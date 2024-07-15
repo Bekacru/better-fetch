@@ -1,5 +1,5 @@
-import type { LiteralUnion } from "type-fest";
 import type { ZodSchema, z } from "zod";
+import type { StringLiteralUnion } from "../type-utils";
 
 export type ParameterSchema = z.ZodString | z.ZodNumber;
 export type FetchSchema = {
@@ -15,7 +15,7 @@ export type Methods = "get" | "post" | "put" | "patch" | "delete";
 
 export const methods = ["get", "post", "put", "patch", "delete"];
 
-type RouteKey = LiteralUnion<`@${Methods}/`, string>;
+type RouteKey = StringLiteralUnion<`@${Methods}/`>;
 
 export type FetchSchemaRoutes = {
 	[key in RouteKey]?: FetchSchema;
