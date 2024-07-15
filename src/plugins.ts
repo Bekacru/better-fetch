@@ -57,9 +57,21 @@ export interface FetchHooks {
  * A plugin that returns an id and hooks
  */
 export type BetterFetchPlugin = {
+	/**
+	 * A unique id for the plugin
+	 */
 	id: string;
+	/**
+	 * A name for the plugin
+	 */
 	name: string;
+	/**
+	 * A description for the plugin
+	 */
 	description?: string;
+	/**
+	 * Hooks for the plugin
+	 */
 	hooks: FetchHooks;
 	/**
 	 * A function that will be called when the plugin is
