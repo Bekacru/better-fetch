@@ -1,25 +1,17 @@
 import { createApp, toNodeListener } from "h3";
 import { type Listener, listen } from "listhen";
-import {
-	afterAll,
-	beforeAll,
-	describe,
-	expect,
-	expectTypeOf,
-	it,
-} from "vitest";
-import { z } from "zod";
-import { BetterFetchResponse, betterFetch, createFetch } from "..";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { betterFetch, createFetch } from "..";
 import { router } from "./test-router";
 
 describe("fetch", () => {
 	const getURL = (path?: string) =>
-		path ? `http://localhost:4000/${path}` : "http://localhost:4000";
+		path ? `http://localhost:4001/${path}` : "http://localhost:4001";
 	let listener: Listener;
 	beforeAll(async () => {
 		const app = createApp().use(router);
 		listener = await listen(toNodeListener(app), {
-			port: 4000,
+			port: 4001,
 		});
 	});
 
