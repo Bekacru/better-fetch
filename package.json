@@ -24,7 +24,10 @@
 		"zod": "^3.23.6"
 	},
 	"exports": {
-		".": "./dist/index.js"
+		".": {
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
 	},
 	"scripts": {
 		"build": "tsup",
@@ -36,8 +39,6 @@
 		"lint:fix": "biome check . --apply",
 		"typecheck": "tsc --noEmit"
 	},
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"type": "module"
 }
