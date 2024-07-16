@@ -103,7 +103,7 @@ export const betterFetch = async <
 			response,
 			request: context,
 		};
-		if (responseType === "json") {
+		if (responseType === "json" || responseType === "text") {
 			const text = await response.text();
 			const parser = context.jsonParser ?? jsonParse;
 			const data = await parser(text);

@@ -1,7 +1,6 @@
 {
 	"name": "@better-fetch/fetch",
 	"version": "1.0.1-beta.2",
-	"packageManager": "bun@1.1.4",
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.js",
 	"react-native": "./dist/index.js",
@@ -50,8 +49,6 @@
 		"lint:fix": "biome check . --apply",
 		"typecheck": "tsc --noEmit"
 	},
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"type": "module"
 }
