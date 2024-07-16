@@ -1,26 +1,34 @@
-import { createApp, toNodeListener } from "h3";
+import {
+	createApp,
+	createRouter,
+	eventHandler,
+	readBody,
+	toNodeListener,
+} from "h3";
 import { type Listener, listen } from "listhen";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { betterFetch, createFetch } from "..";
+import { BetterFetchError, betterFetch, createFetch } from "..";
 import { router } from "./test-router";
 
 describe("fetch", () => {
 	const getURL = (path?: string) =>
-		path ? `http://localhost:4001/${path}` : "http://localhost:4001";
+		path ? `http://localhost:4000/${path}` : "http://localhost:4000";
+
 	let listener: Listener;
+
 	beforeAll(async () => {
 		const app = createApp().use(router);
 		listener = await listen(toNodeListener(app), {
-			port: 4001,
+			port: 4000,
 		});
+	});
+
+	afterAll(async () => {
+		await listener.close().catch(console.error);
 	});
 
 	const $echo = createFetch({
 		baseURL: getURL(),
-	});
-
-	afterAll(() => {
-		listener.close().catch(console.error);
 	});
 
 	it("ok", async () => {
@@ -205,5 +213,20 @@ describe("fetch", () => {
 		expect(res.data.headers).to.include({
 			authorization: "Bearer test",
 		});
+	});
+});
+
+describe("fetch-error", () => {
+	const f = createFetch({
+		baseURL: "http://localhost:4001",
+		customFetchImpl: async (req, init) => {
+			return new Response(null, {
+				status: 500,
+			});
+		},
+		throw: true,
+	});
+	it("should throw if the response is not ok", async () => {
+		await expect(f("/ok")).rejects.toThrowError(BetterFetchError);
 	});
 });

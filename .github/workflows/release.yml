@@ -16,10 +16,6 @@ jobs:
         with: 
           fetch-depth: 0
 
-      - run: npx changelogithub
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
       - uses: ./.github/setup
       
       - uses: actions/setup-node@v4
@@ -41,6 +37,11 @@ jobs:
               
       - name: Build
         run: bun run build
+
+      - run: npx changelogithub
+        if: steps.check_version.outputs.tag == 'latest'
+        env:
+            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           
       - name: Publish to npm
         run: npm publish --access public --no-git-checks --tag ${{steps.check_version.outputs.tag}}

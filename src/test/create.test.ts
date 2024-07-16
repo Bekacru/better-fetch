@@ -9,6 +9,7 @@ import {
 	methods,
 } from "../create-fetch";
 import type { BetterFetchResponse } from "../types";
+
 import { router } from "./test-router";
 
 const schema = {

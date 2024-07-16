@@ -86,10 +86,12 @@ export type BetterFetch<
 					: Res
 				: Res,
 		Err,
-		O["throw"] extends true
-			? true
+		O["throw"] extends boolean
+			? O["throw"]
 			: CreateOptions["throw"] extends true
 				? true
-				: false
+				: Err extends false
+					? true
+					: false
 	>
 >;
