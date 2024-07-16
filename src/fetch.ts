@@ -127,9 +127,7 @@ export const betterFetch = async <
 		}
 
 		if (options?.throw) {
-			return {
-				data: successContext.data,
-			} as any;
+			return successContext.data as any;
 		}
 
 		return {

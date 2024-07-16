@@ -149,8 +149,4 @@ export type BetterFetchResponse<
 	T,
 	E extends Record<string, unknown> | unknown = unknown,
 	Throw extends boolean = false,
-> = Throw extends true
-	? {
-			data: T;
-		}
-	: Data<T> | Error<E>;
+> = Throw extends true ? T : Data<T> | Error<E>;

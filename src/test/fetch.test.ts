@@ -224,3 +224,27 @@ describe("fetch-error", () => {
 		await expect(f("/ok")).rejects.toThrowError(BetterFetchError);
 	});
 });
+
+describe("fetch-error-throw", () => {
+	const f = createFetch({
+		baseURL: "http://localhost:4001",
+		customFetchImpl: async (req, init) => {
+			const url = new URL(req.toString());
+			if (url.pathname.startsWith("/ok")) {
+				return new Response(JSON.stringify({ message: "ok" }));
+			}
+			return new Response(null, {
+				status: 500,
+			});
+		},
+		throw: true,
+	});
+	it("should throw if the response is not ok", async () => {
+		await expect(f("/not-ok")).rejects.toThrowError(BetterFetchError);
+	});
+
+	it("should return data without error object", async () => {
+		const res = await f<{ message: "ok" }>("/ok");
+		expect(res).toEqual({ message: "ok" });
+	});
+});
