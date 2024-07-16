@@ -1,6 +1,6 @@
 import type { BetterFetchOption } from "./types";
 
-type stringOrReturning = string | (() => string);
+type typeOrTypeReturning<T> = T | (() => T);
 /**
  * Bearer token authentication
  *
@@ -9,7 +9,7 @@ type stringOrReturning = string | (() => string);
  */
 export type Bearer = {
 	type: "Bearer";
-	token: stringOrReturning;
+	token: typeOrTypeReturning<string | undefined>;
 };
 
 /**
@@ -17,8 +17,8 @@ export type Bearer = {
  */
 export type Basic = {
 	type: "Basic";
-	username: stringOrReturning;
-	password: stringOrReturning;
+	username: typeOrTypeReturning<string | undefined>;
+	password: typeOrTypeReturning<string | undefined>;
 };
 
 /**
@@ -38,27 +38,36 @@ export type Basic = {
  */
 export type Custom = {
 	type: "Custom";
-	prefix: stringOrReturning;
-	value: stringOrReturning;
+	prefix: typeOrTypeReturning<string | undefined>;
+	value: typeOrTypeReturning<string | undefined>;
 };
 
 export type Auth = Bearer | Basic | Custom;
 
 export const getAuthHeader = (options?: BetterFetchOption) => {
 	const headers: Record<string, string> = {};
-	const getValue = (value: stringOrReturning) =>
+	const getValue = (value: typeOrTypeReturning<string | undefined>) =>
 		typeof value === "function" ? value() : value;
 	if (options?.auth) {
 		if (options.auth.type === "Bearer") {
-			headers["authorization"] = `Bearer ${getValue(options.auth.token)}`;
+			const token = getValue(options.auth.token);
+			if (!token) {
+				return headers;
+			}
+			headers["authorization"] = `Bearer ${token}`;
 		} else if (options.auth.type === "Basic") {
-			headers["authorization"] = `Basic ${btoa(
-				`${getValue(options.auth.username)}:${getValue(options.auth.password)}`,
-			)}`;
+			const username = getValue(options.auth.username);
+			const password = getValue(options.auth.password);
+			if (!username || !password) {
+				return headers;
+			}
+			headers["authorization"] = `Basic ${btoa(`${username}:${password}`)}`;
 		} else if (options.auth.type === "Custom") {
-			headers["authorization"] = `${getValue(options.auth.prefix)} ${getValue(
-				options.auth.value,
-			)}`;
+			const value = getValue(options.auth.value);
+			if (!value) {
+				return headers;
+			}
+			headers["authorization"] = `${getValue(options.auth.prefix)} ${value}`;
 		}
 	}
 	return headers;
