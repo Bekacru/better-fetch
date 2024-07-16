@@ -24,20 +24,7 @@
 		"zod": "^3.23.6"
 	},
 	"exports": {
-		".": {
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
-		},
-		"./typed": {
-			"import": "./dist/typed.js",
-			"require": "./dist/typed.cjs",
-			"types": "./dist/typed.d.ts"
-		},
-		"./react": {
-			"import": "./dist/react.js",
-			"require": "./dist/react.cjs",
-			"types": "./dist/react.d.ts"
-		}
+		".": "./dist/index.js"
 	},
 	"scripts": {
 		"build": "tsup",
@@ -49,8 +36,6 @@
 		"lint:fix": "biome check . --apply",
 		"typecheck": "tsc --noEmit"
 	},
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"type": "module"
 }

@@ -1,10 +1,4 @@
-import {
-	createApp,
-	createRouter,
-	eventHandler,
-	readBody,
-	toNodeListener,
-} from "h3";
+import { createApp, toNodeListener } from "h3";
 import { type Listener, listen } from "listhen";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { BetterFetchError, betterFetch, createFetch } from "..";

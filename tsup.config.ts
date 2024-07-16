@@ -4,8 +4,7 @@ export default defineConfig({
 	entry: ["./src/index.ts"],
 	splitting: false,
 	sourcemap: true,
-	format: ["esm", "cjs"],
+	format: ["esm"],
 	dts: true,
 	clean: true,
-	external: ["zod"],
 });

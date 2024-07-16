@@ -1,4 +1,4 @@
-import { createRouter, eventHandler, readBody, readRawBody } from "h3";
+import { createRouter, eventHandler, readBody } from "h3";
 
 export const router = createRouter()
 	.use(

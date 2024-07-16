@@ -201,7 +201,7 @@ export function getTimeout(
 	options?: BetterFetchOption,
 	controller?: AbortController,
 ) {
-	let abortTimeout: NodeJS.Timeout | undefined;
+	let abortTimeout: ReturnType<typeof setTimeout> | undefined;
 	if (!options?.signal && options?.timeout) {
 		abortTimeout = setTimeout(() => controller?.abort(), options?.timeout);
 	}
