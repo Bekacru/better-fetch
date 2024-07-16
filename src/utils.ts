@@ -164,10 +164,6 @@ export function detectContentType(body: any) {
 		return "multipart/form-data";
 	}
 
-	if (body instanceof ReadableStream) {
-		return "application/octet-stream";
-	}
-
 	if (isJSONSerializable(body)) {
 		return "application/json";
 	}

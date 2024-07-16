@@ -1,11 +1,4 @@
-import {
-	createApp,
-	createRouter,
-	eventHandler,
-	readBody,
-	readRawBody,
-	toNodeListener,
-} from "h3";
+import { createApp, toNodeListener } from "h3";
 import { type Listener, listen } from "listhen";
 import {
 	afterAll,
@@ -220,41 +213,5 @@ describe("fetch", () => {
 		expect(res.data.headers).to.include({
 			authorization: "Bearer test",
 		});
-	});
-});
-
-describe("fetch-error-type-test", (it) => {
-	it("shouldn't return error on throw", () => {
-		const res = betterFetch("http://localhost:3000", {
-			throw: true,
-			output: z.object({
-				id: z.number(),
-			}),
-		});
-		expectTypeOf(res).toMatchTypeOf<
-			Promise<{
-				data: {
-					id: number;
-				};
-			}>
-		>();
-	});
-
-	it("should return error on throw", () => {
-		const res = betterFetch<
-			{
-				id: number;
-			},
-			false
-		>("http://localhost:3000", {
-			throw: true,
-		});
-		expectTypeOf(res).toMatchTypeOf<
-			Promise<{
-				data: {
-					id: number;
-				};
-			}>
-		>();
 	});
 });

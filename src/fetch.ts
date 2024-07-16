@@ -61,8 +61,8 @@ export const betterFetch = async <
 	}
 
 	if (
-		("pipeTo" in (context as unknown as ReadableStream) &&
-			typeof (context as unknown as ReadableStream).pipeTo === "function") ||
+		("pipeTo" in (context as any) &&
+			typeof (context as any).pipeTo === "function") ||
 		typeof options?.body?.pipe === "function"
 	) {
 		if (!("duplex" in context)) {
