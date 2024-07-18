@@ -51,6 +51,11 @@ export interface FetchHooks {
 	 * error occurs.
 	 */
 	onError?: (context: ErrorContext) => Promise<void> | void;
+	/**
+	 * a callback function that will be called when a
+	 * request is retried.
+	 */
+	onRetry?: (response: ResponseContext) => Promise<void> | void;
 }
 
 /**

@@ -1,6 +1,7 @@
 import type { ZodSchema } from "zod";
 import type { Auth } from "./auth";
 import type { BetterFetchPlugin, FetchHooks } from "./plugins";
+import { RetryOptions } from "./retry";
 import type { StringLiteralUnion } from "./type-utils";
 
 type CommonHeaders = {
@@ -91,13 +92,11 @@ export type BetterFetchOption<
 			/**
 			 * Retry count
 			 */
-			retry?: {
-				count: number;
-				/**
-				 * Retry interval in milliseconds
-				 */
-				interval?: number;
-			};
+			retry?: RetryOptions;
+			/**
+			 * the number of times the request has alredy been retried
+			 */
+			retryAttempt?: number;
 			/**
 			 * HTTP method
 			 */

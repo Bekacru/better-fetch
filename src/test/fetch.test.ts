@@ -142,15 +142,70 @@ describe("fetch", () => {
 	it("should retry on error", async () => {
 		let count = 0;
 		await betterFetch(getURL("error"), {
-			retry: {
-				count: 3,
-				interval: 0,
-			},
+			retry: 3,
 			onError() {
 				count++;
 			},
 		});
 		expect(count).toBe(4);
+	});
+
+	it("should retry with linear delay", async () => {
+		let count = 0;
+
+		let beforeCall = Date.now();
+		let lastCallTime = 0;
+
+		const fetchPromise = betterFetch(getURL("error"), {
+			retry: {
+				type: "linear",
+				attempts: 3,
+				delay: 200,
+			},
+			onError() {
+				count++;
+				lastCallTime = Date.now();
+			},
+		});
+
+		await fetchPromise;
+
+		expect(count).toBe(4);
+		expect(lastCallTime - beforeCall).toBeGreaterThanOrEqual(200 * 3);
+	});
+
+	it("should retry with exponential backoff and increasing delays", async () => {
+		let count = 0;
+		const delays: number[] = [];
+		let lastCallTime = 0;
+
+		const fetchPromise = betterFetch(getURL("error"), {
+			retry: {
+				type: "exponential",
+				attempts: 3,
+				baseDelay: 100,
+				maxDelay: 1000,
+			},
+			onError() {
+				count++;
+				const currentTime = Date.now();
+				if (lastCallTime > 0) {
+					delays.push(currentTime - lastCallTime);
+				}
+				lastCallTime = currentTime;
+			},
+		});
+
+		await fetchPromise;
+
+		expect(count).toBe(4);
+
+		expect(delays[1]).toBeGreaterThan(delays[0]);
+		expect(delays[2]).toBeGreaterThan(delays[1]);
+
+		expect(delays[0]).toBeGreaterThanOrEqual(100);
+		expect(delays[1]).toBeGreaterThanOrEqual(200);
+		expect(delays[2]).toBeGreaterThanOrEqual(400);
 	});
 
 	it("abort with retry", () => {
@@ -159,9 +214,7 @@ describe("fetch", () => {
 			controller.abort();
 			const response = await betterFetch("", {
 				baseURL: getURL("ok"),
-				retry: {
-					count: 3,
-				},
+				retry: 3,
 				signal: controller.signal,
 			});
 		}
