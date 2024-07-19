@@ -5,7 +5,8 @@
 	"scripts": {
 		"build": "next build",
 		"dev": "next dev",
-		"start": "next start"
+		"start": "next start",
+		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
 		"@better-fetch/fetch": "1.0.1-beta.7",
