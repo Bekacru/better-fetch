@@ -18,8 +18,8 @@ importers:
   doc:
     dependencies:
       '@better-fetch/fetch':
-        specifier: 1.0.1-beta.7
-        version: 1.0.1-beta.7
+        specifier: workspace:*
+        version: link:../packages/better-fetch
       '@radix-ui/react-icons':
         specifier: ^1.3.0
         version: 1.3.0(react@18.3.1)
@@ -170,9 +170,6 @@ packages:
   '@babel/runtime@7.24.8':
     resolution: {integrity: sha512-5F7SDGs1T72ZczbRwbGO9lQi0NLjQxzl6i4lJxLxfW9U5UluCSyEJeniWvnhl3/euNiqQVbo8zruhsDfid0esA==}
     engines: {node: '>=6.9.0'}
-
-  '@better-fetch/fetch@1.0.1-beta.7':
-    resolution: {integrity: sha512-pqzDVRbnxlLCDW5zbEMFM9fdAx6FAgo7VHEjkBqVEE3m4Hhmwhoz1fEH3Lw6q+wYXbRFQlzyFQnV0yGhNAN3aw==}
 
   '@biomejs/biome@1.7.3':
     resolution: {integrity: sha512-ogFQI+fpXftr+tiahA6bIXwZ7CSikygASdqMtH07J2cUzrpjyTMVc9Y97v23c7/tL1xCZhM+W9k4hYIBm7Q6cQ==}
@@ -3620,8 +3617,6 @@ snapshots:
   '@babel/runtime@7.24.8':
     dependencies:
       regenerator-runtime: 0.14.1
-
-  '@better-fetch/fetch@1.0.1-beta.7': {}
 
   '@biomejs/biome@1.7.3':
     optionalDependencies:
