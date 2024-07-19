@@ -120,7 +120,18 @@ export function getURL(url: string, options?: BetterFetchOption) {
 			url = url.replace(`@${m}/`, "/");
 		}
 	}
-	let _url = url.startsWith("http") ? url : new URL(url, options?.baseURL);
+	let _url;
+	try {
+		_url = url.startsWith("http") ? url : new URL(url, options?.baseURL);
+	} catch(e) {
+		if(e instanceof TypeError){
+			if (!options?.baseURL) {
+				throw TypeError(`Invalid URL ${url}. Are you passing in a relative url but not setting the baseURL?`)
+			}
+			throw TypeError(`Invalid URL ${url}. Please validate that you are passing the correct input.`)
+		}
+		throw e;
+	}
 
 	/**
 	 * Dynamic Parameters.
