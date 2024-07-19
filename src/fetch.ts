@@ -1,6 +1,7 @@
 import { ZodSchema, type z } from "zod";
 import { BetterFetchError } from "./error";
 import { initializePlugins } from "./plugins";
+import { createRetryStrategy } from "./retry";
 import type { BetterFetchOption, BetterFetchResponse } from "./types";
 import {
 	detectResponseType,
@@ -147,19 +148,19 @@ export const betterFetch = async <
 			await onError(errorContext);
 		}
 	}
-	if (options?.retry && options.retry.count > 0) {
-		if (options.retry.interval) {
-			await new Promise((resolve) =>
-				setTimeout(resolve, options.retry?.interval),
-			);
+
+	if (options?.retry) {
+		const retryStrategy = createRetryStrategy(options.retry);
+		const _retryAttempt = options.retryAttempt ?? 0;
+		if (await retryStrategy.shouldAttemptRetry(_retryAttempt, response)) {
+			await options?.onRetry?.(responseContext);
+			const delay = retryStrategy.getDelay(_retryAttempt);
+			await new Promise((resolve) => setTimeout(resolve, delay));
+			return await betterFetch(url, {
+				...options,
+				retryAttempt: _retryAttempt + 1,
+			});
 		}
-		return await betterFetch(url, {
-			...options,
-			retry: {
-				count: options.retry.count - 1,
-				interval: options.retry.interval,
-			},
-		});
 	}
 
 	const parser = options?.jsonParser ?? jsonParse;
