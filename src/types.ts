@@ -1,7 +1,7 @@
 import type { ZodSchema } from "zod";
 import type { Auth } from "./auth";
 import type { BetterFetchPlugin, FetchHooks } from "./plugins";
-import { RetryOptions } from "./retry";
+import type { RetryOptions } from "./retry";
 import type { StringLiteralUnion } from "./type-utils";
 
 type CommonHeaders = {

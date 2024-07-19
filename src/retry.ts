@@ -65,7 +65,7 @@ class ExponentialRetryStrategy implements RetryStrategy {
 	getDelay(attempt: number): number {
 		const delay = Math.min(
 			this.options.maxDelay,
-			this.options.baseDelay * Math.pow(2, attempt),
+			this.options.baseDelay * 2 ** attempt,
 		);
 		return delay;
 	}

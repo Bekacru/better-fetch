@@ -153,15 +153,15 @@ export const betterFetch = async <
 		const retryStrategy = createRetryStrategy(options.retry);
 		const _retryAttempt = options.retryAttempt ?? 0;
 		if (await retryStrategy.shouldAttemptRetry(_retryAttempt, response)) {
-		  await options?.onRetry?.(responseContext);
-		  const delay = retryStrategy.getDelay(_retryAttempt);
-		  await new Promise((resolve) => setTimeout(resolve, delay));
-		  return await betterFetch(url, {
-			...options,
-			retryAttempt: _retryAttempt + 1,
-		  });
+			await options?.onRetry?.(responseContext);
+			const delay = retryStrategy.getDelay(_retryAttempt);
+			await new Promise((resolve) => setTimeout(resolve, delay));
+			return await betterFetch(url, {
+				...options,
+				retryAttempt: _retryAttempt + 1,
+			});
 		}
-	  }
+	}
 
 	const parser = options?.jsonParser ?? jsonParse;
 	const text = await response.text();

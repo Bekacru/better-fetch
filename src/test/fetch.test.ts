@@ -153,7 +153,7 @@ describe("fetch", () => {
 	it("should retry with linear delay", async () => {
 		let count = 0;
 
-		let beforeCall = Date.now();
+		const beforeCall = Date.now();
 		let lastCallTime = 0;
 
 		const fetchPromise = betterFetch(getURL("error"), {
