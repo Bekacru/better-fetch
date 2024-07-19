@@ -1,6 +1,6 @@
 import { createApp, toNodeListener } from "h3";
 import { type Listener, listen } from "listhen";
-import { afterAll, beforeAll, describe, expect, expectTypeOf } from "vitest";
+import { afterAll, beforeAll, describe, expect, expectTypeOf, it } from "vitest";
 import { ZodError, z } from "zod";
 import {
 	type FetchSchemaRoutes,
@@ -55,7 +55,7 @@ const schema = {
 	"@patch/method": {},
 } satisfies FetchSchemaRoutes;
 
-describe("create-fetch-runtime-test", (it) => {
+describe("create-fetch-runtime-test", () => {
 	const $fetch = createFetch({
 		baseURL: "http://localhost:4001",
 		schema: createSchema(schema),
@@ -108,7 +108,7 @@ describe("create-fetch-runtime-test", (it) => {
 	});
 });
 
-describe("create-fetch-type-test", (it) => {
+describe("create-fetch-type-test", () => {
 	const $fetch = createFetch({
 		baseURL: "http://localhost:4001",
 		customFetchImpl: async (req, init) => {
@@ -193,7 +193,7 @@ describe("create-fetch-type-test", (it) => {
 	it("should infer params", () => {
 		const f = createFetch({
 			schema: createSchema(schema),
-			baseURL: "http://localhost:3000",
+			baseURL: "http://localhost:4001",
 			customFetchImpl: async (url, req) => {
 				return new Response();
 			},
@@ -216,13 +216,16 @@ describe("create-fetch-type-test", (it) => {
 
 	it("should infer default response and error types", () => {
 		const $fetch = createFetch({
-			baseURL: "http://localhost:3000",
+			baseURL: "http://localhost:4001",
 			defaultOutput: z.object({
 				data: z.string(),
 			}),
 			defaultError: z.object({
 				error: z.string(),
 			}),
+			customFetchImpl: async (url, req) => {
+				return new Response();
+			},
 		});
 
 		expectTypeOf($fetch("/")).toMatchTypeOf<
