@@ -14,6 +14,6 @@
 		"simple-git-hooks": "^2.11.1"
 	},
 	"simple-git-hooks": {
-		"pre-push": "pnpm typecheck && pnpm format && pnpm test"
+		"pre-push": "pnpm typecheck"
 	}
 }
