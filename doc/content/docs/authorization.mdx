@@ -1,0 +1,63 @@
+---
+title: Authorization
+description: Authorization
+---
+
+Authorization is a way that allows you to add authentication headers to the request.
+Currently, supports `Bearer` and `Basic` authorization.
+
+### Bearer
+
+The bearer authorization is used to add a bearer token to the request. The token is added to the `Authorization` header. 
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from "@better-fetch/fetch";
+
+const $fetch = createFetch({
+    baseURL: "http://localhost:3000",
+    auth: {
+        type: "Bearer",
+        token: "my-token",
+    },
+})
+```
+
+You can also pass a function that returns a string.
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from "@better-fetch/fetch";
+
+const authStore = {
+    getToken: () => "my-token",
+}
+
+//---cut---
+const $fetch = createFetch({
+    baseURL: "http://localhost:3000",
+    auth: {
+        type: "Bearer",
+        token: () => authStore.getToken(),
+    },
+})
+```
+
+<Callout type="info">
+    The function will be called only once when the request is made. If it returns undefined, the header will not be added to the request.
+</Callout>
+
+### Basic
+
+The basic authorization is used to add a basic authentication to the request. The username and password are added to the `Authorization` header.
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from "@better-fetch/fetch";
+
+const $fetch = createFetch({
+    baseURL: "http://localhost:3000",
+    auth: {
+        type: "Basic",
+        username: "my-username",
+        password: "my-password",
+    },
+})
+```

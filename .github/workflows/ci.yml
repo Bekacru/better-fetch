@@ -17,13 +17,13 @@ jobs:
       - uses: ./.github/setup
       
       - name: Build
-        run: bun run build
+        run: pnpm build
 
       - name: Lint
-        run: bun lint
+        run: pnpm lint
 
       - name: Typecheck
-        run: bun typecheck
+        run: pnpm typecheck
 
       - name: Test
-        run: bun run test
+        run: pnpm test

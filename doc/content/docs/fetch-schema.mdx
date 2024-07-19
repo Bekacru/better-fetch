@@ -1,0 +1,271 @@
+---
+title: Fetch Schema
+description: Fetch Schema
+---
+
+Fetch schema allows you to pre-define the url path and the shape of reqeust and response data. This is like <Link href="https://trpc.io/" target="_blank">**trpc**</Link> or other typed rpc librires client but you define it yourself. 
+
+The output of the scheam will be validated using zod and if the validation fails, it'll throw an error. 
+
+Before we start, make sure you have installed the [zod](https://www.npmjs.com/package/zod) package.
+
+```package-install
+npm i zod
+```
+
+to create a fetch schema, you need to import the `createSchema` function from `@better-fetch/fetch`.
+
+```ts twoslash title="fetch.ts" 
+import { createSchema, createFetch } from "@better-fetch/fetch";
+import { z } from "zod";
+
+
+export const schema = createSchema({ // [!code highlight]
+    "/path": { // [!code highlight]
+        input: z.object({ // [!code highlight]
+            userId: z.string(), // [!code highlight]
+            id: z.number(), // [!code highlight]
+            title: z.string(), // [!code highlight]
+            completed: z.boolean(), // [!code highlight]
+        }), // [!code highlight]
+        output: z.object({ // [!code highlight]
+            userId: z.string(), // [!code highlight]
+            id: z.number(), // [!code highlight]
+            title: z.string(), // [!code highlight]
+            completed: z.boolean(), // [!code highlight]
+        }), // [!code highlight]
+    } // [!code highlight]
+}) // [!code highlight]
+
+const $fetch = createFetch({
+    baseUrl: "https://jsonplaceholder.typicode.com",
+    schema: schema // [!code highlight]
+});
+
+```
+
+
+## Fetch Schema
+
+The Fetch Schema is a map of path/url and schema. The path is the url path and the schema is an object with 
+`input`, `output`, `query` and `params` keys.
+
+The `input` key is the schema of the request data. The `output` key is the schema of the response data. The `query` key is the schema of the query params. The `params` key is dynamic path parameters.
+
+### Input
+
+The input schema is the schema of the request data. The `input` key is the schema of the request data. If you defined an input schema, the data will be requeired to be passed as a body of the request.
+
+<Callout type="info">
+If you define an input schema, a `post` method will be used to make the request and if there is no input schema, a `get` method will be used. See [method modifiers](#method-modifiers) section for defining specefic methods.
+</Callout>
+
+```ts twoslash title="fetch.ts"
+import { createFetch, createSchema } from "@better-fetch/fetch";
+import { z } from "zod";
+
+const $fetch = createFetch({
+    baseUrl: "https://jsonplaceholder.typicode.com",
+    schema: createSchema({
+        "/path": {
+            input: z.object({
+                userId: z.string(),
+                id: z.number(),
+                title: z.string(),
+                completed: z.boolean(),
+            }),
+        },
+    }), 
+})
+
+// @errors: 2739
+const { data, error } = await $fetch("/path", {
+    body: {}
+})
+```
+<Callout type="info">
+To make the body optional you can wrap the schema with `z.optional`.
+</Callout>
+
+### Output
+
+The output schema is the schema of the response data. The `output` key is the schema of the response data. If you defined an output schema, the data will be returned as the response body.
+
+
+```ts twoslash title="fetch.ts"
+import { createFetch, createSchema } from "@better-fetch/fetch";
+import { z } from "zod";
+
+const $fetch = createFetch({
+    baseUrl: "https://jsonplaceholder.typicode.com",
+    schema: createSchema({
+        "/path": {
+            output: z.object({
+                userId: z.string(),
+                id: z.number(),
+                title: z.string(),
+                completed: z.boolean(),
+            }),
+        },
+    }), 
+})
+
+const { data, error } = await $fetch("/path")
+// @annotate: Hover over the data object to see the type
+```
+
+
+### Query       
+
+The query schema is the schema of the query params. The `query` key is the schema of the query params. If you defined a query schema, the data will be passed as the query params.
+
+```ts twoslash title="fetch.ts"
+import { createFetch, createSchema } from "@better-fetch/fetch";
+import { z } from "zod";
+
+const $fetch = createFetch({
+    baseUrl: "https://jsonplaceholder.typicode.com",
+    schema: createSchema({
+        "/path": {
+            query: z.object({
+                userId: z.string(),
+                id: z.number(),
+                title: z.string(),
+                completed: z.boolean(),
+            }),
+        },
+    }), 
+})
+
+// @errors: 2739
+const { data, error } = await $fetch("/path", {  
+    query: {}
+})
+// @annotate: Hover over the data object to see the type
+```
+
+### Dynamic Path Parameters
+
+The params schema is the schema of the path params. You can either use the `params` key to define the paramters or prepend `:` to the path to make the parameters dynamic. 
+
+<Callout type="info">
+If you define more than one dynamic path parameter using the string modifier the paramters will be required to be passed as an array of values in the order they are defined.
+</Callout>
+
+```ts twoslash title="fetch.ts" 
+import { createFetch, createSchema } from "@better-fetch/fetch";
+import { z } from "zod";    
+
+const schema = createSchema({
+    "/user/:id": {
+        output: z.object({
+            name: z.string(),
+        }),
+    },
+    "/post": {
+        params: z.object({
+            id: z.string(),
+            title: z.string(),
+        }),
+    },
+    "/post/:id/:title": {
+        output: z.object({
+            title: z.string(),
+        }),
+    }
+}) 
+
+
+const $fetch = createFetch({
+    baseUrl: "https://jsonplaceholder.typicode.com",
+    schema: schema
+})
+
+const response1 = await $fetch("/user/:id", {
+    params: {
+        id: "1",
+    }
+})
+
+const response2 = await $fetch("/post", {
+    params: {
+        id: "1",
+        title: "title"
+    },
+})
+
+const response3 = await $fetch("/post/:id/:title", {
+    params: [
+        "1",
+        "title"
+    ]
+})
+
+```
+
+
+### Method Modifiers
+
+By default the `get` and `post` methods are used to make the request based on weather the input schema is defined or not. You can use the `method` modifier to define the method to be used. 
+
+The method modifiers are `@get`, `@post`, `@put`, `@patch`, `@delete` and `@head`. You prepend the method name to the path to define the method
+
+```ts twoslash title="fetch.ts"
+import { createFetch, createSchema } from "@better-fetch/fetch";
+import { z } from "zod";
+
+const $fetch = createFetch({
+    baseUrl: "https://jsonplaceholder.typicode.com",
+    schema: createSchema({
+        "/@put/user": { // [!code highlight]
+            input: z.object({
+                title: z.string(),
+                completed: z.boolean(),
+            }),
+            output: z.object({
+               title: z.string(),
+               completed: z.boolean(),
+            }),
+        },
+    }), 
+})
+
+const { data, error } = await $fetch("/@put/user", {
+    body: {
+        title: "title",
+        completed: true,
+    }
+})
+// @annotate: the request will be made to "/user" path with a PUT method.
+```
+
+
+## Strict Schema
+
+By default if you define schema better fetch still allows you to make a call to other routes that's not defined on the schema. If you want to enforce only the keys defined to be inferred as valid you can use pass the `strict` option to the schema.
+
+```ts twoslash title="fetch.ts"
+import { createFetch, createSchema } from "@better-fetch/fetch";
+import { z } from "zod";
+
+const $fetch = createFetch({
+    baseUrl: "https://jsonplaceholder.typicode.com",
+    schema: createSchema({
+        "/path": {
+            output: z.object({
+                userId: z.string(),
+                id: z.number(),
+                title: z.string(),
+                completed: z.boolean(),
+            }),
+        },
+    }, 
+    { // [!code highlight]
+        strict: true // [!code highlight]
+    }), // [!code highlight]
+})
+// @errors: 2345
+const { data, error } = await $fetch("/invalid-path")
+```
+
+

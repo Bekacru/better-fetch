@@ -1,44 +1,18 @@
 {
-	"name": "@better-fetch/fetch",
-	"version": "1.0.1",
-	"main": "./dist/index.cjs",
-	"module": "./dist/index.js",
-	"react-native": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"devDependencies": {
-		"@biomejs/biome": "1.7.3",
-		"@happy-dom/global-registrator": "^14.7.1",
-		"@testing-library/dom": "^10.0.0",
-		"@testing-library/react": "^15.0.3",
-		"@types/bun": "^1.1.0",
-		"@types/node": "^20.11.30",
-		"bumpp": "^9.4.1",
-		"global-jsdom": "^24.0.0",
-		"h3": "^1.11.1",
-		"jsdom": "^24.0.0",
-		"listhen": "^1.7.2",
-		"mocha": "^10.4.0",
-		"tsup": "^8.0.2",
-		"typescript": "^5.4.5",
-		"vitest": "^1.5.0",
-		"zod": "^3.23.6"
-	},
-	"exports": {
-		".": {
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
-		}
-	},
-	"scripts": {
-		"build": "tsup",
-		"test": "vitest run",
-		"bump": "bun run bumpp",
-		"test:watch": "vitest watch",
-		"lint": "biome check .",
-		"release": "bun run build && npm publish --access public",
-		"lint:fix": "biome check . --apply",
-		"typecheck": "tsc --noEmit"
-	},
-	"files": ["dist"],
-	"type": "module"
+    "name": "@better-fetch/root",
+    "private": true,
+    "scripts": {
+        "build": "pnpm -F fetch build",
+        "test": "pnpm -F fetch test",
+        "bump": "pnpm -F fetch bump",
+        "lint": "biome check .",
+        "format": "biome check . --apply"
+    },
+    "dependencies": {
+        "@biomejs/biome": "1.7.3",
+        "simple-git-hooks": "^2.11.1"
+    },
+    "simple-git-hooks": {
+        "pre-push": "pnpm typecheck && pnpm format && pnpm test"
+    }
 }

@@ -1,0 +1,77 @@
+---
+title: Hooks
+description: Hooks
+---
+
+Hooks are functions that are called at different stages of the request lifecycle. 
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from "@better-fetch/fetch";
+
+const $fetch = createFetch({
+    baseURL: "http://localhost:3000",
+    onRequest(context) {
+        return context;
+    },
+    onResponse(context) {
+        return context.response
+    },
+    onError(context) {
+    },
+    onSuccess(context) {
+    },
+})
+
+```
+
+## On Request
+
+a callback function that will be called when a request is about to be made. The function will be called with the request context as an argument and it's expected to return the modified request context.
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from "@better-fetch/fetch";
+
+const $fetch = createFetch({
+    baseURL: "http://localhost:3000",
+    onRequest(context) {
+        // do something with the context
+        return context;
+    },
+})
+```
+
+## On Response
+
+a callback function that will be called when a response is received. The function will be called with the response context which includes the `response` and the `requestContext` as an argument and it's expected to return response.
+
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from "@better-fetch/fetch";
+
+const $fetch = createFetch({
+    baseURL: "http://localhost:3000",
+    onResponse(context) {        
+        // do something with the context
+        return context.response // return the response
+    },
+})
+```
+
+
+## On Success and On Error
+
+on success and on error are callbacks that will be called when a request is successful or when an error occurs. The function will be called with the response context as an argument and it's not expeceted to return anything.
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from "@better-fetch/fetch";
+
+const $fetch = createFetch({
+    baseURL: "http://localhost:3000",
+    onSuccess(context) {
+        // do something with the context
+    },
+    onError(context) {
+        // do something with the context
+    },
+})
+```

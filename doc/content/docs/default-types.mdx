@@ -1,0 +1,80 @@
+---
+title: Deafult Types
+description: Deafult Types
+---
+
+
+## Default Output
+
+By default the response data will always be type of `unknown`. If you want to customize the deafult type you can pass `defaultOutput` option to the `createFetch` function.
+
+<Callout type="info">
+This only serve as a type for the response data it's not used as a validation schema.
+</Callout>
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from "@better-fetch/fetch";
+import { z } from "zod";
+
+const $fetch = createFetch({
+    baseURL: "https://jsonplaceholder.typicode.com",
+    defaultOutput: z.any(),
+})
+
+const { data, error } = await $fetch("/todos/1")
+
+// @annotate: Hover over the data object to see the type
+```
+
+If you define output schema, the default output type will be ignored.
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from "@better-fetch/fetch";
+import { z } from "zod";
+
+const $fetch = createFetch({
+    baseURL: "https://jsonplaceholder.typicode.com",
+    defaultOutput: z.any(),
+});
+
+const { data, error } = await $fetch("/todos/1", {
+    output: z.object({
+        userId: z.string(),
+        id: z.number(),
+        title: z.string(),
+        completed: z.boolean(),
+    }),
+})
+// @annotate: Hover over the data object to see the type
+```
+
+## Default error
+
+The default error type is:
+```ts
+{ status: number, statusText: string, message?: string }. 
+```
+
+if you want custom defualt error type, you can pass a `defautlError` option to the `createFetch` function. 
+
+<Callout type="info">
+The `status` and `statusText` properties are always defined. Your custom error definations are only
+infered if the api returns a json error object.
+</Callout>
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from "@better-fetch/fetch";
+import { z } from "zod";
+
+const $fetch = createFetch({
+    baseURL: "https://jsonplaceholder.typicode.com",
+    defaultError: z.object({
+        message: z.string().optional(),
+        error: z.string(),
+    }),
+})
+
+const { data, error } = await $fetch("/todos/1")
+// @annotate: Hover over the error object to see the type
+```
+

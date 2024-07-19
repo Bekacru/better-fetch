@@ -1,0 +1,115 @@
+---
+title: Getting Started
+description: Getting started with Better Fetch
+---
+
+### Installation
+
+
+```package-install
+npm i @better-fetch/fetch
+```
+
+*Optionally you can also install the [zod](https://www.npmjs.com/package/zod) package to use zod schema validations.*
+
+```package-install
+npm i zod
+```
+
+### Quick Start
+
+The fastest way to start using better fetch is to import the `betterFetch` function and start making requests.
+
+You can define the response type using generics or **zod schema (recommended)**.
+
+1. Using generics
+
+```ts twoslash title="with-generics.ts"
+import { betterFetch } from '@better-fetch/fetch';
+
+//Using generic type
+const { data, error } = await betterFetch<{
+    userId: string;
+    id: number;
+    title: string;
+    completed: boolean;
+}>("https://jsonplaceholder.typicode.com/todos/1");
+```
+
+2. Using zod schema
+
+```ts twoslash title="with-zod.ts"
+import { betterFetch } from '@better-fetch/fetch';
+import { z } from 'zod';
+
+//Using zod schema
+const { data: todos, error: todoError } = await betterFetch("https://jsonplaceholder.typicodei.com/todos/1", {
+    output: z.object({
+        userId: z.string(),
+        id: z.number(),
+        title: z.string(),
+        completed: z.boolean(),
+    })  
+});
+```
+
+Better fetch by default returns a `Promise` that resolves to an object of `data` and `error`. Hover over the example code block above to see the type of the response.
+
+<Callout type="info">
+    **data** by defualt is of type `unknown` or `null` incase of a response error.
+</Callout>
+
+You can define the type of the response data in 2 ways:
+
+1. **Using the `output` property to define a zod schema (recommended)**: The `output` property is used to define the type of the response data. The response data will be validated against the schema. If the response data does not match the schema, an error will be thrown.
+
+2. **By passing a generic type to the `betterFetch`**: You can also pass a generic type to the `betterFetch` function. It has some drawbacks but it should work in most cases.
+
+<Callout type="info"> 
+  Make sure strict mode is enabled in your tsconfig when using zod schema validations.
+</Callout>
+
+### Create Fetch
+
+Create Fetch allows you to create a better fetch instance with custom configurations.
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from "@better-fetch/fetch";
+
+export const $fetch = createFetch({
+  baseUrl: "https://jsonplaceholder.typicode.com",
+  retry: {
+    count: 2,
+  },
+});
+
+const { data, error } = await $fetch<{
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+}>("/todos/1");
+```
+You can pass more options see the [Fetch Options](/docs/fetch-options) section for more details.
+
+### Throwing Errors
+
+You can throw errors instead of returning them by passing the `throw` option.
+
+If you pass the `throw` option, the `betterFetch` function will throw an error. And instead of returning `data` and `error` object it'll only the response data as it is.
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from '@better-fetch/fetch';
+import { z } from 'zod';
+
+const $fetch = createFetch({
+    baseUrl: "https://jsonplaceholder.typicode.com",
+    throw: true,
+});
+
+const data = await $fetch<{
+    userId: number;
+}>("https://jsonplaceholder.typicode.com/todos/1");
+```
+Learn more about handling errors [Handling Errors](/docs/handling-errors) section.
+

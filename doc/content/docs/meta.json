@@ -1,0 +1,21 @@
+{
+	"title:": "guide",
+	"root": true,
+	"pages": [
+		"---Guide---",
+		"index",
+		"getting-started",
+		"handling-errors",
+		"---Helpers---",
+		"authorization",
+		"timeout-and-retry",
+		"---Advanced---",
+		"fetch-schema",
+		"default-types",
+		"hooks",
+		"plugins",
+		"---Reference---",
+		"fetch-options",
+		"extra-options"
+	]
+}

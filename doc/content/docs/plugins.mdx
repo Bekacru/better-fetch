@@ -1,0 +1,84 @@
+---
+title: Plugins
+description: Plugins
+---
+
+Plugins are functions that can be used to modify the request, response, error and other parts of the request lifecycle.
+
+The plugins api allows you to modify the request, response, error and other parts of the request lifecycle. 
+
+
+### Init
+
+The init function is called before the request is made and any of the internal functions are called. It takes the `url` and `options` as arguments and is expected to return the modified `url` and `options`.
+
+```ts twoslash title="fetch.ts"
+import { createFetch, BetterFetchPlugin } from "@better-fetch/fetch";
+
+const myPlugin = {
+    id: "my-plugin",
+    name: "My Plugin",
+    init: async (url, options) => {
+       if(url.startsWith("http://")) {
+           const _url = new URL(url)
+           const DEV_URL = "http://localhost:3000"
+           return {
+               url: `${DEV_URL}/${_url.pathname}`,
+               options,
+           }
+       }
+        return {
+            url,
+            options,
+        }
+    },
+} satisfies BetterFetchPlugin;
+
+const $fetch = createFetch({
+    baseUrl: "https://jsonplaceholder.typicode.com",
+    plugins: [myPlugin],
+});
+```
+
+### Hooks
+
+Hooks are functions that are called at different stages of the request lifecycle. See [Hooks](/docs/hooks) for more information.
+
+
+```ts twoslash title="fetch.ts"
+import { createFetch, BetterFetchPlugin } from "@better-fetch/fetch";
+
+const myPlugin = {
+    id: "my-plugin",
+    name: "My Plugin",
+    hooks: {
+        onRequest(context) {
+        // do something with the context
+        return context;
+        },
+        onResponse(context) {
+            // do something with the context
+            return context.response;
+        },
+        onError(context) {
+            // do something with the context
+        },
+        onSuccess(context) {
+            // do something with the context
+        },
+    }
+} satisfies BetterFetchPlugin;
+
+const $fetch = createFetch({
+    baseUrl: "https://jsonplaceholder.typicode.com",
+    plugins: [myPlugin],
+});
+```
+
+<Callout type="info">
+    If more than one plugin is registered, the hooks will be called in the order they are registered.
+</Callout>
+
+
+### Properties
+<AutoTypeTable path="./lib/better-fetch-options.ts" name="BetterFetchPlugin" />

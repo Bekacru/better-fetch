@@ -1,5 +1,4 @@
 name: Release
-
 on:
   push:
     tags:
@@ -36,7 +35,7 @@ jobs:
           fi
               
       - name: Build
-        run: bun run build
+        run: pnpm build
 
       - run: npx changelogithub
         if: steps.check_version.outputs.tag == 'latest'

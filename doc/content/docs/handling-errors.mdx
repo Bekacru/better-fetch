@@ -1,0 +1,104 @@
+---
+title: Handling Errors
+description: Handling Errors
+---
+
+## Default Error Type
+Better fetch by default returns response errors as a value. By defaullt, the error object has 3 properties `status`, `statusText` and `message` properties.
+
+`status` and `statusText` are always defined. If the api returns a json error object it will be parsed and returned with the error object. By default `error` includes `message` property that can be string or undefined.
+
+```ts twoslash title="fetch.ts"
+import { betterFetch } from '@better-fetch/fetch';
+import { z } from 'zod';
+
+const { error } = await betterFetch("https://jsonplaceholder.typicode.com/todos/1");
+// @annotate: Hover over the error object to see the type
+```
+## Custom Error Type
+You can pass a custom error type to be inferred as a second generic argument.
+
+```ts
+import { betterFetch } from 'better-fetch';
+
+const { error } = await betterFetch<{
+    id: number;
+    userId: string;
+    title: string;
+    completed: boolean;
+}, 
+{ 
+    message?: string; // [!code highlight]
+    error?: string;// [!code highlight]
+}>("https://jsonplaceholder.typicode.com/todos/1");
+```
+
+<Callout type="info">
+If you pass a custom error type, it will override the default error type except for the status and statusText properties. If you still need the message property, you need to include it in your custom error type.
+</Callout>
+
+## Throwing Errors
+
+If you prefer to throw errors instead of returning them, you can use the `throw` option.
+
+When you pass the `throw` option, the `betterFetch` function will throw an error. And instead of returning `data` and `error` object it'll only the response data as it is.
+
+```ts twoslash title="fetch.ts"
+import { betterFetch } from '@better-fetch/fetch';
+import { z } from 'zod';
+
+const data = await betterFetch("https://jsonplaceholder.typicode.com/todos/1", {
+    throw: true, // [!code highlight]
+    output: z.object({  
+        userId: z.string(),
+        id: z.number(),
+        title: z.string(),
+        completed: z.boolean(),
+    }),
+});
+
+```
+
+## Inferring Response When Using Generics and `throw` Option
+
+When you pass the `throw` option to the `betterFetch` function, it will throw an error instead of returning it. This means the error will not be returned as a value. However, if you specify the response type as a generic, the `error` object will still be returned, and `data` will be inferred as possibly `null` or the specified type. This issue arises because the `throw` option cannot be inferred when a generic value is passed, due to a TypeScript limitation.
+
+To address this, you have two options. If you use either option, the `error` object will no longer exist, and the response type will be inferred correctly without being unioned with `null`.
+
+1. Create a custom fetch instance with the `throw` option.
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from "@better-fetch/fetch";
+
+export const $fetch = createFetch({
+  baseUrl: "https://jsonplaceholder.typicode.com",
+  retry: {
+    count: 2,
+  },
+  throw: true,
+}); 
+
+
+const data = await $fetch<{
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+}>("/todos/1");
+```
+
+2. Pass false as a second generic argument to the `betterFetch` function.
+
+```ts twoslash title="fetch.ts"
+import { betterFetch } from '@better-fetch/fetch';
+import { z } from 'zod';
+
+const data = await betterFetch<{
+    userId: number;
+    id: number;
+    title: string;
+    completed: boolean;
+}, 
+false // [!code highlight]
+>("https://jsonplaceholder.typicode.com/todos/1");
+```

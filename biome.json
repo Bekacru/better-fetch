@@ -4,25 +4,11 @@
 		"enabled": true
 	},
 	"files": {
-		"ignore": ["dist"]
+		"ignore": [
+			"dist"
+		]
 	},
 	"linter": {
-		"enabled": true,
-		"rules": {
-			"recommended": true,
-			"complexity": {
-				"useLiteralKeys": "off"
-			},
-			"a11y": {
-				"useKeyWithClickEvents": "off"
-			},
-			"suspicious": {
-				"noExplicitAny": "off"
-			},
-			"style": {
-				"noParameterAssign": "off",
-				"useNodejsImportProtocol": "off"
-			}
-		}
+		"enabled": false
 	}
 }

@@ -1,0 +1,45 @@
+---
+title: Timeout and Retry
+description: Timeout and Retry
+---
+
+
+Timeout and retry are two options that can be used to control the request timeout and retry behavior.
+
+
+## Timeout
+
+You can set the timeout in milliseconds.
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from "@better-fetch/fetch";
+
+const $fetch = createFetch({
+    baseURL: "http://localhost:3000",
+    timeout: 5000,
+})
+// ---cut---
+const res = await $fetch("/api/users", {
+    timeout: 10000,
+});
+```
+
+
+## Auto Retry
+
+You can set the retry count and interval in milliseconds.
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from "@better-fetch/fetch";
+
+const $fetch = createFetch({
+    baseURL: "http://localhost:3000",
+})
+// ---cut---
+const res = await $fetch("/api/users", {
+    retry: {
+        count: 3,
+        interval: 1000, //optional
+    }
+});
+```
