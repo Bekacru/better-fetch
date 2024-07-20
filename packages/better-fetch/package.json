@@ -30,7 +30,7 @@
 	},
 	"scripts": {
 		"build": "tsup",
-		"test": "vitest run",
+		"test": "vitest",
 		"bump": "bumpp",
 		"test:watch": "vitest watch",
 		"lint": "biome check .",

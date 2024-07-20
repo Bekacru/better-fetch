@@ -1,3 +1,4 @@
+import { Schema } from "./create-fetch";
 import type { BetterFetchOption } from "./types";
 
 export type RequestContext = {
@@ -93,6 +94,7 @@ export type BetterFetchPlugin = {
 		url: string;
 		options?: BetterFetchOption;
 	}>;
+	schema?: Schema;
 };
 
 export const initializePlugins = async (

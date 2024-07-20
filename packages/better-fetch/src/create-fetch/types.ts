@@ -1,4 +1,4 @@
-import type { ZodSchema, z } from "zod";
+import type { ZodObject, ZodSchema, z } from "zod";
 import type { StringLiteralUnion } from "../type-utils";
 import type { BetterFetchOption, BetterFetchResponse } from "../types";
 import type {
@@ -7,6 +7,7 @@ import type {
 	RequiredOptionKeys,
 	Schema,
 } from "./schema";
+import { BetterFetchPlugin } from "../plugins";
 
 export interface CreateFetchOption extends BetterFetchOption {
 	schema?: Schema;
@@ -20,7 +21,6 @@ export interface CreateFetchOption extends BetterFetchOption {
 }
 
 type WithRequired<T, K extends keyof T | never> = T & { [P in K]-?: T[P] };
-
 type InferBody<T> = T extends ZodSchema ? z.infer<T> : any;
 type InferQuery<T> = T extends ZodSchema ? z.infer<T> : any;
 export type InferParam<Path, Param> = Param extends ZodSchema
@@ -32,7 +32,6 @@ export type InferParam<Path, Param> = Param extends ZodSchema
 					[key in P]: string;
 				}
 		: never;
-
 export type InferOptions<T extends FetchSchema, Key> = WithRequired<
 	BetterFetchOption<
 		InferBody<T["input"]>,
@@ -52,6 +51,33 @@ export type InferKey<S> = S extends Schema
 			>
 	: string;
 
+type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
+	x: infer I,
+) => void
+	? I
+	: never;
+
+export type PluginSchema<P> = P extends BetterFetchPlugin
+	? P["schema"] extends Schema
+		? P["schema"]["schema"] extends Array<infer R>
+			? {
+					schema: {
+						"/": {
+							input: ZodObject<any>;
+						};
+					};
+					config: {
+						strict: false;
+					};
+				}
+			: never
+		: never
+	: never;
+export type MergeSchema<Options extends CreateFetchOption> =
+	Options["plugins"] extends Array<infer P>
+		? PluginSchema<P> & Options["schema"]
+		: Options["schema"];
+
 export type BetterFetch<
 	CreateOptions extends CreateFetchOption,
 	DefaultRes = CreateOptions["defaultOutput"] extends ZodSchema
@@ -60,13 +86,21 @@ export type BetterFetch<
 	DefaultErr = CreateOptions["defaultError"] extends ZodSchema
 		? z.infer<CreateOptions["defaultError"]>
 		: unknown,
-	S extends CreateOptions["schema"] = CreateOptions["schema"],
+	S extends MergeSchema<CreateOptions> = MergeSchema<CreateOptions>,
 > = <
 	Res = DefaultRes,
 	Err = DefaultErr,
 	K extends InferKey<S> = InferKey<S>,
-	F extends S extends Schema ? S["schema"][K] : unknown = S extends Schema
-		? S["schema"][K]
+	F extends S extends Schema
+		? S["schema"] extends Array<infer R>
+			? //@ts-expect-error
+				UnionToIntersection<R>[K]
+			: S["schema"][K]
+		: unknown = S extends Schema
+		? S["schema"] extends Array<infer R>
+			? //@ts-expect-error
+				UnionToIntersection<R>[K]
+			: S["schema"][K]
 		: unknown,
 	O extends BetterFetchOption = BetterFetchOption,
 >(

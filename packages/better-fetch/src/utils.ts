@@ -200,14 +200,7 @@ export function getBody(options?: BetterFetchOption) {
 
 export function getMethod(url: string, options?: BetterFetchOption) {
 	if (options?.method) {
-		return options.method;
-	}
-	if (url.startsWith("@")) {
-		const pMethod = url.split("@")[1]?.split("/")[0];
-		if (!methods.includes(pMethod)) {
-			return options?.body ? "POST" : "GET";
-		}
-		return pMethod.toUpperCase();
+		return options.method.toUpperCase();
 	}
 	return options?.body ? "POST" : "GET";
 }

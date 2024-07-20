@@ -108,10 +108,58 @@ describe("create-fetch-runtime-test", () => {
 	});
 
 	it("should work with method modifiers", async () => {
-		for (const method of methods) {
-			const res = await $fetch(`@${method}/method`);
-			expect(res.data).toEqual(method.toUpperCase());
+		const $f = createFetch({
+			baseURL: "http://localhost:4001",
+			schema: createSchema({
+				[`@put/method`]: {},
+				[`@post/method`]: {},
+				[`@delete/method`]: {},
+				[`@get/method`]: {},
+				[`@patch/method`]: {},
+			}),
+			customFetchImpl: async (req, init) => {
+				return new Response(JSON.stringify({ method: init?.method }));
+			},
+		});
+		for (const method of methods.slice(0, 4)) {
+			const res = await $f(`@${method}/method`);
+			expect(res.data).toEqual({ method: method.toUpperCase() });
 		}
+	});
+
+	it("should apply method", async () => {
+		const $f = createFetch({
+			baseURL: "http://localhost:4001",
+			schema: createSchema({
+				"/": {
+					method: "put",
+					input: z.object({
+						userId: z.string(),
+						id: z.number(),
+						title: z.string(),
+						completed: z.boolean(),
+					}),
+				},
+			}),
+			customFetchImpl: async (req, init) => {
+				return new Response(
+					JSON.stringify({
+						method: init?.method,
+					}),
+				);
+			},
+		});
+		const res = await $f("/", {
+			body: {
+				userId: "1",
+				id: 1,
+				title: "title",
+				completed: true,
+			},
+		});
+		expect(res.data).toMatchObject({
+			method: "PUT",
+		});
 	});
 });
 

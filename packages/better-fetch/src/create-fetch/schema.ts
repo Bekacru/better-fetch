@@ -9,6 +9,7 @@ export type FetchSchema = {
 	params?: z.ZodObject<{
 		[key: string]: ParameterSchema;
 	}>;
+	method?: Methods;
 };
 
 export type Methods = "get" | "post" | "put" | "patch" | "delete";
@@ -36,7 +37,12 @@ export const createSchema = <
 	};
 };
 
-export type Schema = ReturnType<typeof createSchema>;
+export type Schema = {
+	schema: FetchSchemaRoutes;
+	config: {
+		strict: boolean;
+	};
+};
 
 export type InferQuery<Q> = Q extends z.ZodSchema ? z.infer<Q> : any;
 
