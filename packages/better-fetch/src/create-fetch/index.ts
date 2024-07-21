@@ -8,6 +8,7 @@ const applySchemaPlugin = (config: CreateFetchOption) =>
 	({
 		id: "apply-schema",
 		name: "Apply Schema",
+		version: "1.0.0",
 		async init(url, options) {
 			let method = "";
 			if (url.startsWith("@")) {

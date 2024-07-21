@@ -41,6 +41,11 @@ export type Schema = {
 	schema: FetchSchemaRoutes;
 	config: {
 		strict: boolean;
+		/**
+		 * The base url of the schema. By default it's the baseURL of the fetch instance.
+		 */
+		baseURL?: "" | (string & Record<never, never>);
+		prefix?: "" | (string & Record<never, never>);
 	};
 };
 

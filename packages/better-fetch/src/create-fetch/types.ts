@@ -46,10 +46,32 @@ export type InferOptions<T extends FetchSchema, Key> = WithRequired<
 export type InferKey<S> = S extends Schema
 	? S["config"]["strict"] extends true
 		? keyof S["schema"]
-		: StringLiteralUnion<
-				keyof S["schema"] extends string ? keyof S["schema"] : never
-			>
+		: S["config"]["prefix"] extends string
+			? StringLiteralUnion<`${S["config"]["prefix"]}${keyof S["schema"] extends string
+					? keyof S["schema"]
+					: never}`>
+			: S["config"]["baseURL"] extends string
+				? `${S["config"]["baseURL"]}${keyof S["schema"] extends string
+						? keyof S["schema"]
+						: never}`
+				: StringLiteralUnion<
+						keyof S["schema"] extends string ? keyof S["schema"] : never
+					>
 	: string;
+
+export type GetKey<S, K> = S extends Schema
+	? S["config"]["baseURL"] extends string
+		? K extends `${S["config"]["baseURL"]}${infer AK}`
+			? AK extends string
+				? AK
+				: string
+			: S["config"]["prefix"] extends string
+				? K extends `${S["config"]["prefix"]}${infer AP}`
+					? AP
+					: string
+				: string
+		: K
+	: K;
 
 type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
 	x: infer I,
@@ -59,20 +81,10 @@ type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
 
 export type PluginSchema<P> = P extends BetterFetchPlugin
 	? P["schema"] extends Schema
-		? P["schema"]["schema"] extends Array<infer R>
-			? {
-					schema: {
-						"/": {
-							input: ZodObject<any>;
-						};
-					};
-					config: {
-						strict: false;
-					};
-				}
-			: never
+		? P["schema"]
 		: never
 	: never;
+
 export type MergeSchema<Options extends CreateFetchOption> =
 	Options["plugins"] extends Array<infer P>
 		? PluginSchema<P> & Options["schema"]
@@ -90,7 +102,8 @@ export type BetterFetch<
 > = <
 	Res = DefaultRes,
 	Err = DefaultErr,
-	K extends InferKey<S> = InferKey<S>,
+	U extends InferKey<S> = InferKey<S>,
+	K extends GetKey<S, U> = GetKey<S, U>,
 	F extends S extends Schema
 		? S["schema"] extends Array<infer R>
 			? //@ts-expect-error
@@ -104,7 +117,7 @@ export type BetterFetch<
 		: unknown,
 	O extends BetterFetchOption = BetterFetchOption,
 >(
-	url: K,
+	url: U,
 	...options: F extends FetchSchema
 		? IsOptionRequired<F> extends true
 			? [InferOptions<F, K>]

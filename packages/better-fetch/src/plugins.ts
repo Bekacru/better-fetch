@@ -76,6 +76,10 @@ export type BetterFetchPlugin = {
 	 */
 	description?: string;
 	/**
+	 * A version for the plugin
+	 */
+	version?: string;
+	/**
 	 * Hooks for the plugin
 	 */
 	hooks?: FetchHooks;
@@ -94,6 +98,9 @@ export type BetterFetchPlugin = {
 		url: string;
 		options?: BetterFetchOption;
 	}>;
+	/**
+	 * A schema for the plugin
+	 */
 	schema?: Schema;
 };
 
