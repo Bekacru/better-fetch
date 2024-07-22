@@ -1,14 +1,9 @@
 import type { ZodObject, ZodSchema, z } from "zod";
 import type { StringLiteralUnion } from "../type-utils";
 import type { BetterFetchOption, BetterFetchResponse } from "../types";
-import type {
-	FetchSchema,
-	IsOptionRequired,
-	RequiredOptionKeys,
-	Schema,
-} from "./schema";
+import type { FetchSchema, Schema } from "./schema";
 import { BetterFetchPlugin } from "../plugins";
-
+import { IsEmptyObject } from "type-fest";
 export interface CreateFetchOption extends BetterFetchOption {
 	schema?: Schema;
 	/**
@@ -22,38 +17,81 @@ export interface CreateFetchOption extends BetterFetchOption {
 
 type WithRequired<T, K extends keyof T | never> = T & { [P in K]-?: T[P] };
 type InferBody<T> = T extends ZodSchema ? z.infer<T> : any;
-type InferQuery<T> = T extends ZodSchema ? z.infer<T> : any;
+
+type InferParamPath<Path> =
+	Path extends `${infer _Start}:${infer Param}/${infer Rest}`
+		? { [K in Param | keyof InferParamPath<Rest>]: string }
+		: Path extends `${infer _Start}:${infer Param}`
+			? { [K in Param]: string }
+			: Path extends `${infer _Start}/${infer Rest}`
+				? InferParamPath<Rest>
+				: {};
+
 export type InferParam<Path, Param> = Param extends ZodSchema
 	? z.infer<Param>
-	: Path extends `${infer _}:${infer P}`
-		? P extends `${infer _2}:${infer _P}`
-			? Array<string>
-			: {
-					[key in P]: string;
-				}
-		: never;
+	: InferParamPath<Path>;
+
 export type InferOptions<T extends FetchSchema, Key> = WithRequired<
 	BetterFetchOption<
 		InferBody<T["input"]>,
 		InferQuery<T["query"]>,
 		InferParam<Key, T["params"]>
 	>,
-	RequiredOptionKeys<T> extends keyof BetterFetchOption
-		? RequiredOptionKeys<T>
+	RequiredOptionKeys<T, Key> extends keyof BetterFetchOption
+		? RequiredOptionKeys<T, Key>
 		: never
 >;
 
+export type InferQuery<Q> = Q extends z.ZodSchema ? z.infer<Q> : any;
+
+export type IsFieldOptional<T> = T extends z.ZodSchema
+	? T extends z.ZodOptional<any>
+		? true
+		: false
+	: true;
+
+type IsParamOptional<T, K> = IsFieldOptional<T> extends false
+	? false
+	: IsEmptyObject<InferParamPath<K>> extends false
+		? false
+		: true;
+
+export type IsOptionRequired<T extends FetchSchema, Key> = IsFieldOptional<
+	T["input"]
+> extends false
+	? true
+	: IsFieldOptional<T["query"]> extends false
+		? true
+		: IsParamOptional<T["params"], Key> extends false
+			? true
+			: false;
+
+export type RequiredOptionKeys<T extends FetchSchema, Key> =
+	| (IsFieldOptional<T["input"]> extends false ? "body" : never)
+	| (IsFieldOptional<T["query"]> extends false ? "query" : never)
+	| (IsParamOptional<T["params"], Key> extends false ? "params" : never);
+
 export type InferKey<S> = S extends Schema
 	? S["config"]["strict"] extends true
-		? keyof S["schema"]
+		? S["config"]["prefix"] extends string
+			? `${S["config"]["prefix"]}${keyof S["schema"] extends string
+					? keyof S["schema"]
+					: never}`
+			: S["config"]["baseURL"] extends string
+				? `${S["config"]["baseURL"]}${keyof S["schema"] extends string
+						? keyof S["schema"]
+						: never}`
+				: keyof S["schema"] extends string
+					? keyof S["schema"]
+					: never
 		: S["config"]["prefix"] extends string
 			? StringLiteralUnion<`${S["config"]["prefix"]}${keyof S["schema"] extends string
 					? keyof S["schema"]
 					: never}`>
 			: S["config"]["baseURL"] extends string
-				? `${S["config"]["baseURL"]}${keyof S["schema"] extends string
+				? StringLiteralUnion<`${S["config"]["baseURL"]}${keyof S["schema"] extends string
 						? keyof S["schema"]
-						: never}`
+						: never}`>
 				: StringLiteralUnion<
 						keyof S["schema"] extends string ? keyof S["schema"] : never
 					>
@@ -82,8 +120,8 @@ type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
 export type PluginSchema<P> = P extends BetterFetchPlugin
 	? P["schema"] extends Schema
 		? P["schema"]
-		: never
-	: never;
+		: undefined
+	: undefined;
 
 export type MergeSchema<Options extends CreateFetchOption> =
 	Options["plugins"] extends Array<infer P>
@@ -119,7 +157,7 @@ export type BetterFetch<
 >(
 	url: U,
 	...options: F extends FetchSchema
-		? IsOptionRequired<F> extends true
+		? IsOptionRequired<F, K> extends true
 			? [InferOptions<F, K>]
 			: [InferOptions<F, K>?]
 		: [O?]

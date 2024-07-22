@@ -43,7 +43,6 @@ export const betterFetch = async <
 	const body = getBody(opts);
 	const headers = getHeaders(opts);
 	const method = getMethod(__url, opts);
-
 	let context = {
 		...opts,
 		url: _url,
@@ -57,10 +56,12 @@ export const betterFetch = async <
 	 */
 	for (const onRequest of hooks.onRequest) {
 		if (onRequest) {
-			context = await onRequest(context);
+			const res = await onRequest(context);
+			if (res instanceof Object) {
+				context = res;
+			}
 		}
 	}
-
 	if (
 		("pipeTo" in (context as any) &&
 			typeof (context as any).pipeTo === "function") ||
@@ -72,7 +73,6 @@ export const betterFetch = async <
 	}
 
 	const { clearTimeout } = getTimeout(opts, controller);
-
 	let response = await fetch(context.url, context);
 	clearTimeout();
 
@@ -83,7 +83,17 @@ export const betterFetch = async <
 
 	for (const onResponse of hooks.onResponse) {
 		if (onResponse) {
-			response = await onResponse(responseContext);
+			const r = await onResponse({
+				...responseContext,
+				response: options?.hookOptions?.cloneResponse
+					? response.clone()
+					: response,
+			});
+			if (r instanceof Response) {
+				response = r;
+			} else if (r instanceof Object) {
+				response = r.response;
+			}
 		}
 	}
 
@@ -123,7 +133,12 @@ export const betterFetch = async <
 
 		for (const onSuccess of hooks.onSuccess) {
 			if (onSuccess) {
-				await onSuccess(successContext);
+				await onSuccess({
+					...successContext,
+					response: options?.hookOptions?.cloneResponse
+						? response.clone()
+						: response,
+				});
 			}
 		}
 
@@ -145,7 +160,12 @@ export const betterFetch = async <
 	};
 	for (const onError of hooks.onError) {
 		if (onError) {
-			await onError(errorContext);
+			await onError({
+				...errorContext,
+				response: options?.hookOptions?.cloneResponse
+					? response.clone()
+					: response,
+			});
 		}
 	}
 
@@ -153,7 +173,11 @@ export const betterFetch = async <
 		const retryStrategy = createRetryStrategy(options.retry);
 		const _retryAttempt = options.retryAttempt ?? 0;
 		if (await retryStrategy.shouldAttemptRetry(_retryAttempt, response)) {
-			await options?.onRetry?.(responseContext);
+			for (const onRetry of hooks.onRetry) {
+				if (onRetry) {
+					await onRetry(responseContext);
+				}
+			}
 			const delay = retryStrategy.getDelay(_retryAttempt);
 			await new Promise((resolve) => setTimeout(resolve, delay));
 			return await betterFetch(url, {

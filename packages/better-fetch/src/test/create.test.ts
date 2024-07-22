@@ -18,6 +18,7 @@ import {
 import type { BetterFetchResponse } from "../types";
 
 import { router } from "./test-router";
+import { BetterFetchPlugin } from "../plugins";
 
 const schema = {
 	"/": {
@@ -238,11 +239,14 @@ describe("create-fetch-type-test", () => {
 			schema: createSchema(schema, {
 				strict: true,
 			}),
+			baseURL: "http://localhost:4001",
+			customFetchImpl: async (url, req) => {
+				return new Response();
+			},
 		});
-		type SchemaKey = keyof typeof schema;
-		type FunctionKeys = typeof f extends (url: infer U) => any ? U : never;
-		expectTypeOf<FunctionKeys>().toEqualTypeOf<SchemaKey>();
-		expectTypeOf<FunctionKeys>().not.toEqualTypeOf<string>();
+		f("/");
+		//@ts-expect-error
+		f("/not-allowed");
 	});
 
 	it("should infer params", () => {
@@ -295,5 +299,152 @@ describe("create-fetch-type-test", () => {
 				>
 			>
 		>();
+	});
+
+	it("should require params", async () => {
+		const $fetch = createFetch({
+			schema: createSchema(schema),
+			customFetchImpl: async (url, req) => {
+				return new Response();
+			},
+			baseURL: "http://localhost:4001",
+		});
+		//@ts-expect-error
+		const f = $fetch("/user/:id", {});
+	});
+});
+
+describe("plugin", () => {
+	const plugin = {
+		id: "test",
+		name: "Test",
+		schema: createSchema(
+			{
+				"/path": {
+					output: z.object({
+						message: z.string(),
+					}),
+					input: z.object({
+						param: z.string(),
+					}),
+				},
+				"/path/:param": {
+					output: z.object({
+						message: z.string(),
+					}),
+				},
+			},
+			{
+				baseURL: "http://localhost:4001",
+				prefix: "prefix",
+				strict: true,
+			},
+		),
+	} satisfies BetterFetchPlugin;
+	const plugin2 = {
+		id: "test",
+		name: "Test",
+		schema: createSchema(
+			{
+				"/path": {
+					output: z.object({
+						message: z.string(),
+					}),
+				},
+			},
+			{
+				baseURL: "http://localhost:4001",
+				strict: true,
+			},
+		),
+	} satisfies BetterFetchPlugin;
+
+	const plugin3 = {
+		id: "test",
+		name: "Test",
+	};
+
+	it("should infer prefix", async () => {
+		const $fetch = createFetch({
+			plugins: [plugin],
+		});
+		expectTypeOf($fetch)
+			.parameter(0)
+			.toMatchTypeOf<"prefix/path" | "prefix/path/:param">();
+	});
+
+	it("should infer baseURL", async () => {
+		const $fetch = createFetch({
+			plugins: [plugin2],
+		});
+		expectTypeOf($fetch)
+			.parameter(0)
+			.toMatchTypeOf<"http://localhost:4001/path">();
+	});
+
+	it("should infer input and output", async () => {
+		const $fetch = createFetch({
+			plugins: [plugin],
+			customFetchImpl: async (url, req) => {
+				return new Response();
+			},
+		});
+		//@ts-expect-error
+		const f = $fetch("prefix/path");
+		expectTypeOf(f).toMatchTypeOf<
+			Promise<
+				BetterFetchResponse<{
+					message: string;
+				}>
+			>
+		>();
+	});
+
+	it("should replace baseURL", async () => {
+		const $fetch = createFetch({
+			plugins: [plugin],
+			customFetchImpl: async (url, req) => {
+				return new Response();
+			},
+		});
+		await $fetch("prefix/path", {
+			body: {
+				param: "1",
+			},
+			onResponse(context) {
+				expect(context.request.url.toString()).toBe(
+					"http://localhost:4001/path",
+				);
+			},
+		});
+		await $fetch("prefix/path/:param", {
+			params: {
+				param: "1",
+			},
+			onResponse(context) {
+				expect(context.request.url.toString()).toBe(
+					"http://localhost:4001/path/1",
+				);
+			},
+		});
+	});
+
+	it("should not break if plugin is not define schema", async () => {
+		const $fetch = createFetch({
+			plugins: [plugin3],
+			customFetchImpl: async (url, req) => {
+				return new Response();
+			},
+		});
+		await $fetch("prefix/path", {
+			body: {
+				param: "1",
+			},
+			onResponse(context) {
+				expect(context.request.url.toString()).toBe(
+					"http://localhost:4001/path",
+				);
+			},
+		});
 	});
 });

@@ -10,21 +10,35 @@ const applySchemaPlugin = (config: CreateFetchOption) =>
 		name: "Apply Schema",
 		version: "1.0.0",
 		async init(url, options) {
-			let method = "";
-			if (url.startsWith("@")) {
-				const pMethod = url.split("@")[1]?.split("/")[0];
-				if (methods.includes(pMethod)) {
-					method = pMethod;
+			const schema =
+				config.plugins?.find((plugin) =>
+					plugin.schema?.config
+						? url.startsWith(plugin.schema.config.baseURL || "") ||
+							url.startsWith(plugin.schema.config.prefix || "")
+						: false,
+				)?.schema || config.schema;
+			if (schema) {
+				let urlKey = url;
+				if (schema.config?.prefix) {
+					if (urlKey.startsWith(schema.config.prefix)) {
+						urlKey = urlKey.replace(schema.config.prefix, "");
+						if (schema.config.baseURL) {
+							url = url.replace(schema.config.prefix, schema.config.baseURL);
+						}
+					}
 				}
-			}
-			if (config.schema) {
-				const schema = config.schema.schema[url];
-				if (schema) {
+				if (schema.config?.baseURL) {
+					if (urlKey.startsWith(schema.config.baseURL)) {
+						urlKey = urlKey.replace(schema.config.baseURL, "");
+					}
+				}
+				const keySchema = schema.schema[urlKey];
+				if (keySchema) {
 					return {
 						url,
 						options: {
-							method: schema.method ?? method,
-							output: schema.output,
+							method: keySchema.method,
+							output: keySchema.output,
 							...options,
 						},
 					};
@@ -44,10 +58,7 @@ export const createFetch = <Option extends CreateFetchOption>(
 		const opts = {
 			...config,
 			...options,
-			plugins: [
-				...(config?.plugins || []),
-				config?.schema ? applySchemaPlugin(config) : [],
-			],
+			plugins: [...(config?.plugins || []), applySchemaPlugin(config || {})],
 		} as BetterFetchOption;
 
 		if (config?.catchAllError) {

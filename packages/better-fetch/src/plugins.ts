@@ -21,7 +21,6 @@ export type ErrorContext = {
 	response: Response;
 	request: RequestContext;
 };
-
 export interface FetchHooks {
 	/**
 	 * a callback function that will be called when a
@@ -32,7 +31,7 @@ export interface FetchHooks {
 	 */
 	onRequest?: (
 		context: RequestContext,
-	) => Promise<RequestContext> | RequestContext;
+	) => Promise<RequestContext | void> | RequestContext | void;
 	/**
 	 * a callback function that will be called when
 	 * response is received. This will be called before
@@ -41,7 +40,13 @@ export interface FetchHooks {
 	 * The returned response will be reassigned to the
 	 * original response if it's changed.
 	 */
-	onResponse?: (context: ResponseContext) => Promise<Response> | Response;
+	onResponse?: (
+		context: ResponseContext,
+	) =>
+		| Promise<Response | void | ResponseContext>
+		| Response
+		| ResponseContext
+		| void;
 	/**
 	 * a callback function that will be called when a
 	 * response is successful.
@@ -57,6 +62,16 @@ export interface FetchHooks {
 	 * request is retried.
 	 */
 	onRetry?: (response: ResponseContext) => Promise<void> | void;
+	/**
+	 * Options for the hooks
+	 */
+	hookOptions?: {
+		/**
+		 * Clone the response
+		 * @see https://developer.mozilla.org/en-US/docs/Web/API/Response/clone
+		 */
+		cloneResponse?: boolean;
+	};
 }
 
 /**
@@ -94,10 +109,15 @@ export type BetterFetchPlugin = {
 	init?: (
 		url: string,
 		options?: BetterFetchOption,
-	) => Promise<{
-		url: string;
-		options?: BetterFetchOption;
-	}>;
+	) =>
+		| Promise<{
+				url: string;
+				options?: BetterFetchOption;
+		  }>
+		| {
+				url: string;
+				options?: BetterFetchOption;
+		  };
 	/**
 	 * A schema for the plugin
 	 */
@@ -114,11 +134,13 @@ export const initializePlugins = async (
 		onResponse: Array<FetchHooks["onResponse"]>;
 		onSuccess: Array<FetchHooks["onSuccess"]>;
 		onError: Array<FetchHooks["onError"]>;
+		onRetry: Array<FetchHooks["onRetry"]>;
 	} = {
 		onRequest: [options?.onRequest],
 		onResponse: [options?.onResponse],
 		onSuccess: [options?.onSuccess],
 		onError: [options?.onError],
+		onRetry: [options?.onRetry],
 	};
 	if (!options || !options?.plugins) {
 		return {
@@ -137,6 +159,7 @@ export const initializePlugins = async (
 		hooks.onResponse.push(plugin.hooks?.onResponse);
 		hooks.onSuccess.push(plugin.hooks?.onSuccess);
 		hooks.onError.push(plugin.hooks?.onError);
+		hooks.onRetry.push(plugin.hooks?.onRetry);
 	}
 
 	return {

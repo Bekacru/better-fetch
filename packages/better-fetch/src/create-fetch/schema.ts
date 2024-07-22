@@ -24,50 +24,36 @@ export type FetchSchemaRoutes = {
 
 export const createSchema = <
 	F extends FetchSchemaRoutes,
-	S extends {
-		strict?: boolean;
-	},
+	S extends SchemaConfig,
 >(
 	schema: F,
 	config?: S,
 ) => {
 	return {
-		schema,
+		schema: schema as F,
 		config: config as S,
 	};
 };
 
-export type Schema = {
-	schema: FetchSchemaRoutes;
-	config: {
-		strict: boolean;
-		/**
-		 * The base url of the schema. By default it's the baseURL of the fetch instance.
-		 */
-		baseURL?: "" | (string & Record<never, never>);
-		prefix?: "" | (string & Record<never, never>);
-	};
+export type SchemaConfig = {
+	strict?: boolean;
+	/**
+	 * A prefix that will be prepended when it's
+	 * calling the schema.
+	 *
+	 * NOTE: Make sure to handle converting
+	 * the prefix to the baseURL in the init
+	 * function if you you are defining for a
+	 * plugin.
+	 */
+	prefix?: "" | (string & Record<never, never>);
+	/**
+	 * The base url of the schema. By default it's the baseURL of the fetch instance.
+	 */
+	baseURL?: "" | (string & Record<never, never>);
 };
 
-export type InferQuery<Q> = Q extends z.ZodSchema ? z.infer<Q> : any;
-
-export type IsFieldOptional<T> = T extends z.ZodSchema
-	? T extends z.ZodOptional<any>
-		? true
-		: false
-	: true;
-
-export type IsOptionRequired<T extends FetchSchema> = IsFieldOptional<
-	T["input"]
-> extends false
-	? true
-	: IsFieldOptional<T["query"]> extends false
-		? true
-		: IsFieldOptional<T["params"]> extends false
-			? true
-			: false;
-
-export type RequiredOptionKeys<T extends FetchSchema> =
-	| (IsFieldOptional<T["input"]> extends false ? "body" : never)
-	| (IsFieldOptional<T["query"]> extends false ? "query" : never)
-	| (IsFieldOptional<T["params"]> extends false ? "params" : never);
+export type Schema = {
+	schema: FetchSchemaRoutes;
+	config: SchemaConfig;
+};

@@ -4,7 +4,6 @@ import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
 import "fumadocs-ui/twoslash.css";
 import { baseUrl, createMetadata } from "@/lib/metadata";
-import { Viewport } from "next";
 
 const inter = Inter({
 	subsets: ["latin"],

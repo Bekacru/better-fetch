@@ -2,8 +2,9 @@
 	"name": "@better-fetch/root",
 	"private": true,
 	"scripts": {
-		"build": "pnpm -F fetch build",
-		"test": "pnpm -F fetch test",
+		"build": "pnpm --filter \"./packages/*\" build",
+		"dev": "pnpm -F fetch dev",
+		"test": "pnpm --filter \"./packages/*\" test",
 		"bump": "pnpm -F fetch bump",
 		"typecheck": "pnpm -r typecheck",
 		"lint": "biome check .",
@@ -11,9 +12,13 @@
 	},
 	"dependencies": {
 		"@biomejs/biome": "1.7.3",
-		"simple-git-hooks": "^2.11.1"
+		"simple-git-hooks": "^2.11.1",
+		"vitest": "^1.5.0"
 	},
 	"simple-git-hooks": {
 		"pre-push": "pnpm typecheck"
+	},
+	"devDependencies": {
+		"tsup": "^8.0.2"
 	}
 }

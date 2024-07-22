@@ -140,14 +140,20 @@ export function getURL(url: string, options?: BetterFetchOption) {
 	/**
 	 * Dynamic Parameters.
 	 */
-	const params = options?.params
-		? Array.isArray(options.params)
-			? `/${options.params.join("/")}`
-			: `/${Object.values(options.params).join("/")}`
-		: "";
-	if (params) {
-		_url = _url.toString().split("/:")[0];
-		_url = `${_url.toString()}${params}`;
+	if (options?.params) {
+		if (Array.isArray(options?.params)) {
+			const params = options?.params
+				? Array.isArray(options.params)
+					? `/${options.params.join("/")}`
+					: `/${Object.values(options.params).join("/")}`
+				: "";
+			_url = _url.toString().split("/:")[0];
+			_url = `${_url.toString()}${params}`;
+		} else {
+			for (const [key, value] of Object.entries(options?.params)) {
+				_url = _url.toString().replace(`:${key}`, String(value));
+			}
+		}
 	}
 	const __url = new URL(_url);
 	/**
@@ -159,6 +165,7 @@ export function getURL(url: string, options?: BetterFetchOption) {
 			__url.searchParams.append(key, String(value));
 		}
 	}
+
 	return __url;
 }
 
@@ -201,6 +208,13 @@ export function getBody(options?: BetterFetchOption) {
 export function getMethod(url: string, options?: BetterFetchOption) {
 	if (options?.method) {
 		return options.method.toUpperCase();
+	}
+	if (url.startsWith("@")) {
+		const pMethod = url.split("@")[1]?.split("/")[0];
+		if (!methods.includes(pMethod)) {
+			return options?.body ? "POST" : "GET";
+		}
+		return pMethod.toUpperCase();
 	}
 	return options?.body ? "POST" : "GET";
 }

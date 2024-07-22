@@ -29,7 +29,7 @@ export type Method = PayloadMethod | NonPayloadMethod;
 export type BetterFetchOption<
 	Body = any,
 	Query extends Record<string, any> = any,
-	Params extends Record<string, any> | Array<string> = any,
+	Params extends Record<string, any> | Array<string> | undefined = any,
 > = Prettify<
 	Omit<RequestInit, "body"> &
 		FetchHooks & {
@@ -94,7 +94,7 @@ export type BetterFetchOption<
 			 */
 			retry?: RetryOptions;
 			/**
-			 * the number of times the request has alredy been retried
+			 * the number of times the request has already been retried
 			 */
 			retryAttempt?: number;
 			/**
