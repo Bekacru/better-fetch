@@ -1,0 +1,30 @@
+{
+	"name": "@better-fetch/logger",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.cjs",
+	"module": "index.js",
+	"scripts": {
+		"test": "vitest",
+		"build": "tsup"
+	},
+	"devDependencies": {
+		"@better-fetch/fetch": "workspace:*",
+		"tsx": "^4.16.2",
+		"typescript": "^5.5.3",
+		"zod": "^3.23.8"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"dependencies": {
+		"consola": "^3.2.3"
+	},
+	"type": "module"
+}
