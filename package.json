@@ -5,7 +5,7 @@
 		"build": "pnpm --filter \"./packages/*\" build",
 		"dev": "pnpm -F fetch dev",
 		"test": "pnpm --filter \"./packages/*\" test",
-		"bump": "pnpm --filter \"./packages/*\" bump",
+		"bump": "bumpp  \"./packages/*/package.json\"",
 		"typecheck": "pnpm -r typecheck",
 		"lint": "biome check .",
 		"format": "biome check . --apply"
