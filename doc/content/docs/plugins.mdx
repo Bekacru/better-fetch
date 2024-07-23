@@ -88,7 +88,7 @@ const plugin = {
     id: "my-plugin",
     name: "My Plugin",
     schema: {
-        schema: {
+        schema: createSchema({
             "/path": {
                 input: z.object({
                     /**
@@ -106,18 +106,17 @@ const plugin = {
                     completed: z.boolean(),
                 }),
             }
-        },
-        config: {
-            strict: true
-        }
+        }, {
+            baseURL: "https://jsonplaceholder.typicode.com",
+        })
     }
 } satisfies BetterFetchPlugin;
 
-const $fetch = createFetch({
-    baseURL: "https://jsonplaceholder.typicode.com",
+const $fetch = createFetch({    
+    baseURL: "localhost:3000"
 })
 
-const { data, error } = await $fetch("/path", {
+const { data, error } = await $fetch("https://jsonplaceholder.typicode.com/path", {
     body: {
         userId: "1",
         id: 1,
@@ -126,7 +125,11 @@ const { data, error } = await $fetch("/path", {
     },
 });
 
+//@annotate: baseURL is inferred to "https://jsonplaceholder.typicode.com"
 ```
+<Callout type="info">
+    You can also pass a `prefix` to the `createSchema` function to prefix all the routes.
+</Callout>
 
 ### Properties
 <AutoTypeTable path="./lib/better-fetch-options.ts" name="BetterFetchPlugin" />
