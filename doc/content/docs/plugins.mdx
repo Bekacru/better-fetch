@@ -78,7 +78,8 @@ const $fetch = createFetch({
 </Callout>
 
 ### Schema
-You can define a schema for the plugin. You can easily document api usage using this schema.
+
+You can define a schema for a plugin. This allows you to easily document the api usage using a schema.
 
 ```ts twoslash title="fetch.ts"
 import { createFetch, createSchema, BetterFetchPlugin } from "@better-fetch/fetch";
@@ -87,8 +88,7 @@ import { z } from "zod";
 const plugin = {
     id: "my-plugin",
     name: "My Plugin",
-    schema: {
-        schema: createSchema({
+    schema: createSchema({
             "/path": {
                 input: z.object({
                     /**
@@ -106,10 +106,9 @@ const plugin = {
                     completed: z.boolean(),
                 }),
             }
-        }, {
+        },{
             baseURL: "https://jsonplaceholder.typicode.com",
         })
-    }
 } satisfies BetterFetchPlugin;
 
 const $fetch = createFetch({    
