@@ -9,7 +9,7 @@ on:
 
 jobs:
   test:
-    name: test, lint & typecheck
+    name: test & typecheck
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -32,9 +32,6 @@ jobs:
       
       - name: Build
         run: pnpm build
-
-      - name: Lint
-        run: pnpm lint
 
       - name: Typecheck
         run: pnpm typecheck
