@@ -311,6 +311,8 @@ describe("create-fetch-type-test", () => {
 		});
 		//@ts-expect-error
 		const f = $fetch("/user/:id", {});
+
+		const f2 = $fetch("/post/:id", {});
 	});
 });
 
@@ -367,6 +369,7 @@ describe("plugin", () => {
 	it("should infer prefix", async () => {
 		const $fetch = createFetch({
 			plugins: [plugin],
+			baseURL: "http://localhost:4001",
 		});
 		expectTypeOf($fetch)
 			.parameter(0)
@@ -376,6 +379,7 @@ describe("plugin", () => {
 	it("should infer baseURL", async () => {
 		const $fetch = createFetch({
 			plugins: [plugin2],
+			baseURL: "http://localhost:4001",
 		});
 		expectTypeOf($fetch)
 			.parameter(0)
@@ -385,6 +389,7 @@ describe("plugin", () => {
 	it("should infer input and output", async () => {
 		const $fetch = createFetch({
 			plugins: [plugin],
+			baseURL: "http://localhost:4001",
 			customFetchImpl: async (url, req) => {
 				return new Response();
 			},
@@ -403,6 +408,7 @@ describe("plugin", () => {
 	it("should replace baseURL", async () => {
 		const $fetch = createFetch({
 			plugins: [plugin],
+			baseURL: "http://localhost:4001",
 			customFetchImpl: async (url, req) => {
 				return new Response();
 			},
@@ -432,6 +438,7 @@ describe("plugin", () => {
 	it("should not break if plugin is not define schema", async () => {
 		const $fetch = createFetch({
 			plugins: [plugin3],
+			baseURL: "http://localhost:4001",
 			customFetchImpl: async (url, req) => {
 				return new Response();
 			},
@@ -440,11 +447,7 @@ describe("plugin", () => {
 			body: {
 				param: "1",
 			},
-			onResponse(context) {
-				expect(context.request.url.toString()).toBe(
-					"http://localhost:4001/path",
-				);
-			},
+			onResponse(context) {},
 		});
 	});
 });

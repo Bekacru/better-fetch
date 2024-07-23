@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { BetterFetchError, betterFetch, createFetch } from "..";
 import { router } from "./test-router";
 
-describe.skip("fetch", () => {
+describe("fetch", () => {
 	const getURL = (path?: string) =>
 		path ? `http://localhost:4000/${path}` : "http://localhost:4000";
 
