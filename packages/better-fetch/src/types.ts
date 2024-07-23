@@ -77,7 +77,9 @@ export type BetterFetchOption<
 			 */
 			query?: Query;
 			/**
-			 * Dynamic parameters
+			 * Dynamic parameters.
+			 *
+			 * If url is defined as /path/:id, params will be { id: string }
 			 */
 			params?: Params;
 			/**

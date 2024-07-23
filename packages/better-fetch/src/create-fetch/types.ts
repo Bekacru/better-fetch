@@ -139,10 +139,6 @@ export type InferPluginOptions<Options extends CreateFetchOption> =
 			: {}
 		: {};
 
-export type MergePluginOptions<Options extends CreateFetchOption> = Prettify<
-	BetterFetchOption & Partial<InferPluginOptions<Options>>
->;
-
 export type BetterFetch<
 	CreateOptions extends CreateFetchOption,
 	DefaultRes = CreateOptions["defaultOutput"] extends ZodSchema
@@ -168,15 +164,27 @@ export type BetterFetch<
 				UnionToIntersection<R>[K]
 			: S["schema"][K]
 		: unknown,
-	O extends
-		MergePluginOptions<CreateOptions> = MergePluginOptions<CreateOptions>,
+	O extends Omit<BetterFetchOption, "params"> = Omit<
+		BetterFetchOption,
+		"params"
+	>,
+	PluginOptions extends Partial<InferPluginOptions<CreateOptions>> = Partial<
+		InferPluginOptions<CreateOptions>
+	>,
 >(
 	url: U,
 	...options: F extends FetchSchema
 		? IsOptionRequired<F, K> extends true
-			? [InferOptions<F, K>]
-			: [InferOptions<F, K>?]
-		: [O?]
+			? [Prettify<InferOptions<F, K> & PluginOptions>]
+			: [Prettify<InferOptions<F, K> & PluginOptions>?]
+		: [
+				Prettify<
+					PluginOptions &
+						O & {
+							params?: InferParamPath<K>;
+						}
+				>?,
+			]
 ) => Promise<
 	BetterFetchResponse<
 		O["output"] extends ZodSchema

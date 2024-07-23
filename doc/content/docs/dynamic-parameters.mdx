@@ -1,0 +1,27 @@
+---
+title: Dynamic Parameters
+description: Dynamic Parameters
+---
+
+Dynamic parameters are parameters that are defined in the url path. They are defined using the `:` prefix. When the request is made, the dynamic paramters will be replace with the values passed in the `params` option.
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from "@better-fetch/fetch";
+
+const $fetch = createFetch({
+    baseURL: "http://localhost:3000",
+})
+
+const res = await $fetch("/path/:id", {
+    params: {
+        id: "1"
+    }
+})
+
+const res2 = await $fetch("/repos/:owner/:repo", {
+    params: {
+        owner: "octocat",
+        repo: "hello-world"
+    }
+})
+```

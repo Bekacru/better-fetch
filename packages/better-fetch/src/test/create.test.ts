@@ -185,22 +185,26 @@ describe("create-fetch-type-test", () => {
 	});
 
 	it("if output is defined it should be used", () => {
-		const res = $fetch("/", {
-			output: z.object({
-				somethingElse: z.string(),
-			}),
+		const f = createFetch({
+			baseURL: "http://localhost:4001",
+			customFetchImpl: async (url, req) => {
+				return new Response(JSON.stringify({ message: "ok" }));
+			},
+		});
+		const res = f("/", {
+			output: z.object({ message: z.string() }),
 		});
 		expectTypeOf(res).toMatchTypeOf<
 			Promise<
 				BetterFetchResponse<{
-					somethingElse: string;
+					message: string;
 				}>
 			>
 		>();
 		expectTypeOf(res).not.toMatchTypeOf<
 			Promise<
 				BetterFetchResponse<{
-					message: string;
+					message: number;
 				}>
 			>
 		>();
@@ -311,8 +315,16 @@ describe("create-fetch-type-test", () => {
 		});
 		//@ts-expect-error
 		const f = $fetch("/user/:id", {});
-
-		const f2 = $fetch("/post/:id", {});
+		$fetch("/post/:id/:title", {
+			//@ts-expect-error
+			params: {},
+		});
+		$fetch("/post/:id/:title", {
+			params: {
+				//@ts-expect-error
+				title: 1,
+			},
+		});
 	});
 });
 
@@ -342,6 +354,11 @@ describe("plugin", () => {
 				strict: true,
 			},
 		),
+		getOptions() {
+			return z.object({
+				onUpload: z.function(),
+			});
+		},
 	} satisfies BetterFetchPlugin;
 	const plugin2 = {
 		id: "test",
@@ -449,5 +466,37 @@ describe("plugin", () => {
 			},
 			onResponse(context) {},
 		});
+	});
+
+	it("should infer additional options", async () => {
+		const $fetch = createFetch({
+			plugins: [
+				{
+					id: "test",
+					name: "Test",
+					schema: createSchema({
+						"/path": {
+							output: z.object({
+								message: z.string(),
+							}),
+						},
+					}),
+					getOptions() {
+						return z.object({
+							onUpload: z.function(),
+						});
+					},
+				},
+			],
+			baseURL: "http://localhost:4001",
+			customFetchImpl: async (url, req) => {
+				return new Response();
+			},
+		});
+		expectTypeOf(
+			$fetch("/path", {
+				onUpload() {},
+			}),
+		);
 	});
 });
