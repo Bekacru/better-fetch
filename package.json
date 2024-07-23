@@ -5,7 +5,7 @@
 		"build": "pnpm --filter \"./packages/*\" build",
 		"dev": "pnpm -F fetch dev",
 		"test": "pnpm --filter \"./packages/*\" test",
-		"bump": "pnpm -F fetch bump",
+		"bump": "pnpm --filter \"./packages/*\" bump",
 		"typecheck": "pnpm -r typecheck",
 		"lint": "biome check .",
 		"format": "biome check . --apply"
@@ -19,6 +19,7 @@
 		"pre-push": "pnpm typecheck"
 	},
 	"devDependencies": {
+		"bumpp": "^9.4.1",
 		"tsup": "^8.0.2"
 	}
 }

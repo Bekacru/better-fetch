@@ -1,12 +1,13 @@
 {
 	"name": "@better-fetch/logger",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"description": "",
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"scripts": {
 		"test": "vitest",
+		"bump": "bumpp",
 		"build": "tsup"
 	},
 	"devDependencies": {

@@ -18,6 +18,9 @@ importers:
         specifier: ^1.5.0
         version: 1.6.0(@types/node@20.14.11)(happy-dom@14.12.3)(jsdom@24.1.0)
     devDependencies:
+      bumpp:
+        specifier: ^9.4.1
+        version: 9.4.1
       tsup:
         specifier: ^8.0.2
         version: 8.2.0(jiti@1.21.6)(postcss@8.4.39)(tsx@4.16.2)(typescript@5.5.3)(yaml@2.4.5)
