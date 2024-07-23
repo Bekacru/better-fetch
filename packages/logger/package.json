@@ -2,8 +2,9 @@
 	"name": "@better-fetch/logger",
 	"version": "1.0.0",
 	"description": "",
-	"main": "index.cjs",
-	"module": "index.js",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"scripts": {
 		"test": "vitest",
 		"build": "tsup"

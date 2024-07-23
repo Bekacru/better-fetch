@@ -1,13 +1,14 @@
+import { ZodAny, ZodObject, ZodSchema } from "zod";
 import { Schema } from "./create-fetch";
 import type { BetterFetchOption } from "./types";
 
-export type RequestContext = {
+export type RequestContext<T extends Record<string, any> = any> = {
 	url: URL;
 	headers: Headers;
 	body: any;
 	method: string;
 	signal: AbortSignal;
-} & BetterFetchOption;
+} & BetterFetchOption<any, any, any, T>;
 export type ResponseContext = {
 	response: Response;
 	request: RequestContext;
@@ -29,8 +30,8 @@ export interface FetchHooks {
 	 * The returned context object will be reassigned to
 	 * the original request context.
 	 */
-	onRequest?: (
-		context: RequestContext,
+	onRequest?: <T extends Record<string, any>>(
+		context: RequestContext<T>,
 	) => Promise<RequestContext | void> | RequestContext | void;
 	/**
 	 * a callback function that will be called when
@@ -122,6 +123,10 @@ export type BetterFetchPlugin = {
 	 * A schema for the plugin
 	 */
 	schema?: Schema;
+	/**
+	 * Additional options that can be passed to the plugin
+	 */
+	getOptions?: () => ZodSchema;
 };
 
 export const initializePlugins = async (

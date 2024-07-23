@@ -107,7 +107,10 @@ export function getHeaders(opts?: BetterFetchOption) {
 		headers.set(key, value);
 	}
 	if (!headers.has("content-type")) {
-		headers.set("content-type", detectContentType(opts?.body));
+		const t = detectContentType(opts?.body);
+		if (t) {
+			headers.set("content-type", t);
+		}
 	}
 
 	return headers;
@@ -170,27 +173,11 @@ export function getURL(url: string, options?: BetterFetchOption) {
 }
 
 export function detectContentType(body: any) {
-	if (body instanceof Blob) {
-		return "application/octet-stream";
-	}
-
-	if (body instanceof File) {
-		return "application/octet-stream";
-	}
-
-	if (body instanceof URLSearchParams) {
-		return "application/x-www-form-urlencoded";
-	}
-
-	if (body instanceof FormData) {
-		return "multipart/form-data";
-	}
-
 	if (isJSONSerializable(body)) {
 		return "application/json";
 	}
 
-	return "text/plain";
+	return null;
 }
 
 export function getBody(options?: BetterFetchOption) {

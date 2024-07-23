@@ -2,7 +2,7 @@ import type { ZodSchema } from "zod";
 import type { Auth } from "./auth";
 import type { BetterFetchPlugin, FetchHooks } from "./plugins";
 import type { RetryOptions } from "./retry";
-import type { StringLiteralUnion } from "./type-utils";
+import type { Prettify, StringLiteralUnion } from "./type-utils";
 
 type CommonHeaders = {
 	accept: "application/json" | "text/plain" | "application/octet-stream";
@@ -19,9 +19,6 @@ export type FetchEsque = (
 	init?: RequestInit,
 ) => Promise<Response>;
 
-type Prettify<T> = {
-	[key in keyof T]: T[key];
-} & {};
 export type PayloadMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 export type NonPayloadMethod = "GET" | "HEAD" | "OPTIONS";
 export type Method = PayloadMethod | NonPayloadMethod;
@@ -30,8 +27,10 @@ export type BetterFetchOption<
 	Body = any,
 	Query extends Record<string, any> = any,
 	Params extends Record<string, any> | Array<string> | undefined = any,
+	ExtraOptions extends Record<string, any> = {},
 > = Prettify<
-	Omit<RequestInit, "body"> &
+	ExtraOptions &
+		Omit<RequestInit, "body"> &
 		FetchHooks & {
 			/**
 			 * a timeout that will be used to abort the

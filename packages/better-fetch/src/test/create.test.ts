@@ -17,8 +17,8 @@ import {
 } from "../create-fetch";
 import type { BetterFetchResponse } from "../types";
 
-import { router } from "./test-router";
 import { BetterFetchPlugin } from "../plugins";
+import { router } from "./test-router";
 
 const schema = {
 	"/": {

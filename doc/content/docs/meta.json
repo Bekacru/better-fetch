@@ -14,6 +14,8 @@
 		"default-types",
 		"hooks",
 		"plugins",
+		"---Plugins---",
+		"utility",
 		"---Reference---",
 		"fetch-options",
 		"extra-options"

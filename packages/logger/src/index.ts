@@ -1,5 +1,6 @@
-import { BetterFetchPlugin, createFetch } from "@better-fetch/fetch";
+import { BetterFetchPlugin } from "@better-fetch/fetch";
 import { createConsola } from "consola";
+import { getStatusText } from "./util";
 
 type ConsoleEsque = {
 	log: (...args: any[]) => void;
@@ -94,29 +95,13 @@ export const logger = (options?: LoggerOptions) => {
 				log(
 					"Request failed with status: ",
 					context.response.status,
-					`(${context.response.statusText})`,
+					`(${
+						context.response.statusText ||
+						getStatusText(context.response.status)
+					})`,
 				);
 				options?.verbose && obj && opts.console.error(obj);
 			},
 		},
 	} satisfies BetterFetchPlugin;
 };
-
-const f = createFetch({
-	plugins: [logger()],
-	baseURL: "http://localhost:4001",
-	customFetchImpl: async (url, req) => {
-		return new Response(
-			JSON.stringify({
-				message: "ok",
-			}),
-			{
-				status: 500,
-				statusText: "Internal Server Error",
-			},
-		);
-	},
-	retry: 4,
-});
-
-f("/");

@@ -72,9 +72,7 @@ import { createFetch } from "@better-fetch/fetch";
 
 export const $fetch = createFetch({
   baseUrl: "https://jsonplaceholder.typicode.com",
-  retry: {
-    count: 2,
-  },
+  retry: 2,
   throw: true,
 }); 
 

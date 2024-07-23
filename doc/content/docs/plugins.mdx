@@ -1,11 +1,9 @@
 ---
-title: Plugins
+title: Plugins 
 description: Plugins
 ---
 
-Plugins are functions that can be used to modify the request, response, error and other parts of the request lifecycle.
-
-The plugins api allows you to modify the request, response, error and other parts of the request lifecycle. 
+Plugins are functions that can be used to modify the request, response, error and other parts of the request lifecycle and can be used to define <Link href="/docs/fetch-schema">Fetch Schema</Link>.
 
 
 ### Init
@@ -58,7 +56,7 @@ const myPlugin = {
         },
         onResponse(context) {
             // do something with the context
-            return context.response;
+            return context;
         },
         onError(context) {
             // do something with the context
@@ -79,6 +77,56 @@ const $fetch = createFetch({
     If more than one plugin is registered, the hooks will be called in the order they are registered.
 </Callout>
 
+### Schema
+You can define a schema for the plugin. You can easily document api usage using this schema.
+
+```ts twoslash title="fetch.ts"
+import { createFetch, createSchema, BetterFetchPlugin } from "@better-fetch/fetch";
+import { z } from "zod";
+// @errors: 2353 2561
+const plugin = {
+    id: "my-plugin",
+    name: "My Plugin",
+    schema: {
+        schema: {
+            "/path": {
+                input: z.object({
+                    /**
+                     * You can write descriptions for the properties. Hover over the property to see 
+                     * the description.
+                     */
+                    userId: z.string(),
+                    /**
+                     * The id property is required
+                     */
+                    id: z.number(),
+                }),
+                output: z.object({
+                    title: z.string(),
+                    completed: z.boolean(),
+                }),
+            }
+        },
+        config: {
+            strict: true
+        }
+    }
+} satisfies BetterFetchPlugin;
+
+const $fetch = createFetch({
+    baseURL: "https://jsonplaceholder.typicode.com",
+})
+
+const { data, error } = await $fetch("/path", {
+    body: {
+        userId: "1",
+        id: 1,
+        title: "title",
+        completed: true,
+    },
+});
+
+```
 
 ### Properties
 <AutoTypeTable path="./lib/better-fetch-options.ts" name="BetterFetchPlugin" />

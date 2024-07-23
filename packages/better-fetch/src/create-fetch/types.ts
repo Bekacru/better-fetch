@@ -1,10 +1,10 @@
+import { IsEmptyObject } from "type-fest";
 import type { ZodObject, ZodSchema, z } from "zod";
-import type { StringLiteralUnion } from "../type-utils";
+import { BetterFetchPlugin } from "../plugins";
+import type { Prettify, StringLiteralUnion } from "../type-utils";
 import type { BetterFetchOption, BetterFetchResponse } from "../types";
 import type { FetchSchema, Schema } from "./schema";
-import { BetterFetchPlugin } from "../plugins";
-import { IsEmptyObject } from "type-fest";
-export interface CreateFetchOption extends BetterFetchOption {
+export type CreateFetchOption = BetterFetchOption & {
 	schema?: Schema;
 	/**
 	 * Catch all error including non api errors. Like schema validation, etc.
@@ -13,7 +13,7 @@ export interface CreateFetchOption extends BetterFetchOption {
 	catchAllError?: boolean;
 	defaultOutput?: ZodSchema;
 	defaultError?: ZodSchema;
-}
+};
 
 type WithRequired<T, K extends keyof T | never> = T & { [P in K]-?: T[P] };
 type InferBody<T> = T extends ZodSchema ? z.infer<T> : any;
@@ -128,6 +128,21 @@ export type MergeSchema<Options extends CreateFetchOption> =
 		? PluginSchema<P> & Options["schema"]
 		: Options["schema"];
 
+export type InferPluginOptions<Options extends CreateFetchOption> =
+	Options["plugins"] extends Array<infer P>
+		? P extends BetterFetchPlugin
+			? P["getOptions"] extends () => infer O
+				? O extends ZodSchema
+					? UnionToIntersection<z.infer<O>>
+					: {}
+				: {}
+			: {}
+		: {};
+
+export type MergePluginOptions<Options extends CreateFetchOption> = Prettify<
+	BetterFetchOption & Partial<InferPluginOptions<Options>>
+>;
+
 export type BetterFetch<
 	CreateOptions extends CreateFetchOption,
 	DefaultRes = CreateOptions["defaultOutput"] extends ZodSchema
@@ -153,7 +168,8 @@ export type BetterFetch<
 				UnionToIntersection<R>[K]
 			: S["schema"][K]
 		: unknown,
-	O extends BetterFetchOption = BetterFetchOption,
+	O extends
+		MergePluginOptions<CreateOptions> = MergePluginOptions<CreateOptions>,
 >(
 	url: U,
 	...options: F extends FetchSchema

@@ -3,7 +3,7 @@ title: Fetch Schema
 description: Fetch Schema
 ---
 
-Fetch schema allows you to pre-define the url path and the shape of reqeust and response data. This is like <Link href="https://trpc.io/" target="_blank">**trpc**</Link> or other typed rpc librires client but you define it yourself. 
+Fetch schema allows you to pre-define the url path and the shape of reqeust and response data. You can easily document your api using this schema. 
 
 The output of the scheam will be validated using zod and if the validation fails, it'll throw an error. 
 
@@ -195,10 +195,10 @@ const response2 = await $fetch("/post", {
 })
 
 const response3 = await $fetch("/post/:id/:title", {
-    params: [
-        "1",
-        "title"
-    ]
+    params: {
+        id: "1",
+        title: "title"
+    }
 })
 
 ```

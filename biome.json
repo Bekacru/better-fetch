@@ -3,8 +3,11 @@
 	"organizeImports": {
 		"enabled": true
 	},
+	"formatter": {
+		"enabled": true
+	},
 	"files": {
-		"ignore": ["dist"]
+		"ignore": ["dist", "node_modules", ".next"]
 	},
 	"linter": {
 		"enabled": false
