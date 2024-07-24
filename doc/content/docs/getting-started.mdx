@@ -21,10 +21,10 @@ The fastest way to start using better fetch is to import the `betterFetch` funct
 
 You can define the response type using generics or **zod schema (recommended)**.
 
-1. Using generics
-
-```ts twoslash title="with-generics.ts"
+```ts twoslash title="fetch.ts"
 import { betterFetch } from '@better-fetch/fetch';
+import { z } from 'zod';
+
 
 //Using generic type
 const { data, error } = await betterFetch<{
@@ -33,13 +33,7 @@ const { data, error } = await betterFetch<{
     title: string;
     completed: boolean;
 }>("https://jsonplaceholder.typicode.com/todos/1");
-```
 
-2. Using zod schema
-
-```ts twoslash title="with-zod.ts"
-import { betterFetch } from '@better-fetch/fetch';
-import { z } from 'zod';
 
 //Using zod schema
 const { data: todos, error: todoError } = await betterFetch("https://jsonplaceholder.typicodei.com/todos/1", {
@@ -50,23 +44,15 @@ const { data: todos, error: todoError } = await betterFetch("https://jsonplaceho
         completed: z.boolean(),
     })  
 });
+
+// @annotate: Hover over the data object to see the type
 ```
-
-Better fetch by default returns a `Promise` that resolves to an object of `data` and `error`. Hover over the example code block above to see the type of the response.
-
-<Callout type="info">
-    **data** by defualt is of type `unknown` or `null` incase of a response error.
-</Callout>
-
-You can define the type of the response data in 2 ways:
-
-1. **Using the `output` property to define a zod schema (recommended)**: The `output` property is used to define the type of the response data. The response data will be validated against the schema. If the response data does not match the schema, an error will be thrown.
-
-2. **By passing a generic type to the `betterFetch`**: You can also pass a generic type to the `betterFetch` function. It has some drawbacks but it should work in most cases.
 
 <Callout type="info"> 
   Make sure strict mode is enabled in your tsconfig when using zod schema validations.
 </Callout>
+
+Better fetch by default returns a `Promise` that resolves to an object of `data` and `error` but if you pass the `throw` option, it will return the parsed response data only. 
 
 ### Create Fetch
 
@@ -77,7 +63,11 @@ import { createFetch } from "@better-fetch/fetch";
 
 export const $fetch = createFetch({
   baseUrl: "https://jsonplaceholder.typicode.com",
-  retry: 2 ,
+  retry: {
+      type: "linear",
+      attempts: 3,
+      delay: 1000 
+  }
 });
 
 const { data, error } = await $fetch<{
@@ -110,3 +100,45 @@ const data = await $fetch<{
 ```
 Learn more about handling errors [Handling Errors](/docs/handling-errors) section.
 
+### Fetch Schema
+
+The fetch schema enables you to pre-define the URL path and the shape of request and response data. This makes it easy to document your API. With plugins, you can even share these schemas with other as a package.
+
+The output of the scheam will be validated using zod and if the validation fails, it'll throw an error.
+
+```ts twoslash title="fetch.ts" 
+import { createSchema, createFetch } from "@better-fetch/fetch";
+import { z } from "zod";
+
+export const schema = createSchema({ // [!code highlight]
+    "/path": { // [!code highlight]
+        input: z.object({ // [!code highlight]
+            userId: z.string(), // [!code highlight]
+            id: z.number(), // [!code highlight]
+            title: z.string(), // [!code highlight]
+            completed: z.boolean(), // [!code highlight]
+        }), // [!code highlight]
+        output: z.object({ // [!code highlight]
+            userId: z.string(), // [!code highlight]
+            id: z.number(), // [!code highlight]
+            title: z.string(), // [!code highlight]
+            completed: z.boolean(), // [!code highlight]
+        }), // [!code highlight]
+    } // [!code highlight]
+}) // [!code highlight]
+
+const $fetch = createFetch({
+    baseUrl: "https://jsonplaceholder.typicode.com",
+    schema: schema // [!code highlight]
+});
+
+
+const { data, error } = await $fetch("/path", {
+    body: {
+        userId: "1",
+        id: 1,
+        title: "title",
+        completed: true,
+    },
+});
+```
