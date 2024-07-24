@@ -1,4 +1,4 @@
-import { ZodAny, ZodObject, ZodSchema } from "zod";
+import { ZodSchema } from "zod";
 import { Schema } from "./create-fetch";
 import type { BetterFetchOption } from "./types";
 
