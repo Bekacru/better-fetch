@@ -6,7 +6,6 @@
 	"module": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"scripts": {
-		"test": "vitest",
 		"bump": "bumpp",
 		"build": "tsup"
 	},

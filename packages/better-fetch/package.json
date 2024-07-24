@@ -5,6 +5,17 @@
 	"module": "./dist/index.js",
 	"react-native": "./dist/index.js",
 	"types": "./dist/index.d.ts",
+	"scripts": {
+		"build": "tsup",
+		"dev": "tsup --watch",
+		"test": "vitest",
+		"bump": "bumpp",
+		"test:watch": "vitest watch",
+		"lint": "biome check .",
+		"release": "bun run build && npm publish --access public",
+		"lint:fix": "biome check . --apply",
+		"typecheck": "tsc --noEmit"
+	},
 	"devDependencies": {
 		"@happy-dom/global-registrator": "^14.7.1",
 		"@testing-library/dom": "^10.0.0",
@@ -28,17 +39,6 @@
 			"import": "./dist/index.js",
 			"require": "./dist/index.cjs"
 		}
-	},
-	"scripts": {
-		"build": "tsup",
-		"dev": "tsup --watch",
-		"test": "vitest",
-		"bump": "bumpp",
-		"test:watch": "vitest watch",
-		"lint": "biome check .",
-		"release": "bun run build && npm publish --access public",
-		"lint:fix": "biome check . --apply",
-		"typecheck": "tsc --noEmit"
 	},
 	"files": ["dist"],
 	"type": "module"
