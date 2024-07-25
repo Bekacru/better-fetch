@@ -153,16 +153,8 @@ export type BetterFetch<
 	Err = DefaultErr,
 	U extends InferKey<S> = InferKey<S>,
 	K extends GetKey<S, U> = GetKey<S, U>,
-	F extends S extends Schema
-		? S["schema"] extends Array<infer R>
-			? //@ts-expect-error
-				UnionToIntersection<R>[K]
-			: S["schema"][K]
-		: unknown = S extends Schema
-		? S["schema"] extends Array<infer R>
-			? //@ts-expect-error
-				UnionToIntersection<R>[K]
-			: S["schema"][K]
+	F extends S extends Schema ? S["schema"][K] : unknown = S extends Schema
+		? S["schema"][K]
 		: unknown,
 	O extends Omit<BetterFetchOption, "params"> = Omit<
 		BetterFetchOption,

@@ -4,6 +4,8 @@ export class BetterFetchError extends Error {
 		public statusText: string,
 		public error: any,
 	) {
-		super(statusText || status.toString());
+		super(statusText || status.toString(), {
+			cause: error,
+		});
 	}
 }
