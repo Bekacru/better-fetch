@@ -2,7 +2,7 @@ import { z } from "zod";
 import { betterFetch } from "../fetch";
 import { BetterFetchPlugin } from "../plugins";
 import type { BetterFetchOption } from "../types";
-import { methods } from "./schema";
+import { createSchema, methods } from "./schema";
 import type { BetterFetch, CreateFetchOption } from "./types";
 
 const applySchemaPlugin = (config: CreateFetchOption) =>

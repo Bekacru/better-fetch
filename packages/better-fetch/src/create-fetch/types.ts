@@ -120,8 +120,8 @@ type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
 export type PluginSchema<P> = P extends BetterFetchPlugin
 	? P["schema"] extends Schema
 		? P["schema"]
-		: undefined
-	: undefined;
+		: {}
+	: {};
 
 export type MergeSchema<Options extends CreateFetchOption> =
 	Options["plugins"] extends Array<infer P>

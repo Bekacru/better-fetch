@@ -499,4 +499,28 @@ describe("plugin", () => {
 			}),
 		);
 	});
+
+	it("shouldn't break the type on plugin with no schema plugin a schema defined", async () => {
+		const f = createFetch({
+			plugins: [
+				{
+					id: "test",
+					name: "Test",
+				},
+			],
+			schema: createSchema(
+				{
+					"/path": {
+						output: z.object({
+							message: z.string(),
+						}),
+					},
+				},
+				{
+					strict: true,
+				},
+			),
+		});
+		expectTypeOf(f).parameter(0).toMatchTypeOf<"/path">();
+	});
 });
