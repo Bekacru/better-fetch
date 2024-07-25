@@ -102,7 +102,11 @@ Learn more about handling errors [Handling Errors](/docs/handling-errors) sectio
 
 ### Fetch Schema
 
-The fetch schema enables you to pre-define the URL path and the shape of request and response data. This makes it easy to document your API. With plugins, you can even share these schemas with other as a package.
+Fetch schema enables you to pre-define the URL path and the shape of request and response data. This makes it easy to document your API. 
+
+<Callout type="info">
+   Plugins can also define fetch schemas. See [Plugins](/docs/plugins) section for more details.
+</Callout>
 
 The output of the scheam will be validated using zod and if the validation fails, it'll throw an error.
 
@@ -131,7 +135,6 @@ const $fetch = createFetch({
     baseUrl: "https://jsonplaceholder.typicode.com",
     schema: schema // [!code highlight]
 });
-
 
 const { data, error } = await $fetch("/path", {
     body: {

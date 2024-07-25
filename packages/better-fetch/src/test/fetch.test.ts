@@ -1,6 +1,6 @@
 import { createApp, toNodeListener } from "h3";
 import { type Listener, listen } from "listhen";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { BetterFetchError, betterFetch, createFetch } from "..";
 import { router } from "./test-router";
 
@@ -275,6 +275,45 @@ describe("fetch-error", () => {
 	});
 	it("should throw if the response is not ok", async () => {
 		await expect(f("/ok")).rejects.toThrowError(BetterFetchError);
+	});
+});
+
+describe.only("hooks", () => {
+	it("should call onRequest and onResponse", async () => {
+		const onRequest = vi.fn();
+		const onResponse = vi.fn();
+		const f = createFetch({
+			baseURL: "http://localhost:4001",
+			customFetchImpl: async (req, init) => {
+				return new Response(JSON.stringify({ message: "ok" }));
+			},
+			onRequest,
+			onResponse,
+		});
+		await f("/ok");
+		expect(onRequest).toHaveBeenCalled();
+		expect(onResponse).toHaveBeenCalled();
+	});
+
+	it("should call onError", async () => {
+		const onError = vi.fn();
+		const onResponse = vi.fn();
+		const onSuccess = vi.fn();
+		const f = createFetch({
+			baseURL: "http://localhost:4001",
+			customFetchImpl: async (req, init) => {
+				return new Response(null, {
+					status: 500,
+				});
+			},
+			onError,
+			onResponse,
+			onSuccess,
+		});
+		await f("/ok");
+		expect(onError).toHaveBeenCalled();
+		expect(onResponse).toHaveBeenCalled();
+		expect(onSuccess).not.toHaveBeenCalled();
 	});
 });
 

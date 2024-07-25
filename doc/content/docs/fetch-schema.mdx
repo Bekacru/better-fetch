@@ -217,7 +217,7 @@ import { z } from "zod";
 const $fetch = createFetch({
     baseUrl: "https://jsonplaceholder.typicode.com",
     schema: createSchema({
-        "/@put/user": { // [!code highlight]
+        "@put/user": { // [!code highlight]
             input: z.object({
                 title: z.string(),
                 completed: z.boolean(),
