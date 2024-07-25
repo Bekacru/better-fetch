@@ -278,7 +278,7 @@ describe("fetch-error", () => {
 	});
 });
 
-describe.only("hooks", () => {
+describe("hooks", () => {
 	it("should call onRequest and onResponse", async () => {
 		const onRequest = vi.fn();
 		const onResponse = vi.fn();
