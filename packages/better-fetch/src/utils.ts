@@ -125,7 +125,19 @@ export function getURL(url: string, options?: BetterFetchOption) {
 	}
 	let _url: string | URL;
 	try {
-		_url = url.startsWith("http") ? url : new URL(url, options?.baseURL);
+		if (url.startsWith("http")) {
+			_url = url;
+		} else {
+			let baseURL = options?.baseURL;
+			if (baseURL && !baseURL?.endsWith("/")) {
+				baseURL = baseURL + "/";
+			}
+			if (url.startsWith("/")) {
+				_url = new URL(url.substring(1), baseURL);
+			} else {
+				_url = new URL(url, options?.baseURL);
+			}
+		}
 	} catch (e) {
 		if (e instanceof TypeError) {
 			if (!options?.baseURL) {
@@ -168,7 +180,6 @@ export function getURL(url: string, options?: BetterFetchOption) {
 			__url.searchParams.append(key, String(value));
 		}
 	}
-
 	return __url;
 }
 

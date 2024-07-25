@@ -81,6 +81,48 @@ describe("create-fetch-runtime-test", () => {
 		listener.close().catch(console.error);
 	});
 
+	it("should merge baseURL and url", async () => {
+		const $fetch = createFetch({
+			baseURL: "http://localhost:4001",
+			schema: createSchema(schema),
+			customFetchImpl: async (req, init) => {
+				return new Response(null, {
+					status: 200,
+				});
+			},
+		});
+		$fetch("/echo", {
+			baseURL: "http://localhost:4001",
+			body: { id: 1 },
+			onRequest(context) {
+				expect(context.url.toString()).toBe("http://localhost:4001/echo");
+			},
+		});
+		$fetch("/path", {
+			baseURL: "http://localhost:4001/v1",
+			body: { id: 1 },
+			onRequest(context) {
+				expect(context.url.toString()).toBe("http://localhost:4001/v1/path");
+			},
+		});
+
+		$fetch("/path", {
+			baseURL: "http://localhost:4001/v1/",
+			body: { id: 1 },
+			onRequest(context) {
+				expect(context.url.toString()).toBe("http://localhost:4001/v1/path");
+			},
+		});
+
+		$fetch("/path/", {
+			baseURL: "http://localhost:4001/v1/",
+			body: { id: 1 },
+			onRequest(context) {
+				expect(context.url.toString()).toBe("http://localhost:4001/v1/path/");
+			},
+		});
+	});
+
 	it("should validate response and throw if validation fails", async () => {
 		expect(
 			$fetch("/post", {
