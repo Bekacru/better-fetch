@@ -140,7 +140,7 @@ export type InferPluginOptions<Options extends CreateFetchOption> =
 		: {};
 
 export type BetterFetch<
-	CreateOptions extends CreateFetchOption,
+	CreateOptions extends CreateFetchOption = CreateFetchOption,
 	DefaultRes = CreateOptions["defaultOutput"] extends ZodSchema
 		? z.infer<CreateOptions["defaultOutput"]>
 		: unknown,

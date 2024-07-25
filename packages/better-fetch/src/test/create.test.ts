@@ -10,6 +10,7 @@ import {
 } from "vitest";
 import { ZodError, z } from "zod";
 import {
+	BetterFetch,
 	type FetchSchemaRoutes,
 	createFetch,
 	createSchema,
