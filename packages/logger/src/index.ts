@@ -60,19 +60,23 @@ export const logger = (options?: LoggerOptions) => {
 		enabled: true,
 		...options,
 	};
+	const { enabled } = opts;
 	return {
 		id: "logger",
 		name: "Logger",
 		version: "1.0.0",
 		hooks: {
 			onRequest(context) {
+				if (!enabled) return;
 				opts.console.log("Request being sent to:", context.url.toString());
 			},
 			async onSuccess(context) {
+				if (!enabled) return;
 				const log = opts.console.success || opts.console.log;
 				log("Request succeeded", context.data);
 			},
 			onRetry(response) {
+				if (!enabled) return;
 				const log = opts.console.warn || opts.console.log;
 				log(
 					"Retrying request...",
@@ -81,6 +85,7 @@ export const logger = (options?: LoggerOptions) => {
 				);
 			},
 			async onError(context) {
+				if (!enabled) return;
 				const log = opts.console.fail || opts.console.error;
 				let obj: any;
 				try {
