@@ -5,9 +5,15 @@ export type FetchSchema = {
 	input?: ZodSchema;
 	output?: ZodSchema;
 	query?: ZodSchema;
-	params?: z.ZodObject<{
-		[key: string]: ZodSchema;
-	}>;
+	params?:
+		| z.ZodObject<{
+				[key: string]: ZodSchema;
+		  }>
+		| z.ZodOptional<
+				z.ZodObject<{
+					[key: string]: ZodSchema;
+				}>
+		  >;
 	method?: Methods;
 };
 
