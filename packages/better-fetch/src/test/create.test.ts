@@ -98,7 +98,7 @@ describe("create-fetch-runtime-test", () => {
 				expect(context.url.toString()).toBe("http://localhost:4001/echo");
 			},
 		});
-		$fetch("/path", {
+		await $fetch("/path", {
 			baseURL: "http://localhost:4001/v1",
 			body: { id: 1 },
 			onRequest(context) {
@@ -106,7 +106,7 @@ describe("create-fetch-runtime-test", () => {
 			},
 		});
 
-		$fetch("/path", {
+		await $fetch("/path", {
 			baseURL: "http://localhost:4001/v1/",
 			body: { id: 1 },
 			onRequest(context) {
@@ -114,7 +114,7 @@ describe("create-fetch-runtime-test", () => {
 			},
 		});
 
-		$fetch("/path/", {
+		await $fetch("/path/", {
 			baseURL: "http://localhost:4001/v1/",
 			body: { id: 1 },
 			onRequest(context) {

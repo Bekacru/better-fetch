@@ -10,10 +10,10 @@ import {
 	getHeaders,
 	getMethod,
 	getTimeout,
-	getURL,
 	isJSONParsable,
 	jsonParse,
 } from "./utils";
+import { getURL } from "./url";
 
 export const betterFetch = async <
 	TRes extends Option["output"] extends ZodSchema

@@ -3,6 +3,7 @@ import { type Listener, listen } from "listhen";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { BetterFetchError, betterFetch, createFetch } from "..";
 import { router } from "./test-router";
+import { getURL } from "../url";
 
 describe("fetch", () => {
 	const getURL = (path?: string) =>
@@ -353,5 +354,82 @@ describe("fetch-error-throw", () => {
 	it("should return data without error object", async () => {
 		const res = await f<{ message: "ok" }>("/ok");
 		expect(res).toEqual({ message: "ok" });
+	});
+});
+
+describe("url", () => {
+	it("should work with params", async () => {
+		const url = getURL("param/:id", {
+			params: {
+				id: "1",
+			},
+			baseURL: "http://localhost:4001",
+		});
+		expect(url.toString()).toBe("http://localhost:4001/param/1");
+	});
+
+	it("should use the url base if the url starts with http", async () => {
+		const url = getURL("http://localhost:4001/param/:id", {
+			params: {
+				id: "1",
+			},
+		});
+		expect(url.toString()).toBe("http://localhost:4001/param/1");
+	});
+
+	it("should work with query params", async () => {
+		const url = getURL("/query", {
+			query: {
+				id: "1",
+			},
+			baseURL: "http://localhost:4001",
+		});
+		expect(url.toString()).toBe("http://localhost:4001/query?id=1");
+	});
+
+	it("should work with dynamic params", async () => {
+		const url = getURL("/param/:id", {
+			params: {
+				id: "1",
+			},
+			baseURL: "http://localhost:4001",
+		});
+		expect(url.toString()).toBe("http://localhost:4001/param/1");
+	});
+
+	it("should merge query from the url", async () => {
+		const url = getURL("/query?name=test&age=20", {
+			query: {
+				id: "1",
+			},
+			baseURL: "http://localhost:4001",
+		});
+		expect(url.toString()).toBe(
+			"http://localhost:4001/query?name=test&age=20&id=1",
+		);
+	});
+
+	it("should give priority based on the order", async () => {
+		const url = getURL("/query", {
+			query: {
+				id: "1",
+				name: "test2",
+			},
+			baseURL: "http://localhost:4001",
+		});
+		expect(url.toString()).toBe("http://localhost:4001/query?id=1&name=test2");
+	});
+
+	it("should encode the query params", async () => {
+		const url = getURL("/query", {
+			query: {
+				id: "#20",
+				name: "test 2",
+			},
+			baseURL: "http://localhost:4001",
+		});
+		expect(url.toString()).toBe(
+			"http://localhost:4001/query?id=%2320&name=test+2",
+		);
 	});
 });

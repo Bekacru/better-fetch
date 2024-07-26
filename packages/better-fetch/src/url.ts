@@ -1,0 +1,67 @@
+import { methods } from "./create-fetch";
+import { BetterFetchOption } from "./types";
+
+/**
+ * Normalize URL
+ */
+export function getURL(url: string, option?: BetterFetchOption) {
+	let { baseURL, params, query } = option || {
+		query: {},
+		params: {},
+		baseURL: "",
+	};
+	let basePath = url.startsWith("http")
+		? url.split("/").slice(0, 3).join("/")
+		: baseURL;
+	if (!basePath) {
+		throw new TypeError(
+			`Invalid URL ${url}. Are you passing in a relative URL but not setting the baseURL?`,
+		);
+	}
+
+	/**
+	 * Remove method modifiers
+	 */
+	if (url.startsWith("@")) {
+		const m = url.toString().split("@")[1].split("/")[0];
+		if (methods.includes(m)) {
+			url = url.replace(`@${m}/`, "/");
+		}
+	}
+
+	if (!basePath.endsWith("/")) basePath += "/";
+	let [path, urlQuery] = url.replace(basePath, "").split("?");
+	const existingQuery =
+		urlQuery?.split("&").reduce(
+			(acc, param) => {
+				const [key, value] = param.split("=");
+				acc[key] = decodeURIComponent(value);
+				return acc;
+			},
+			{} as Record<string, string>,
+		) || {};
+	query = { ...existingQuery, ...query };
+	const queryParams = new URLSearchParams();
+	for (const [key, value] of Object.entries(query || {})) {
+		queryParams.set(key, String(value));
+	}
+	if (params) {
+		if (Array.isArray(params)) {
+			const paramPaths = path.split("/").filter((p) => p.startsWith(":"));
+			for (const [index, key] of paramPaths.entries()) {
+				const value = params[index];
+				path = path.replace(key, value);
+			}
+		} else {
+			for (const [key, value] of Object.entries(params)) {
+				path = path.replace(`:${key}`, String(value));
+			}
+		}
+	}
+
+	path = path.split("/").map(encodeURIComponent).join("/");
+	if (path.startsWith("/")) path = path.slice(1);
+	const queryParamString = queryParams.size > 0 ? `?${queryParams}` : "";
+	const _url = new URL(`${path}${queryParamString}`, basePath);
+	return _url;
+}
