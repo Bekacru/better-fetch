@@ -1,13 +1,12 @@
 import type { ZodSchema, z } from "zod";
 import type { StringLiteralUnion } from "../type-utils";
 
-export type ParameterSchema = z.ZodString | z.ZodNumber;
 export type FetchSchema = {
 	input?: ZodSchema;
 	output?: ZodSchema;
 	query?: ZodSchema;
 	params?: z.ZodObject<{
-		[key: string]: ParameterSchema;
+		[key: string]: ZodSchema;
 	}>;
 	method?: Methods;
 };

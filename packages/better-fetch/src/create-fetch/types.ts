@@ -16,7 +16,7 @@ export type CreateFetchOption = BetterFetchOption & {
 };
 
 type WithRequired<T, K extends keyof T | never> = T & { [P in K]-?: T[P] };
-type InferBody<T> = T extends ZodSchema ? z.infer<T> : any;
+type InferBody<T> = T extends ZodSchema ? z.input<T> : any;
 
 type InferParamPath<Path> =
 	Path extends `${infer _Start}:${infer Param}/${infer Rest}`
@@ -28,7 +28,7 @@ type InferParamPath<Path> =
 				: {};
 
 export type InferParam<Path, Param> = Param extends ZodSchema
-	? z.infer<Param>
+	? z.input<Param>
 	: InferParamPath<Path>;
 
 export type InferOptions<T extends FetchSchema, Key> = WithRequired<
@@ -42,7 +42,7 @@ export type InferOptions<T extends FetchSchema, Key> = WithRequired<
 		: never
 >;
 
-export type InferQuery<Q> = Q extends z.ZodSchema ? z.infer<Q> : any;
+export type InferQuery<Q> = Q extends z.ZodSchema ? z.input<Q> : any;
 
 export type IsFieldOptional<T> = T extends z.ZodSchema
 	? T extends z.ZodOptional<any>

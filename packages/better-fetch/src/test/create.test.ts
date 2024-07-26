@@ -140,6 +140,47 @@ describe("create-fetch-runtime-test", () => {
 		expect(f("/post")).rejects.toThrowError(ZodError);
 	});
 
+	it("should parse params and other inputs", async () => {
+		const $fetch = createFetch({
+			schema: createSchema({
+				"/path/:code/:phone": {
+					params: z.object({
+						code: z.number().default(1),
+						phone: z.string().default("123456789"),
+					}),
+					input: z.object({
+						code: z.number().default(1),
+						phone: z.string(),
+					}),
+					query: z.object({
+						code: z.number(),
+						phone: z.string().default("123"),
+					}),
+				},
+			}),
+			baseURL: "http://localhost:4001",
+			customFetchImpl: async (url, req) => {
+				return new Response();
+			},
+			onRequest(context) {
+				expect(context.params).toEqual({ code: 1, phone: "123456789" });
+				expect(JSON.parse(context.body)).toEqual({ code: 1, phone: "test" });
+				expect(context.query).toEqual({ code: 1, phone: "123" });
+			},
+		});
+		await $fetch("/path/:code/:phone", {
+			params: {
+				code: 1,
+			},
+			body: {
+				phone: "test",
+			},
+			query: {
+				code: 1,
+			},
+		});
+	});
+
 	it("should validate response and return data if validation passes", async () => {
 		const res = await $fetch("/echo", {
 			output: z.object({
