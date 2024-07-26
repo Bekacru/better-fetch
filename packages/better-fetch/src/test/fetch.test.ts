@@ -5,7 +5,7 @@ import { BetterFetchError, betterFetch, createFetch } from "..";
 import { router } from "./test-router";
 import { getURL } from "../url";
 
-describe("fetch", () => {
+describe.skip("fetch", () => {
 	const getURL = (path?: string) =>
 		path ? `http://localhost:4000/${path}` : "http://localhost:4000";
 

@@ -124,14 +124,20 @@ describe("create-fetch-runtime-test", () => {
 	});
 
 	it("should validate response and throw if validation fails", async () => {
-		expect(
-			$fetch("/post", {
-				output: z.object({
-					id: z.number(),
-				}),
-				method: "POST",
+		const f = createFetch({
+			schema: createSchema({
+				"/post": {
+					output: z.object({
+						id: z.number(),
+					}),
+				},
 			}),
-		).rejects.toThrowError(ZodError);
+			baseURL: "http://localhost:4001",
+			customFetchImpl: async (url, req) => {
+				return new Response();
+			},
+		});
+		expect(f("/post")).rejects.toThrowError(ZodError);
 	});
 
 	it("should validate response and return data if validation passes", async () => {
@@ -215,6 +221,7 @@ describe("create-fetch-type-test", () => {
 		},
 		schema: createSchema(schema),
 		catchAllError: true,
+		disableValidation: true,
 	});
 	it("should return unknown if no output is defined", () => {
 		const res = $fetch("/");
@@ -290,6 +297,7 @@ describe("create-fetch-type-test", () => {
 			customFetchImpl: async (url, req) => {
 				return new Response();
 			},
+			disableValidation: true,
 		});
 		f("/");
 		//@ts-expect-error
@@ -453,6 +461,7 @@ describe("plugin", () => {
 			customFetchImpl: async (url, req) => {
 				return new Response();
 			},
+			disableValidation: true,
 		});
 		//@ts-expect-error
 		const f = $fetch("prefix/path");
@@ -472,6 +481,7 @@ describe("plugin", () => {
 			customFetchImpl: async (url, req) => {
 				return new Response();
 			},
+			disableValidation: true,
 		});
 		await $fetch("prefix/path", {
 			body: {

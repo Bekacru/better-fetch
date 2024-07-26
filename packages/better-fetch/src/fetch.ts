@@ -122,12 +122,13 @@ export const betterFetch = async <
 		} else {
 			successContext.data = await response[responseType]();
 		}
+
 		/**
 		 * Parse the data if the output schema is defined
 		 */
-		if (options?.output) {
-			if (options.output instanceof ZodSchema && !options.disableValidation) {
-				successContext.data = options.output.parse(successContext.data);
+		if (context?.output) {
+			if (context.output instanceof ZodSchema && !context.disableValidation) {
+				successContext.data = context.output.parse(successContext.data);
 			}
 		}
 

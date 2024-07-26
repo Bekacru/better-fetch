@@ -35,13 +35,14 @@ const applySchemaPlugin = (config: CreateFetchOption) =>
 				}
 				const keySchema = schema.schema[urlKey];
 				if (keySchema) {
+					const opts = {
+						method: keySchema.method,
+						output: keySchema.output,
+						...options,
+					};
 					return {
 						url,
-						options: {
-							method: keySchema.method,
-							output: keySchema.output,
-							...options,
-						},
+						options: opts,
 					};
 				}
 			}
