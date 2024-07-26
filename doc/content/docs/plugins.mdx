@@ -33,7 +33,7 @@ const myPlugin = {
 } satisfies BetterFetchPlugin;
 
 const $fetch = createFetch({
-    baseUrl: "https://jsonplaceholder.typicode.com",
+    baseURL: "https://jsonplaceholder.typicode.com",
     plugins: [myPlugin],
 });
 ```
@@ -68,7 +68,7 @@ const myPlugin = {
 } satisfies BetterFetchPlugin;
 
 const $fetch = createFetch({
-    baseUrl: "https://jsonplaceholder.typicode.com",
+    baseURL: "https://jsonplaceholder.typicode.com",
     plugins: [myPlugin],
 });
 ```
@@ -152,7 +152,7 @@ const plugin = {
 } satisfies BetterFetchPlugin;
 
 const $fetch = createFetch({
-    baseUrl: "https://jsonplaceholder.typicode.com",
+    baseURL: "https://jsonplaceholder.typicode.com",
     plugins: [plugin],
 });
 

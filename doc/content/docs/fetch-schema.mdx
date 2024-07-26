@@ -38,7 +38,7 @@ export const schema = createSchema({ // [!code highlight]
 }) // [!code highlight]
 
 const $fetch = createFetch({
-    baseUrl: "https://jsonplaceholder.typicode.com",
+    baseURL: "https://jsonplaceholder.typicode.com",
     schema: schema // [!code highlight]
 });
 
@@ -65,7 +65,7 @@ import { createFetch, createSchema } from "@better-fetch/fetch";
 import { z } from "zod";
 
 const $fetch = createFetch({
-    baseUrl: "https://jsonplaceholder.typicode.com",
+    baseURL: "https://jsonplaceholder.typicode.com",
     schema: createSchema({
         "/path": {
             input: z.object({
@@ -97,7 +97,7 @@ import { createFetch, createSchema } from "@better-fetch/fetch";
 import { z } from "zod";
 
 const $fetch = createFetch({
-    baseUrl: "https://jsonplaceholder.typicode.com",
+    baseURL: "https://jsonplaceholder.typicode.com",
     schema: createSchema({
         "/path": {
             output: z.object({
@@ -124,7 +124,7 @@ import { createFetch, createSchema } from "@better-fetch/fetch";
 import { z } from "zod";
 
 const $fetch = createFetch({
-    baseUrl: "https://jsonplaceholder.typicode.com",
+    baseURL: "https://jsonplaceholder.typicode.com",
     schema: createSchema({
         "/path": {
             query: z.object({
@@ -177,7 +177,7 @@ const schema = createSchema({
 
 
 const $fetch = createFetch({
-    baseUrl: "https://jsonplaceholder.typicode.com",
+    baseURL: "https://jsonplaceholder.typicode.com",
     schema: schema
 })
 
@@ -215,7 +215,7 @@ import { createFetch, createSchema } from "@better-fetch/fetch";
 import { z } from "zod";
 
 const $fetch = createFetch({
-    baseUrl: "https://jsonplaceholder.typicode.com",
+    baseURL: "https://jsonplaceholder.typicode.com",
     schema: createSchema({
         "@put/user": { // [!code highlight]
             input: z.object({
@@ -249,7 +249,7 @@ import { createFetch, createSchema } from "@better-fetch/fetch";
 import { z } from "zod";
 
 const $fetch = createFetch({
-    baseUrl: "https://jsonplaceholder.typicode.com",
+    baseURL: "https://jsonplaceholder.typicode.com",
     schema: createSchema({
         "/path": {
             output: z.object({

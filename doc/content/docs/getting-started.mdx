@@ -62,7 +62,7 @@ Create Fetch allows you to create a better fetch instance with custom configurat
 import { createFetch } from "@better-fetch/fetch";
 
 export const $fetch = createFetch({
-  baseUrl: "https://jsonplaceholder.typicode.com",
+  baseURL: "https://jsonplaceholder.typicode.com",
   retry: {
       type: "linear",
       attempts: 3,
@@ -90,7 +90,7 @@ import { createFetch } from '@better-fetch/fetch';
 import { z } from 'zod';
 
 const $fetch = createFetch({
-    baseUrl: "https://jsonplaceholder.typicode.com",
+    baseURL: "https://jsonplaceholder.typicode.com",
     throw: true,
 });
 
@@ -132,7 +132,7 @@ export const schema = createSchema({ // [!code highlight]
 }) // [!code highlight]
 
 const $fetch = createFetch({
-    baseUrl: "https://jsonplaceholder.typicode.com",
+    baseURL: "https://jsonplaceholder.typicode.com",
     schema: schema // [!code highlight]
 });
 
