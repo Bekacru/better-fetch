@@ -429,7 +429,18 @@ describe("url", () => {
 			baseURL: "http://localhost:4001",
 		});
 		expect(url.toString()).toBe(
-			"http://localhost:4001/query?id=%2320&name=test+2",
+			"http://localhost:4001/query?id=%2320&name=test%202",
 		);
+	});
+
+	it("should encode dynamic params", async () => {
+		const url = getURL("/param/:id/:space", {
+			params: {
+				id: "#test",
+				space: "item 1",
+			},
+			baseURL: "http://localhost:4001",
+		});
+		expect(url.toString()).toBe("http://localhost:4001/param/%23test/item%201");
 	});
 });

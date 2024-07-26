@@ -31,17 +31,7 @@ export function getURL(url: string, option?: BetterFetchOption) {
 
 	if (!basePath.endsWith("/")) basePath += "/";
 	let [path, urlQuery] = url.replace(basePath, "").split("?");
-	const existingQuery =
-		urlQuery?.split("&").reduce(
-			(acc, param) => {
-				const [key, value] = param.split("=");
-				acc[key] = decodeURIComponent(value);
-				return acc;
-			},
-			{} as Record<string, string>,
-		) || {};
-	query = { ...existingQuery, ...query };
-	const queryParams = new URLSearchParams();
+	const queryParams = new URLSearchParams(urlQuery);
 	for (const [key, value] of Object.entries(query || {})) {
 		queryParams.set(key, String(value));
 	}
@@ -61,7 +51,8 @@ export function getURL(url: string, option?: BetterFetchOption) {
 
 	path = path.split("/").map(encodeURIComponent).join("/");
 	if (path.startsWith("/")) path = path.slice(1);
-	const queryParamString = queryParams.size > 0 ? `?${queryParams}` : "";
+	let queryParamString =
+		queryParams.size > 0 ? `?${queryParams}`.replace(/\+/g, "%20") : "";
 	const _url = new URL(`${path}${queryParamString}`, basePath);
 	return _url;
 }
