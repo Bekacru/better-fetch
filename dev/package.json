@@ -1,0 +1,19 @@
+{
+	"name": "dev",
+	"module": "index.ts",
+	"type": "module",
+	"scripts": {
+		"client": "bun run index.ts",
+		"serve": "bun run server.ts"
+	},
+	"devDependencies": {
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	},
+	"dependencies": {
+		"@better-fetch/fetch": "workspace:*",
+		"zod": "^3.23.8"
+	}
+}

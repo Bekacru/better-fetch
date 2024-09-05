@@ -25,6 +25,22 @@ importers:
         specifier: ^8.0.2
         version: 8.2.0(jiti@1.21.6)(postcss@8.4.39)(tsx@4.16.2)(typescript@5.5.3)(yaml@2.4.5)
 
+  dev:
+    dependencies:
+      '@better-fetch/fetch':
+        specifier: workspace:*
+        version: link:../packages/better-fetch
+      typescript:
+        specifier: ^5.0.0
+        version: 5.5.3
+      zod:
+        specifier: ^3.23.8
+        version: 3.23.8
+    devDependencies:
+      '@types/bun':
+        specifier: latest
+        version: 1.1.6
+
   doc:
     dependencies:
       '@better-fetch/fetch':

@@ -2,6 +2,7 @@ import { rehypeCodeDefaultOptions } from "fumadocs-core/mdx-plugins";
 import { remarkInstall } from "fumadocs-docgen";
 import createMDX from "fumadocs-mdx/config";
 import { transformerTwoslash } from "fumadocs-twoslash";
+
 const withMDX = createMDX({
 	mdxOptions: {
 		rehypeCodeOptions: {

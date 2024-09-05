@@ -18,9 +18,15 @@ export type CreateFetchOption = BetterFetchOption & {
 type WithRequired<T, K extends keyof T | never> = T & { [P in K]-?: T[P] };
 type InferBody<T> = T extends ZodSchema ? z.input<T> : any;
 
+type RemoveEmptyString<T> = T extends string ? ("" extends T ? never : T) : T;
+
 type InferParamPath<Path> =
 	Path extends `${infer _Start}:${infer Param}/${infer Rest}`
-		? { [K in Param | keyof InferParamPath<Rest>]: string }
+		? {
+				[K in
+					| Param
+					| keyof InferParamPath<Rest> as RemoveEmptyString<K>]: string;
+			}
 		: Path extends `${infer _Start}:${infer Param}`
 			? { [K in Param]: string }
 			: Path extends `${infer _Start}/${infer Rest}`
