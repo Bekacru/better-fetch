@@ -303,16 +303,29 @@ describe("hooks", () => {
 		const f = createFetch({
 			baseURL: "http://localhost:4001",
 			customFetchImpl: async (req, init) => {
-				return new Response(null, {
-					status: 500,
-				});
+				return new Response(
+					JSON.stringify({
+						message: "Server Error",
+					}),
+					{
+						status: 500,
+					},
+				);
 			},
 			onError,
 			onResponse,
 			onSuccess,
 		});
 		await f("/ok");
-		expect(onError).toHaveBeenCalled();
+		expect(onError).toHaveBeenCalledWith({
+			request: expect.any(Object),
+			response: expect.any(Response),
+			error: {
+				message: "Server Error",
+				status: 500,
+				statusText: "",
+			},
+		});
 		expect(onResponse).toHaveBeenCalled();
 		expect(onSuccess).not.toHaveBeenCalled();
 	});

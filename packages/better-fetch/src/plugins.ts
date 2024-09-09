@@ -1,6 +1,7 @@
 import { ZodSchema } from "zod";
 import { Schema } from "./create-fetch";
 import type { BetterFetchOption } from "./types";
+import { BetterFetchError } from "./error";
 
 export type RequestContext<T extends Record<string, any> = any> = {
 	url: URL;
@@ -21,6 +22,7 @@ export type SuccessContext = {
 export type ErrorContext = {
 	response: Response;
 	request: RequestContext;
+	error: BetterFetchError & Record<string, any>;
 };
 export interface FetchHooks {
 	/**

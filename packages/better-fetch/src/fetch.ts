@@ -152,12 +152,20 @@ export const betterFetch = async <
 			error: null,
 		} as any;
 	}
+	const parser = options?.jsonParser ?? jsonParse;
+	const text = await response.text();
+	const errorObject = isJSONParsable(text) ? await parser(text) : {};
 	/**
 	 * Error Branch
 	 */
 	const errorContext = {
 		response,
 		request: context,
+		error: {
+			...errorObject,
+			status: response.status,
+			statusText: response.statusText,
+		},
 	};
 	for (const onError of hooks.onError) {
 		if (onError) {
@@ -187,10 +195,6 @@ export const betterFetch = async <
 			});
 		}
 	}
-
-	const parser = options?.jsonParser ?? jsonParse;
-	const text = await response.text();
-	const errorObject = isJSONParsable(text) ? await parser(text) : {};
 
 	if (options?.throw) {
 		throw new BetterFetchError(
