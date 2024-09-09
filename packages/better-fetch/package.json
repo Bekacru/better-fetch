@@ -1,6 +1,6 @@
 {
 	"name": "@better-fetch/fetch",
-	"version": "1.1.7",
+	"version": "1.1.8",
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.js",
 	"react-native": "./dist/index.js",
