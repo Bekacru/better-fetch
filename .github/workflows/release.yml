@@ -49,4 +49,9 @@ jobs:
       - run: npx changelogithub
         if: steps.check_version.outputs.tag == 'latest'
         env:
-            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}      
+            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          
+      - name: Publish to npm
+        run: pnpm -r publish --access public --no-git-checks --tag ${{steps.check_version.outputs.tag}}
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
