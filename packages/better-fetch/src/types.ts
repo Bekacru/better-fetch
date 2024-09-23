@@ -27,11 +27,12 @@ export type BetterFetchOption<
 	Body = any,
 	Query extends Record<string, any> = any,
 	Params extends Record<string, any> | Array<string> | undefined = any,
+	Res = any,
 	ExtraOptions extends Record<string, any> = {},
 > = Prettify<
 	ExtraOptions &
 		Omit<RequestInit, "body"> &
-		FetchHooks & {
+		FetchHooks<Res> & {
 			/**
 			 * a timeout that will be used to abort the
 			 * request. Should be in milliseconds.

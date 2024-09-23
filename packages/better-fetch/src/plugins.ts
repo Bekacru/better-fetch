@@ -14,8 +14,8 @@ export type ResponseContext = {
 	response: Response;
 	request: RequestContext;
 };
-export type SuccessContext = {
-	data: any;
+export type SuccessContext<Res = any> = {
+	data: Res;
 	response: Response;
 	request: RequestContext;
 };
@@ -24,7 +24,7 @@ export type ErrorContext = {
 	request: RequestContext;
 	error: BetterFetchError & Record<string, any>;
 };
-export interface FetchHooks {
+export interface FetchHooks<Res = any> {
 	/**
 	 * a callback function that will be called when a
 	 * request is made.
@@ -54,7 +54,7 @@ export interface FetchHooks {
 	 * a callback function that will be called when a
 	 * response is successful.
 	 */
-	onSuccess?: (context: SuccessContext) => Promise<void> | void;
+	onSuccess?: (context: SuccessContext<Res>) => Promise<void> | void;
 	/**
 	 * a callback function that will be called when an
 	 * error occurs.

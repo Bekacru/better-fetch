@@ -20,7 +20,7 @@ export const betterFetch = async <
 		? z.infer<Option["output"]>
 		: unknown,
 	TErr = unknown,
-	Option extends BetterFetchOption = BetterFetchOption,
+	Option extends BetterFetchOption = BetterFetchOption<any, any, any, TRes>,
 >(
 	url: string,
 	options?: Option,

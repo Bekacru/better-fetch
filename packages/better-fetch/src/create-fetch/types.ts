@@ -37,11 +37,12 @@ export type InferParam<Path, Param> = Param extends ZodSchema
 	? z.input<Param>
 	: InferParamPath<Path>;
 
-export type InferOptions<T extends FetchSchema, Key> = WithRequired<
+export type InferOptions<T extends FetchSchema, Key, Res = any> = WithRequired<
 	BetterFetchOption<
 		InferBody<T["input"]>,
 		InferQuery<T["query"]>,
-		InferParam<Key, T["params"]>
+		InferParam<Key, T["params"]>,
+		Res
 	>,
 	RequiredOptionKeys<T, Key> extends keyof BetterFetchOption
 		? RequiredOptionKeys<T, Key>
@@ -163,28 +164,13 @@ export type BetterFetch<
 		? S["schema"][K]
 		: unknown,
 	O extends Omit<BetterFetchOption, "params"> = Omit<
-		BetterFetchOption,
+		BetterFetchOption<any, any, any, Res>,
 		"params"
 	>,
 	PluginOptions extends Partial<InferPluginOptions<CreateOptions>> = Partial<
 		InferPluginOptions<CreateOptions>
 	>,
->(
-	url: U,
-	...options: F extends FetchSchema
-		? IsOptionRequired<F, K> extends true
-			? [Prettify<InferOptions<F, K> & PluginOptions>]
-			: [Prettify<InferOptions<F, K> & PluginOptions>?]
-		: [
-				Prettify<
-					PluginOptions &
-						O & {
-							params?: InferParamPath<K>;
-						}
-				>?,
-			]
-) => Promise<
-	BetterFetchResponse<
+	Result = BetterFetchResponse<
 		O["output"] extends ZodSchema
 			? z.infer<O["output"]>
 			: F extends FetchSchema
@@ -200,5 +186,37 @@ export type BetterFetch<
 				: Err extends false
 					? true
 					: false
-	>
->;
+	>,
+>(
+	url: U,
+	...options: F extends FetchSchema
+		? IsOptionRequired<F, K> extends true
+			? [
+					Prettify<
+						InferOptions<
+							F,
+							K,
+							Result extends { data: any } ? NonNullable<Result["data"]> : any
+						> &
+							PluginOptions
+					>,
+				]
+			: [
+					Prettify<
+						InferOptions<
+							F,
+							K,
+							Result extends { data: any } ? NonNullable<Result["data"]> : any
+						> &
+							PluginOptions
+					>?,
+				]
+		: [
+				Prettify<
+					PluginOptions &
+						O & {
+							params?: InferParamPath<K>;
+						}
+				>?,
+			]
+) => Promise<Result>;

@@ -418,6 +418,36 @@ describe("create-fetch-type-test", () => {
 			},
 		});
 	});
+	it("should infer response type inside a hook", async () => {
+		const $fetch = createFetch({
+			baseURL: "http://localhost:4001",
+			customFetchImpl: async (url, req) => {
+				return new Response(null);
+			},
+		});
+		$fetch<{ foo: string; bar: number }>("/", {
+			onSuccess(context) {
+				expectTypeOf(context.data).toMatchTypeOf<{
+					foo: string;
+					bar: number;
+				}>();
+			},
+		});
+		const $fetch2 = createFetch({
+			baseURL: "http://localhost:4001",
+			schema: createSchema(schema),
+			customFetchImpl: async (url, req) => {
+				return new Response();
+			},
+		});
+		$fetch2("/", {
+			onSuccess(context) {
+				expectTypeOf(context.data).toMatchTypeOf<{
+					message: string;
+				}>();
+			},
+		});
+	});
 });
 
 describe("plugin", () => {
