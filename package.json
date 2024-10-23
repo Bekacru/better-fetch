@@ -14,6 +14,7 @@
 	"dependencies": {
 		"@biomejs/biome": "1.7.3",
 		"simple-git-hooks": "^2.11.1",
+		"tinyglobby": "^0.2.9",
 		"vitest": "^1.5.0"
 	},
 	"simple-git-hooks": {
