@@ -1,4 +1,4 @@
-import { ZodSchema } from "zod";
+import type { ZodSchema } from "zod";
 import { Schema } from "./create-fetch";
 import type { BetterFetchOption } from "./types";
 import { BetterFetchError } from "./error";
