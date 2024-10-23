@@ -1,5 +1,5 @@
 import { IsEmptyObject } from "type-fest";
-import type { ZodObject, ZodSchema, z } from "zod";
+import type { ZodSchema, z } from "zod";
 import { BetterFetchPlugin } from "../plugins";
 import type { Prettify, StringLiteralUnion } from "../type-utils";
 import type { BetterFetchOption, BetterFetchResponse } from "../types";
@@ -15,12 +15,18 @@ export type CreateFetchOption = BetterFetchOption & {
 	defaultError?: ZodSchema;
 };
 
-type WithRequired<T, K extends keyof T | never> = T & { [P in K]-?: T[P] };
-type InferBody<T> = T extends ZodSchema ? z.input<T> : any;
+export type WithRequired<T, K extends keyof T | never> = T & {
+	[P in K]-?: T[P];
+};
+export type InferBody<T> = T extends ZodSchema ? z.input<T> : any;
 
-type RemoveEmptyString<T> = T extends string ? ("" extends T ? never : T) : T;
+export type RemoveEmptyString<T> = T extends string
+	? "" extends T
+		? never
+		: T
+	: T;
 
-type InferParamPath<Path> =
+export type InferParamPath<Path> =
 	Path extends `${infer _Start}:${infer Param}/${infer Rest}`
 		? {
 				[K in
@@ -57,7 +63,7 @@ export type IsFieldOptional<T> = T extends z.ZodSchema
 		: false
 	: true;
 
-type IsParamOptional<T, K> = IsFieldOptional<T> extends false
+export type IsParamOptional<T, K> = IsFieldOptional<T> extends false
 	? false
 	: IsEmptyObject<InferParamPath<K>> extends false
 		? false
@@ -118,9 +124,11 @@ export type GetKey<S, K> = S extends Schema
 		: K
 	: K;
 
-type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (
-	x: infer I,
-) => void
+export type UnionToIntersection<U> = (
+	U extends any
+		? (x: U) => void
+		: never
+) extends (x: infer I) => void
 	? I
 	: never;
 

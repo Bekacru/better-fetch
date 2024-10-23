@@ -1,6 +1,6 @@
 import type { BetterFetchOption } from "./types";
 
-type typeOrTypeReturning<T> = T | (() => T);
+export type typeOrTypeReturning<T> = T | (() => T);
 /**
  * Bearer token authentication
  *
