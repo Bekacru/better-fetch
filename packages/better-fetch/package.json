@@ -40,8 +40,6 @@
 			"require": "./dist/index.cjs"
 		}
 	},
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"type": "module"
 }
