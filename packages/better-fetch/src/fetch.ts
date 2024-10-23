@@ -1,4 +1,4 @@
-import { ZodSchema, type z } from "zod";
+import type { ZodSchema, z } from "zod";
 import { BetterFetchError } from "./error";
 import { initializePlugins } from "./plugins";
 import { createRetryStrategy } from "./retry";
@@ -127,8 +127,10 @@ export const betterFetch = async <
 		 * Parse the data if the output schema is defined
 		 */
 		if (context?.output) {
-			if (context.output instanceof ZodSchema && !context.disableValidation) {
-				successContext.data = context.output.parse(successContext.data);
+			if (context.output && !context.disableValidation) {
+				successContext.data = (context.output as ZodSchema).parse(
+					successContext.data,
+				);
 			}
 		}
 
