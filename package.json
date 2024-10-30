@@ -15,7 +15,7 @@
 		"@biomejs/biome": "1.9.4",
 		"simple-git-hooks": "^2.11.1",
 		"tinyglobby": "^0.2.10",
-		"vitest": "^1.6.0"
+		"vitest": "^2.1.4"
 	},
 	"simple-git-hooks": {
 		"pre-push": "pnpm typecheck"

@@ -2,14 +2,14 @@
 	"title:": "guide",
 	"root": true,
 	"pages": [
-		"---Guide---",
-		"index",
-		"getting-started",
-		"handling-errors",
+		"---Get Started---",
+		"introduction",
+		"installation",
 		"---Helpers---",
 		"authorization",
 		"dynamic-parameters",
 		"timeout-and-retry",
+		"handling-errors",
 		"---Advanced---",
 		"fetch-schema",
 		"default-types",
@@ -18,7 +18,7 @@
 		"---Plugins---",
 		"utility",
 		"---Reference---",
-		"fetch-options",
+		"all-options",
 		"extra-options"
 	]
 }
