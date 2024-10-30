@@ -10,11 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Github } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Highlight, themes } from "prism-react-renderer";
-import {
-	AnimatePresence,
-	motion,
-	MotionConfig,
-} from "framer-motion";
+import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import { Cover } from "../ui/cover";
 
 const tabs: {
