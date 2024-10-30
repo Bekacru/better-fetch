@@ -9,19 +9,19 @@
 		"release": "pnpm --filter \"./packages/*\" build && bumpp && pnpm -r publish --access public",
 		"typecheck": "pnpm -r typecheck",
 		"lint": "biome check .",
-		"format": "biome check . --apply"
+		"format": "biome check . --write"
 	},
 	"dependencies": {
-		"@biomejs/biome": "1.7.3",
+		"@biomejs/biome": "1.9.4",
 		"simple-git-hooks": "^2.11.1",
-		"tinyglobby": "^0.2.9",
-		"vitest": "^1.5.0"
+		"tinyglobby": "^0.2.10",
+		"vitest": "^1.6.0"
 	},
 	"simple-git-hooks": {
 		"pre-push": "pnpm typecheck"
 	},
 	"devDependencies": {
-		"bumpp": "^9.4.1",
-		"tsup": "^8.0.2"
+		"bumpp": "^9.8.0",
+		"tsup": "^8.3.5"
 	}
 }

@@ -1,15 +1,39 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.6.3/schema.json",
-	"organizeImports": {
-		"enabled": true
-	},
+	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
 	"formatter": {
-		"enabled": true
+		"enabled": true,
+		"indentStyle": "tab"
 	},
-	"files": {
-		"ignore": ["dist", "node_modules", ".next"]
+	"organizeImports": {
+		"enabled": false
 	},
 	"linter": {
-		"enabled": false
+		"enabled": true,
+		"rules": {
+			"recommended": false,
+			"suspicious": {
+				"noImplicitAnyLet": "warn",
+				"noDuplicateObjectKeys": "warn"
+			},
+			"performance": {
+				"noDelete": "error"
+			},
+			"complexity": {
+				"noUselessSwitchCase": "warn",
+				"noUselessTypeConstraint": "warn"
+			}
+		}
+	},
+	"files": {
+		"ignore": [
+			"dist",
+			".next",
+			".svelte-kit",
+			"package.json",
+			".contentlayer",
+			".turbo",
+			".nuxt",
+			".source"
+		]
 	}
 }

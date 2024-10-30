@@ -9,5 +9,8 @@
 	},
 	"[github-actions-workflow]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"editor.codeActionsOnSave": {
+		"source.removeUnusedImports": "explicit"
 	}
 }
