@@ -1,0 +1,24 @@
+{
+	"title:": "guide",
+	"root": true,
+	"pages": [
+		"---Get Started---",
+		"introduction",
+		"installation",
+		"---Helpers---",
+		"authorization",
+		"dynamic-parameters",
+		"timeout-and-retry",
+		"handling-errors",
+		"---Advanced---",
+		"fetch-schema",
+		"default-types",
+		"hooks",
+		"plugins",
+		"---Plugins---",
+		"utility",
+		"---Reference---",
+		"all-options",
+		"extra-options"
+	]
+}

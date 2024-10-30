@@ -1,0 +1,170 @@
+---
+title: Installation
+description: Learn how to install and use Better Fetch
+---
+
+<Steps>
+
+<Step>
+### Install the Package
+
+Let's start by adding Better Fetch to your project:
+
+```package-install
+@better-fetch/fetch
+```
+
+<Callout type="info">
+*You also need to have [zod](https://www.npmjs.com/package/zod) installed for schema validations. If you don't plan to use zod for schema validation, you can install it as a dev dependency.*
+
+```package-install
+zod
+```
+</Callout>
+</Step>
+
+<Step>
+### Quick Start
+
+The fastest way to start using better fetch is to import the `betterFetch` function and start making requests.
+
+You can define the response type using generics or **zod schema (recommended)**.
+
+```ts twoslash title="fetch.ts"
+import { betterFetch } from '@better-fetch/fetch';
+import { z } from 'zod';
+
+
+//Using generic type
+const { data, error } = await betterFetch<{
+    userId: string;
+    id: number;
+    title: string;
+    completed: boolean;
+}>("https://jsonplaceholder.typicode.com/todos/1");
+
+
+//Using zod schema
+const { data: todos, error: todoError } = await betterFetch("https://jsonplaceholder.typicodei.com/todos/1", {
+    output: z.object({
+        userId: z.string(),
+        id: z.number(),
+        title: z.string(),
+        completed: z.boolean(),
+    })  
+});
+
+// @annotate: Hover over the data object to see the type
+```
+
+<Callout type="info"> 
+  Make sure strict mode is enabled in your tsconfig when using zod schema validations.
+</Callout>
+
+Better fetch by default returns a `Promise` that resolves to an object of `data` and `error` but if you pass the `throw` option, it will return the parsed response data only. 
+</Step>
+
+<Step>
+### Create Fetch
+
+Create Fetch allows you to create a better fetch instance with custom configurations.
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from "@better-fetch/fetch";
+
+export const $fetch = createFetch({
+  baseURL: "https://jsonplaceholder.typicode.com",
+  retry: {
+      type: "linear",
+      attempts: 3,
+      delay: 1000 
+  }
+});
+
+const { data, error } = await $fetch<{
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+}>("/todos/1");
+```
+You can pass more options see the [Fetch Options](/docs/reference/all-options) section for more details.
+</Step>
+
+<Step>
+### Throwing Errors
+
+You can throw errors instead of returning them by passing the `throw` option.
+
+If you pass the `throw` option, the `betterFetch` function will throw an error. And instead of returning `data` and `error` object it'll only the response data as it is.
+
+```ts twoslash title="fetch.ts"
+import { createFetch } from '@better-fetch/fetch';
+import { z } from 'zod';
+
+const $fetch = createFetch({
+    baseURL: "https://jsonplaceholder.typicode.com",
+    throw: true,
+});
+
+const data = await $fetch<{
+    userId: number;
+}>("https://jsonplaceholder.typicode.com/todos/1");
+```
+Learn more about handling errors [Handling Errors](/docs/helpers/handling-errors) section.
+</Step>
+
+<Step>
+### Fetch Schema
+
+Fetch schema enables you to pre-define the URL path and the shape of request and response data. This makes it easy to document your API. 
+
+<Callout type="info">
+   Plugins can also define fetch schemas. See [Plugins](/docs/advanced/plugins) section for more details.
+</Callout>
+
+The output of the scheam will be validated using zod and if the validation fails, it'll throw an error.
+
+```ts twoslash title="fetch.ts" 
+import { createSchema, createFetch } from "@better-fetch/fetch";
+import { z } from "zod";
+
+export const schema = createSchema({ // [!code highlight]
+    "/path": { // [!code highlight]
+        input: z.object({ // [!code highlight]
+            userId: z.string(), // [!code highlight]
+            id: z.number(), // [!code highlight]
+            title: z.string(), // [!code highlight]
+            completed: z.boolean(), // [!code highlight]
+        }), // [!code highlight]
+        output: z.object({ // [!code highlight]
+            userId: z.string(), // [!code highlight]
+            id: z.number(), // [!code highlight]
+            title: z.string(), // [!code highlight]
+            completed: z.boolean(), // [!code highlight]
+        }), // [!code highlight]
+    } // [!code highlight]
+}) // [!code highlight]
+
+const $fetch = createFetch({
+    baseURL: "https://jsonplaceholder.typicode.com",
+    schema: schema // [!code highlight]
+});
+
+const { data, error } = await $fetch("/path", {
+    body: {
+        userId: "1",
+        id: 1,
+        title: "title",
+        completed: true,
+    },
+});
+```
+</Step>
+
+<Step>
+### 🎉 That's it!
+That's it! You are now ready to use better-fetch in your application. Learn more about fetch schema under the [Fetch Schema](/docs/advanced/fetch-schema) section.
+</Step>
+
+</Steps>
