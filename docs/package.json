@@ -40,6 +40,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-use-measure": "^2.1.1",
+    "source-map-support": "^0.5.21",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"
