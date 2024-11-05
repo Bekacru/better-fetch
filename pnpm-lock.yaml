@@ -42,7 +42,7 @@ importers:
     devDependencies:
       '@types/bun':
         specifier: latest
-        version: 1.1.12
+        version: 1.1.13
 
   doc:
     dependencies:
@@ -1400,8 +1400,8 @@ packages:
   '@types/bun@1.1.10':
     resolution: {integrity: sha512-76KYVSwrHwr9zsnk6oLXOGs9KvyBg3U066GLO4rk6JZk1ypEPGCUDZ5yOiESyIHWs9cx9iC8r01utYN32XdmgA==}
 
-  '@types/bun@1.1.12':
-    resolution: {integrity: sha512-UkewJesRDP3+AW30Gc8hvxuIt+vHgYZXmVOKaXV8xnwAnMXTAs3XZDsa/jW+LSdAYhHslokSm72lq63FYYjZqA==}
+  '@types/bun@1.1.13':
+    resolution: {integrity: sha512-KmQxSBgVWCl6RSuerlLGZlIWfdxkKqat0nxN61+qu4y1KDn0Ll3j7v1Pl8GnaL3a/U6GGWVTJh75ap62kR1E8Q==}
 
   '@types/debug@4.1.12':
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
@@ -1599,8 +1599,8 @@ packages:
   bun-types@1.1.29:
     resolution: {integrity: sha512-En3/TzSPMPyl5UlUB1MHzHpcrZDakTm7mS203eLoX1fBoEa3PW+aSS8GAqVJ7Is/m34Z5ogL+ECniLY0uDaCPw==}
 
-  bun-types@1.1.32:
-    resolution: {integrity: sha512-Lxgux4InO/WRjSAEy3iyDscsnDXR8+3rgNDeZYjPAizFYjUraoNuMl9PuRd9XMgFZgdyQwaUX7/QHmOw5KGFQw==}
+  bun-types@1.1.34:
+    resolution: {integrity: sha512-br5QygTEL/TwB4uQOb96Ky22j4Gq2WxWH/8Oqv20fk5HagwKXo/akB+LiYgSfzexCt6kkcUaVm+bKiPl71xPvw==}
 
   bundle-require@5.0.0:
     resolution: {integrity: sha512-GuziW3fSSmopcx4KRymQEJVbZUfqlCqcq7dvs6TYwKRZiegK/2buMxQTPs6MGlNv50wms1699qYO54R8XfRX4w==}
@@ -3081,6 +3081,9 @@ packages:
   remark-gfm@4.0.0:
     resolution: {integrity: sha512-U92vJgBPkbw4Zfu/IiW2oTZLSL3Zpv+uI7My2eq8JxKgqraFdU8YUGicEJCEgSbeaG+QDFqIcwwfMTOEelPxuA==}
 
+  remark-mdx@3.0.0:
+    resolution: {integrity: sha512-O7yfjuC6ra3NHPbRVxfflafAj3LTwx3b73aBvkEFU5z4PsD6FD4vrqJAkE5iNGLz71GdjXfgRqm3SQ0h0VuE7g==}
+
   remark-mdx@3.0.1:
     resolution: {integrity: sha512-3Pz3yPQ5Rht2pM5R+0J2MrGoBSrzf+tJG94N+t/ilfdh8YLyyKYtidAYwTveB20BoHAcwIopOUqhcmh2F7hGYA==}
 
@@ -3980,11 +3983,11 @@ snapshots:
       hast-util-to-jsx-runtime: 2.3.0
       markdown-extensions: 2.0.0
       periscopic: 3.1.0
-      remark-mdx: 3.0.1
+      remark-mdx: 3.0.0
       remark-parse: 11.0.0
       remark-rehype: 11.1.1
       source-map: 0.7.4
-      unified: 11.0.5
+      unified: 11.0.4
       unist-util-position-from-estree: 2.0.0
       unist-util-stringify-position: 4.0.0
       unist-util-visit: 5.0.0
@@ -4701,9 +4704,9 @@ snapshots:
     dependencies:
       bun-types: 1.1.29
 
-  '@types/bun@1.1.12':
+  '@types/bun@1.1.13':
     dependencies:
-      bun-types: 1.1.32
+      bun-types: 1.1.34
 
   '@types/debug@4.1.12':
     dependencies:
@@ -4913,7 +4916,7 @@ snapshots:
       '@types/node': 20.12.14
       '@types/ws': 8.5.12
 
-  bun-types@1.1.32:
+  bun-types@1.1.34:
     dependencies:
       '@types/node': 20.12.14
       '@types/ws': 8.5.12
@@ -6823,6 +6826,13 @@ snapshots:
       remark-parse: 11.0.0
       remark-stringify: 11.0.0
       unified: 11.0.5
+    transitivePeerDependencies:
+      - supports-color
+
+  remark-mdx@3.0.0:
+    dependencies:
+      mdast-util-mdx: 3.0.0
+      micromark-extension-mdxjs: 3.0.0
     transitivePeerDependencies:
       - supports-color
 

@@ -133,7 +133,10 @@ export type BetterFetchOption<
 			 * @default false
 			 */
 			disableValidation?: boolean;
-			signal?: AbortSignal | null;
+			/**
+			 * Abort signal
+			 */
+			signal?: AbortSignal;
 		}
 >;
 
