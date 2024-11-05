@@ -1,6 +1,7 @@
 {
 	"name": "@better-fetch/root",
 	"private": true,
+	"version": "",
 	"scripts": {
 		"build": "pnpm --filter \"./packages/*\" build",
 		"dev": "pnpm -F fetch dev",
