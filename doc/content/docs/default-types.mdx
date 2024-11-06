@@ -1,15 +1,15 @@
 ---
-title: Deafult Types
-description: Deafult Types
+title: Default Types
+description: Default Types
 ---
 
 
 ## Default Output
 
-By default the response data will always be type of `unknown`. If you want to customize the deafult type you can pass `defaultOutput` option to the `createFetch` function.
+By default, the response data will always be type of `unknown`. If you want to customize the default type you can pass the `defaultOutput` option to the `createFetch` function.
 
 <Callout type="info">
-This only serve as a type for the response data it's not used as a validation schema.
+This only serves as a type for the response data it's not used as a validation schema.
 </Callout>
 
 ```ts twoslash title="fetch.ts"
@@ -55,11 +55,11 @@ The default error type is:
 { status: number, statusText: string, message?: string }. 
 ```
 
-if you want custom defualt error type, you can pass a `defautlError` option to the `createFetch` function. 
+if you want custom default error type, you can pass a `defaultError` option to the `createFetch` function. 
 
 <Callout type="info">
-The `status` and `statusText` properties are always defined. Your custom error definations are only
-infered if the api returns a json error object.
+The `status` and `statusText` properties are always defined. Your custom error definitions are only
+inferred if the API returns a JSON error object.
 </Callout>
 
 ```ts twoslash title="fetch.ts"
