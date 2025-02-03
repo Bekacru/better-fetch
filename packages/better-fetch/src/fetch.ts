@@ -155,13 +155,15 @@ export const betterFetch = async <
 		} as any;
 	}
 	const parser = options?.jsonParser ?? jsonParse;
-	const text = await response.text();
-	const errorObject = isJSONParsable(text) ? await parser(text) : {};
+	const responseText = await response.text();
+	const isJSONResponse = isJSONParsable(responseText);
+	const errorObject = isJSONResponse ? await parser(responseText) : null;
 	/**
 	 * Error Branch
 	 */
 	const errorContext = {
 		response,
+		responseText,
 		request: context,
 		error: {
 			...errorObject,
@@ -202,7 +204,7 @@ export const betterFetch = async <
 		throw new BetterFetchError(
 			response.status,
 			response.statusText,
-			errorObject,
+			isJSONResponse ? errorObject : responseText
 		);
 	}
 	return {
