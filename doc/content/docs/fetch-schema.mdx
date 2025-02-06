@@ -3,9 +3,9 @@ title: Fetch Schema
 description: Fetch Schema
 ---
 
-Fetch schema allows you to pre-define the url path and the shape of reqeust and response data. You can easily document your api using this schema. 
+Fetch schema allows you to pre-define the url path and the shape of request and response data. You can easily document your api using this schema. 
 
-The output of the scheam will be validated using zod and if the validation fails, it'll throw an error. 
+The output of the schema will be validated using zod and if the validation fails, it'll throw an error. 
 
 Before we start, make sure you have installed the [zod](https://www.npmjs.com/package/zod) package.
 
@@ -13,12 +13,11 @@ Before we start, make sure you have installed the [zod](https://www.npmjs.com/pa
 npm i zod
 ```
 
-to create a fetch schema, you need to import the `createSchema` function from `@better-fetch/fetch`.
+To create a fetch schema, you need to import the `createSchema` function from `@better-fetch/fetch`.
 
 ```ts twoslash title="fetch.ts" 
 import { createSchema, createFetch } from "@better-fetch/fetch";
 import { z } from "zod";
-
 
 export const schema = createSchema({ // [!code highlight]
     "/path": { // [!code highlight]
@@ -54,10 +53,10 @@ The `input` key is the schema of the request data. The `output` key is the schem
 
 ### Input
 
-The input schema is the schema of the request data. The `input` key is the schema of the request data. If you defined an input schema, the data will be requeired to be passed as a body of the request.
+The input schema is the schema of the request data. The `input` key is the schema of the request data. If you defined an input schema, the data will be required to be passed as a body of the request.
 
 <Callout type="info">
-If you define an input schema, a `post` method will be used to make the request and if there is no input schema, a `get` method will be used. See [method modifiers](#method-modifiers) section for defining specefic methods.
+If you define an input schema, a `post` method will be used to make the request and if there is no input schema, a `get` method will be used. See [method modifiers](#method-modifiers) section for defining specific methods.
 </Callout>
 
 ```ts twoslash title="fetch.ts"
@@ -89,7 +88,7 @@ To make the body optional you can wrap the schema with `z.optional`.
 
 ### Output
 
-The output schema is the schema of the response data. The `output` key is the schema of the response data. If you defined an output schema, the data will be returned as the response body.
+The `output` key is the schema of the response data. If you defined an output schema, the data will be returned as the response body.
 
 
 ```ts twoslash title="fetch.ts"
@@ -206,9 +205,9 @@ const response3 = await $fetch("/post/:id/:title", {
 
 ### Method Modifiers
 
-By default the `get` and `post` methods are used to make the request based on weather the input schema is defined or not. You can use the `method` modifier to define the method to be used. 
+By default the `get` and `post` methods are used to make the request based on whether the input schema is defined or not. You can use the `method` modifier to define the method to be used. 
 
-The method modifiers are `@get`, `@post`, `@put`, `@patch`, `@delete` and `@head`. You prepend the method name to the path to define the method
+The method modifiers are `@get`, `@post`, `@put`, `@patch`, `@delete` and `@head`. You prepend the method name to the path to define the method.
 
 ```ts twoslash title="fetch.ts"
 import { createFetch, createSchema } from "@better-fetch/fetch";
