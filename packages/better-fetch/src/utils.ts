@@ -197,6 +197,11 @@ export function getBody(options?: BetterFetchOption) {
 	}
 	const headers = new Headers(options?.headers);
 	if (isJSONSerializable(options.body) && !headers.has("content-type")) {
+		for (const [key, value] of Object.entries(options?.body)) {
+			if (value instanceof Date) {
+				options.body[key] = value.toISOString();
+			}
+		}
 		return JSON.stringify(options.body);
 	}
 

@@ -437,7 +437,7 @@ describe("create-fetch-type-test", () => {
 			baseURL: "http://localhost:4001",
 			schema: createSchema(schema),
 			customFetchImpl: async (url, req) => {
-				return new Response();
+				return new Response(JSON.stringify({ message: "hello" }));
 			},
 		});
 		$fetch2("/", {
