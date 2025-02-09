@@ -320,6 +320,7 @@ describe("hooks", () => {
 		expect(onError).toHaveBeenCalledWith({
 			request: expect.any(Object),
 			response: expect.any(Response),
+			responseText: "{\"message\":\"Server Error\"}",
 			error: {
 				message: "Server Error",
 				status: 500,
@@ -339,8 +340,13 @@ describe("fetch-error-throw", () => {
 			if (url.pathname.startsWith("/ok")) {
 				return new Response(JSON.stringify({ message: "ok" }));
 			}
-			if (url.pathname.startsWith("/error")) {
+			if (url.pathname.startsWith("/error-json-response")) {
 				return new Response(JSON.stringify({ message: "error" }), {
+					status: 400,
+				});
+			}
+			if (url.pathname.startsWith("/error-string-response")) {
+				return new Response("An error occurred", {
 					status: 400,
 				});
 			}
@@ -354,12 +360,22 @@ describe("fetch-error-throw", () => {
 		await expect(f("/not-ok")).rejects.toThrowError(BetterFetchError);
 	});
 
-	it("error should have error object", async () => {
+	it("error should have error object if json returned", async () => {
 		try {
-			await f("/error");
+			await f("/error-json-response");
 		} catch (error) {
 			if (error instanceof BetterFetchError) {
 				expect(error.error).toEqual({ message: "error" });
+			}
+		}
+	});
+
+	it("error should have error string if text returned", async () => {
+		try {
+			await f("/error-string-response");
+		} catch (error) {
+			if (error instanceof BetterFetchError) {
+				expect(error.error).toEqual("An error occurred");
 			}
 		}
 	});
