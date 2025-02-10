@@ -110,7 +110,7 @@ export const betterFetch = async <
 		}
 		const responseType = detectResponseType(response);
 		const successContext = {
-			data: "" as any,
+			data: null as any,
 			response,
 			request: context,
 		};
@@ -204,7 +204,7 @@ export const betterFetch = async <
 		throw new BetterFetchError(
 			response.status,
 			response.statusText,
-			isJSONResponse ? errorObject : responseText
+			isJSONResponse ? errorObject : responseText,
 		);
 	}
 	return {
