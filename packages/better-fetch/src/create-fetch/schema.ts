@@ -5,7 +5,7 @@ export type FetchSchema = {
 	input?: StandardSchemaV1;
 	output?: StandardSchemaV1;
 	query?: StandardSchemaV1;
-	params?:  StandardSchemaV1<Record<string, unknown>> | undefined;
+	params?: StandardSchemaV1<Record<string, unknown>> | undefined;
 	method?: Methods;
 };
 

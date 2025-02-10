@@ -19,8 +19,8 @@ import {
 import type { BetterFetchResponse } from "../types";
 
 import { BetterFetchPlugin } from "../plugins";
+import { ValidationError } from "../utils";
 import { router } from "./test-router";
-import { ValidationError } from '../utils';
 
 const schema = {
 	"/": {

@@ -9,24 +9,19 @@ description: Getting started with Better Fetch
 npm i @better-fetch/fetch
 ```
 
-*You also need to have [zod](https://www.npmjs.com/package/zod) installed for schema validations. If you don't plan to use zod for schema validation, you can install it as a dev dependency.*
-
 ```package-install
-npm i zod
+npm i Schema-validation-of-your-choice
 ```
 
 ### Quick Start
 
-The fastest way to start using better fetch is to import the `betterFetch` function and start making requests.
-
-You can define the response type using generics or **zod schema (recommended)**.
+The fastest way to start using Better Fetch is to import the `betterFetch` function.
+You can define the response type using generics or use a schema that supports Standard Schema (recommended).
 
 ```ts twoslash title="fetch.ts"
 import { betterFetch } from '@better-fetch/fetch';
-import { z } from 'zod';
 
-
-//Using generic type
+// Using generic type
 const { data, error } = await betterFetch<{
     userId: string;
     id: number;
@@ -35,8 +30,10 @@ const { data, error } = await betterFetch<{
 }>("https://jsonplaceholder.typicode.com/todos/1");
 
 
-//Using zod schema
-const { data: todos, error: todoError } = await betterFetch("https://jsonplaceholder.typicodei.com/todos/1", {
+// Using a Standard Schema validator (for example, zod)
+import { z } from 'zod'; // or your preferred Standard Schema compliant library
+
+const { data: todos, error: todoError } = await betterFetch("https://jsonplaceholder.typicode.com/todos/1", {
     output: z.object({
         userId: z.string(),
         id: z.number(),
@@ -44,12 +41,11 @@ const { data: todos, error: todoError } = await betterFetch("https://jsonplaceho
         completed: z.boolean(),
     })  
 });
-
 // @annotate: Hover over the data object to see the type
 ```
 
 <Callout type="info"> 
-  Make sure strict mode is enabled in your tsconfig when using zod schema validations.
+  Make sure strict mode is enabled in your tsconfig when using schema validations.
 </Callout>
 
 Better fetch by default returns a `Promise` that resolves to an object of `data` and `error` but if you pass the `throw` option, it will return the parsed response data only. 
@@ -108,13 +104,15 @@ Fetch schema enables you to pre-define the URL path and the shape of request and
    Plugins can also define fetch schemas. See [Plugins](/docs/plugins) section for more details.
 </Callout>
 
-The output of the scheam will be validated using zod and if the validation fails, it'll throw an error.
+The output of the scheam will be validated using your schema and if the validation fails, it'll throw an error.
 
 ```ts twoslash title="fetch.ts" 
 import { createSchema, createFetch } from "@better-fetch/fetch";
+
+// ZOD example
 import { z } from "zod";
 
-export const schema = createSchema({ // [!code highlight]
+export const zodSchema = createSchema({ // [!code highlight]
     "/path": { // [!code highlight]
         input: z.object({ // [!code highlight]
             userId: z.string(), // [!code highlight]
@@ -133,7 +131,7 @@ export const schema = createSchema({ // [!code highlight]
 
 const $fetch = createFetch({
     baseURL: "https://jsonplaceholder.typicode.com",
-    schema: schema // [!code highlight]
+    schema: zodSchema // [!code highlight]
 });
 
 const { data, error } = await $fetch("/path", {

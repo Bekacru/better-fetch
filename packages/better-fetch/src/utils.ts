@@ -249,16 +249,16 @@ export function bodyParser(data: any, responseType: ResponseType) {
 }
 
 export class ValidationError extends Error {
-  public readonly issues: ReadonlyArray<StandardSchemaV1.Issue>;
+	public readonly issues: ReadonlyArray<StandardSchemaV1.Issue>;
 
-  constructor(issues: ReadonlyArray<StandardSchemaV1.Issue>, message?: string) {
-    // Default message fallback in case one isn't supplied.
-    super(message || JSON.stringify(issues, null, 2));
-    this.issues = issues;
-    
-    // Set the prototype explicitly to ensure that instanceof works correctly.
-    Object.setPrototypeOf(this, ValidationError.prototype);
-  }
+	constructor(issues: ReadonlyArray<StandardSchemaV1.Issue>, message?: string) {
+		// Default message fallback in case one isn't supplied.
+		super(message || JSON.stringify(issues, null, 2));
+		this.issues = issues;
+
+		// Set the prototype explicitly to ensure that instanceof works correctly.
+		Object.setPrototypeOf(this, ValidationError.prototype);
+	}
 }
 
 export async function parseStandardSchema<TSchema extends StandardSchemaV1>(
@@ -268,8 +268,7 @@ export async function parseStandardSchema<TSchema extends StandardSchemaV1>(
 	let result = await schema["~standard"].validate(input);
 
 	if (result.issues) {
-		throw new ValidationError(result.issues)
+		throw new ValidationError(result.issues);
 	}
 	return result.value;
 }
-

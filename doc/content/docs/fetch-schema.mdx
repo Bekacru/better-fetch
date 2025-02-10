@@ -3,11 +3,11 @@ title: Fetch Schema
 description: Fetch Schema
 ---
 
-Fetch schema allows you to pre-define the url path and the shape of request and response data. You can easily document your api using this schema. 
+Fetch schema allows you to pre-define the URL path and the shape of request and response data. You can easily document your API using this schema.
 
-The output of the schema will be validated using zod and if the validation fails, it'll throw an error. 
+Better Fetch now uses Standard Schema internally, allowing you to bring your own Standard Schema-compliant validator (e.g., Zod, Valibot, ArkType).
 
-Before we start, make sure you have installed the [zod](https://www.npmjs.com/package/zod) package.
+To create a fetch schema, you need to import the `createSchema` function from `@better-fetch/fetch`.
 
 ```package-install
 npm i zod

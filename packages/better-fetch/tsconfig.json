@@ -8,7 +8,7 @@
 		"noImplicitReturns": true /* Enable error reporting for codepaths that do not explicitly return in a function. */,
 		"skipLibCheck": true /* Skip type checking all .d.ts files. */,
 		"noEmit": true,
-		"moduleResolution": "bundler", /// https://github.com/colinhacks/zod/issues/3739
+		"moduleResolution": "bundler" /// https://github.com/colinhacks/zod/issues/3739
 	},
 	"exclude": ["node_modules", "dist"]
 }
