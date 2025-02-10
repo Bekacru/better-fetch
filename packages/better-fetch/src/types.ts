@@ -136,7 +136,7 @@ export type BetterFetchOption<
 			/**
 			 * Abort signal
 			 */
-			signal?: AbortSignal;
+			signal?: AbortSignal | null;
 		}
 >;
 
