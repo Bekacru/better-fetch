@@ -1,19 +1,11 @@
-import type { ZodSchema, z } from "zod";
+import type { StandardSchemaV1 } from "@standard-schema/spec";
 import type { StringLiteralUnion } from "../type-utils";
 
 export type FetchSchema = {
-	input?: ZodSchema;
-	output?: ZodSchema;
-	query?: ZodSchema;
-	params?:
-		| z.ZodObject<{
-				[key: string]: ZodSchema;
-		  }>
-		| z.ZodOptional<
-				z.ZodObject<{
-					[key: string]: ZodSchema;
-				}>
-		  >;
+	input?: StandardSchemaV1;
+	output?: StandardSchemaV1;
+	query?: StandardSchemaV1;
+	params?:  StandardSchemaV1<Record<string, unknown>> | undefined;
 	method?: Methods;
 };
 

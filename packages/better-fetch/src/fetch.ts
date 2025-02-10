@@ -1,8 +1,9 @@
-import type { ZodSchema, z } from "zod";
+import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { BetterFetchError } from "./error";
 import { initializePlugins } from "./plugins";
 import { createRetryStrategy } from "./retry";
 import type { BetterFetchOption, BetterFetchResponse } from "./types";
+import { getURL } from "./url";
 import {
 	detectResponseType,
 	getBody,
@@ -12,12 +13,12 @@ import {
 	getTimeout,
 	isJSONParsable,
 	jsonParse,
+	parseStandardSchema,
 } from "./utils";
-import { getURL } from "./url";
 
 export const betterFetch = async <
-	TRes extends Option["output"] extends ZodSchema
-		? z.infer<Option["output"]>
+	TRes extends Option["output"] extends StandardSchemaV1
+		? StandardSchemaV1.InferOutput<Option["output"]>
 		: unknown,
 	TErr = unknown,
 	Option extends BetterFetchOption = BetterFetchOption<any, any, any, TRes>,
@@ -128,7 +129,8 @@ export const betterFetch = async <
 		 */
 		if (context?.output) {
 			if (context.output && !context.disableValidation) {
-				successContext.data = (context.output as ZodSchema).parse(
+				successContext.data = await parseStandardSchema(
+					context.output as StandardSchemaV1,
 					successContext.data,
 				);
 			}
@@ -204,7 +206,7 @@ export const betterFetch = async <
 		throw new BetterFetchError(
 			response.status,
 			response.statusText,
-			isJSONResponse ? errorObject : responseText
+			isJSONResponse ? errorObject : responseText,
 		);
 	}
 	return {

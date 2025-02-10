@@ -1,6 +1,7 @@
 import { betterFetch } from "../fetch";
 import { BetterFetchPlugin } from "../plugins";
 import type { BetterFetchOption } from "../types";
+import { parseStandardSchema } from "../utils";
 import type { BetterFetch, CreateFetchOption } from "./types";
 
 export const applySchemaPlugin = (config: CreateFetchOption) =>
@@ -42,13 +43,13 @@ export const applySchemaPlugin = (config: CreateFetchOption) =>
 						opts = {
 							...opts,
 							body: keySchema.input
-								? keySchema.input.parse(options?.body)
+								? await parseStandardSchema(keySchema.input, options?.body)
 								: options?.body,
 							params: keySchema.params
-								? keySchema.params.parse(options?.params)
+								? await parseStandardSchema(keySchema.params, options?.params)
 								: options?.params,
 							query: keySchema.query
-								? keySchema.query.parse(options?.query)
+								? await parseStandardSchema(keySchema.query, options?.query)
 								: options?.query,
 						};
 					}
