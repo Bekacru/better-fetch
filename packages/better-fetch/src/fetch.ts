@@ -122,7 +122,6 @@ export const betterFetch = async <
 		} else {
 			successContext.data = await response[responseType]();
 		}
-		console.log({ ctx: successContext.data, responseType });
 
 		/**
 		 * Parse the data if the output schema is defined
