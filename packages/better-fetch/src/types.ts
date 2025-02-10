@@ -90,7 +90,7 @@ export type BetterFetchOption<
 			/**
 			 * Custom JSON parser
 			 */
-			jsonParser?: <T>(text: string) => Promise<T | undefined>;
+			jsonParser?: (text: string) => Promise<any> | any;
 			/**
 			 * Retry count
 			 */
