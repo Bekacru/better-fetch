@@ -5,3 +5,4 @@ export * from "./error";
 export * from "./utils";
 export * from "./plugins";
 export * from "./retry";
+export type * from "./standard-schema";
