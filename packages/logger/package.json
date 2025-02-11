@@ -1,6 +1,7 @@
 {
 	"name": "@better-fetch/logger",
 	"version": "1.1.13-beta.7",
+	"type": "module",
 	"description": "",
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.js",
@@ -9,23 +10,19 @@
 		"bump": "bumpp",
 		"build": "tsup"
 	},
+	"dependencies": {
+		"consola": "^3.2.3"
+	},
 	"devDependencies": {
 		"@better-fetch/fetch": "workspace:*",
 		"tsx": "^4.16.2",
 		"typescript": "^5.5.3"
 	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
 	"exports": {
 		".": {
 			"import": "./dist/index.js",
 			"require": "./dist/index.cjs"
 		}
 	},
-	"files": ["dist"],
-	"dependencies": {
-		"consola": "^3.2.3"
-	},
-	"type": "module"
+	"files": ["dist"]
 }
