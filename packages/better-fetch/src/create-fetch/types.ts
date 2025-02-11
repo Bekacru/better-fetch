@@ -1,4 +1,4 @@
-import type { StandardSchemaV1 } from "@standard-schema/spec";
+import type { StandardSchemaV1 } from "../standard-schema";
 import { IsEmptyObject } from "type-fest";
 import { BetterFetchPlugin } from "../plugins";
 import type { Prettify, StringLiteralUnion } from "../type-utils";

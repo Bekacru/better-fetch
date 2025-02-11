@@ -1,7 +1,7 @@
-import type { StandardSchemaV1 } from "@standard-schema/spec";
 import type { Auth } from "./auth";
 import type { BetterFetchPlugin, FetchHooks } from "./plugins";
 import type { RetryOptions } from "./retry";
+import { StandardSchemaV1 } from "./standard-schema";
 import type { Prettify, StringLiteralUnion } from "./type-utils";
 
 type CommonHeaders = {

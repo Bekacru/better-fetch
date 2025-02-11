@@ -1,4 +1,4 @@
-import type { StandardSchemaV1 } from "@standard-schema/spec";
+import type { StandardSchemaV1 } from "./standard-schema";
 import { getAuthHeader } from "./auth";
 import { methods } from "./create-fetch";
 import type { BetterFetchOption, FetchEsque } from "./types";

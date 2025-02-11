@@ -1,4 +1,4 @@
-import type { StandardSchemaV1 } from "@standard-schema/spec";
+import type { StandardSchemaV1 } from "./standard-schema";
 import { Schema } from "./create-fetch";
 import { BetterFetchError } from "./error";
 import type { BetterFetchOption } from "./types";

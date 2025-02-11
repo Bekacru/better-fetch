@@ -1,4 +1,4 @@
-import type { StandardSchemaV1 } from "@standard-schema/spec";
+import type { StandardSchemaV1 } from "./standard-schema";
 import { BetterFetchError } from "./error";
 import { initializePlugins } from "./plugins";
 import { createRetryStrategy } from "./retry";

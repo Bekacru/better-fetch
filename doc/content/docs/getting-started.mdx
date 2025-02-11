@@ -9,8 +9,10 @@ description: Getting started with Better Fetch
 npm i @better-fetch/fetch
 ```
 
+If you plan to use runtime validation, you need to install [standard schema](https://github.com/standard-schema/standard-schema) compliant validator like [zod](https://github.com/colinhacks/zod), [valibot](https://valibot.dev), [arktype](https://github.com/arktypeio/arktype) and so on.
+
 ```package-install
-npm i Schema-validation-of-your-choice
+npm i zod # valibot, arktype...
 ```
 
 ### Quick Start
@@ -44,8 +46,8 @@ const { data: todos, error: todoError } = await betterFetch("https://jsonplaceho
 // @annotate: Hover over the data object to see the type
 ```
 
-<Callout type="info"> 
-  Make sure strict mode is enabled in your tsconfig when using schema validations.
+<Callout type="warn"> 
+  Make sure `strict` mode is enabled in your tsconfig when using schema validations.
 </Callout>
 
 Better fetch by default returns a `Promise` that resolves to an object of `data` and `error` but if you pass the `throw` option, it will return the parsed response data only. 
