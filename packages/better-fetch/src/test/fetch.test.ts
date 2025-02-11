@@ -2,8 +2,8 @@ import { createApp, toNodeListener } from "h3";
 import { type Listener, listen } from "listhen";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { BetterFetchError, betterFetch, createFetch } from "..";
-import { router } from "./test-router";
 import { getURL } from "../url";
+import { router } from "./test-router";
 
 describe("fetch", () => {
 	const getURL = (path?: string) =>
@@ -320,7 +320,7 @@ describe("hooks", () => {
 		expect(onError).toHaveBeenCalledWith({
 			request: expect.any(Object),
 			response: expect.any(Response),
-			responseText: "{\"message\":\"Server Error\"}",
+			responseText: '{"message":"Server Error"}',
 			error: {
 				message: "Server Error",
 				status: 500,

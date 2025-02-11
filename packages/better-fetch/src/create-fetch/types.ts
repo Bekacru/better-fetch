@@ -1,5 +1,5 @@
+import type { StandardSchemaV1 } from "../standard-schema";
 import { IsEmptyObject } from "type-fest";
-import type { ZodSchema, z } from "zod";
 import { BetterFetchPlugin } from "../plugins";
 import type { Prettify, StringLiteralUnion } from "../type-utils";
 import type { BetterFetchOption, BetterFetchResponse } from "../types";
@@ -11,14 +11,16 @@ export type CreateFetchOption = BetterFetchOption & {
 	 * @default false
 	 */
 	catchAllError?: boolean;
-	defaultOutput?: ZodSchema;
-	defaultError?: ZodSchema;
+	defaultOutput?: StandardSchemaV1;
+	defaultError?: StandardSchemaV1;
 };
 
 export type WithRequired<T, K extends keyof T | never> = T & {
 	[P in K]-?: T[P];
 };
-export type InferBody<T> = T extends ZodSchema ? z.input<T> : any;
+export type InferBody<T> = T extends StandardSchemaV1
+	? StandardSchemaV1.InferInput<T>
+	: any;
 
 export type RemoveEmptyString<T> = T extends string
 	? "" extends T
@@ -39,8 +41,8 @@ export type InferParamPath<Path> =
 				? InferParamPath<Rest>
 				: {};
 
-export type InferParam<Path, Param> = Param extends ZodSchema
-	? z.input<Param>
+export type InferParam<Path, Param> = Param extends StandardSchemaV1
+	? StandardSchemaV1.InferInput<Param>
 	: InferParamPath<Path>;
 
 export type InferOptions<T extends FetchSchema, Key, Res = any> = WithRequired<
@@ -55,10 +57,12 @@ export type InferOptions<T extends FetchSchema, Key, Res = any> = WithRequired<
 		: never
 >;
 
-export type InferQuery<Q> = Q extends z.ZodSchema ? z.input<Q> : any;
+export type InferQuery<Q> = Q extends StandardSchemaV1
+	? StandardSchemaV1.InferInput<Q>
+	: any;
 
-export type IsFieldOptional<T> = T extends z.ZodSchema
-	? T extends z.ZodOptional<any>
+export type IsFieldOptional<T> = T extends StandardSchemaV1
+	? undefined extends T
 		? true
 		: false
 	: true;
@@ -147,8 +151,8 @@ export type InferPluginOptions<Options extends CreateFetchOption> =
 	Options["plugins"] extends Array<infer P>
 		? P extends BetterFetchPlugin
 			? P["getOptions"] extends () => infer O
-				? O extends ZodSchema
-					? UnionToIntersection<z.infer<O>>
+				? O extends StandardSchemaV1
+					? UnionToIntersection<StandardSchemaV1.InferOutput<O>>
 					: {}
 				: {}
 			: {}
@@ -156,11 +160,11 @@ export type InferPluginOptions<Options extends CreateFetchOption> =
 
 export type BetterFetch<
 	CreateOptions extends CreateFetchOption = CreateFetchOption,
-	DefaultRes = CreateOptions["defaultOutput"] extends ZodSchema
-		? z.infer<CreateOptions["defaultOutput"]>
+	DefaultRes = CreateOptions["defaultOutput"] extends StandardSchemaV1
+		? StandardSchemaV1.InferOutput<CreateOptions["defaultOutput"]>
 		: unknown,
-	DefaultErr = CreateOptions["defaultError"] extends ZodSchema
-		? z.infer<CreateOptions["defaultError"]>
+	DefaultErr = CreateOptions["defaultError"] extends StandardSchemaV1
+		? StandardSchemaV1.InferOutput<CreateOptions["defaultError"]>
 		: unknown,
 	S extends MergeSchema<CreateOptions> = MergeSchema<CreateOptions>,
 > = <
@@ -179,11 +183,11 @@ export type BetterFetch<
 		InferPluginOptions<CreateOptions>
 	>,
 	Result = BetterFetchResponse<
-		O["output"] extends ZodSchema
-			? z.infer<O["output"]>
+		O["output"] extends StandardSchemaV1
+			? StandardSchemaV1.InferOutput<O["output"]>
 			: F extends FetchSchema
-				? F["output"] extends ZodSchema
-					? z.infer<F["output"]>
+				? F["output"] extends StandardSchemaV1
+					? StandardSchemaV1.InferOutput<F["output"]>
 					: Res
 				: Res,
 		Err,

@@ -1,7 +1,7 @@
-import type { ZodSchema } from "zod";
 import type { Auth } from "./auth";
 import type { BetterFetchPlugin, FetchHooks } from "./plugins";
 import type { RetryOptions } from "./retry";
+import { StandardSchemaV1 } from "./standard-schema";
 import type { Prettify, StringLiteralUnion } from "./type-utils";
 
 type CommonHeaders = {
@@ -122,14 +122,14 @@ export type BetterFetchOption<
 			 * });
 			 * ```
 			 */
-			output?: ZodSchema | typeof Blob | typeof File;
+			output?: StandardSchemaV1 | typeof Blob | typeof File;
 			/**
 			 * Additional error schema for the error object if the
 			 * response fails.
 			 */
-			errorSchema?: ZodSchema;
+			errorSchema?: StandardSchemaV1;
 			/**
-			 * Disable zod validation for the response
+			 * Disable validation for the response
 			 * @default false
 			 */
 			disableValidation?: boolean;

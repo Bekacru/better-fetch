@@ -8,7 +8,7 @@ import {
 	expectTypeOf,
 	it,
 } from "vitest";
-import { ZodError, z } from "zod";
+import { z } from "zod";
 import {
 	BetterFetch,
 	type FetchSchemaRoutes,
@@ -19,6 +19,7 @@ import {
 import type { BetterFetchResponse } from "../types";
 
 import { BetterFetchPlugin } from "../plugins";
+import { ValidationError } from "../utils";
 import { router } from "./test-router";
 
 const schema = {
@@ -137,7 +138,7 @@ describe("create-fetch-runtime-test", () => {
 				return new Response();
 			},
 		});
-		expect(f("/post")).rejects.toThrowError(ZodError);
+		expect(f("/post")).rejects.toThrowError(ValidationError);
 	});
 
 	it("should parse params and other inputs", async () => {

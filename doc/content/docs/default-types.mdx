@@ -6,7 +6,9 @@ description: Default Types
 
 ## Default Output
 
-By default, the response data will always be type of `unknown`. If you want to customize the default type you can pass the `defaultOutput` option to the `createFetch` function.
+By default, the response data will always be of type `unknown`. If you want to customize the default type you can pass the `defaultOutput` option to the `createFetch` function.
+Note: When you supply a custom output schema using a Standard Schema validator (for example, zod or any alternative),
+the provided output schema will override the `defaultOutput` type. This approach offers a strongly typed solution without locking you to a single library.
 
 <Callout type="info">
 This only serves as a type for the response data it's not used as a validation schema.
@@ -14,7 +16,8 @@ This only serves as a type for the response data it's not used as a validation s
 
 ```ts twoslash title="fetch.ts"
 import { createFetch } from "@better-fetch/fetch";
-import { z } from "zod";
+// Example using zod (or any Standard Schema compliant library)
+import { z } from "zod"; 
 
 const $fetch = createFetch({
     baseURL: "https://jsonplaceholder.typicode.com",
@@ -52,10 +55,12 @@ const { data, error } = await $fetch("/todos/1", {
 
 The default error type is:
 ```ts
-{ status: number, statusText: string, message?: string }. 
+{ status: number, statusText: string, message?: string }
 ```
 
-if you want custom default error type, you can pass a `defaultError` option to the `createFetch` function. 
+If you want a custom error type, you can pass a `defaultError` option to the `createFetch` function.
+Remember: Your custom error type builds on top of the default properties, and if your API returns a JSON error,
+// it will be merged with your definition.
 
 <Callout type="info">
 The `status` and `statusText` properties are always defined. Your custom error definitions are only
@@ -64,7 +69,7 @@ inferred if the API returns a JSON error object.
 
 ```ts twoslash title="fetch.ts"
 import { createFetch } from "@better-fetch/fetch";
-import { z } from "zod";
+import { z } from "zod"; // Example only
 
 const $fetch = createFetch({
     baseURL: "https://jsonplaceholder.typicode.com",

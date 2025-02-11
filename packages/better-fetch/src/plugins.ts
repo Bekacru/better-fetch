@@ -1,7 +1,7 @@
-import type { ZodSchema } from "zod";
+import type { StandardSchemaV1 } from "./standard-schema";
 import { Schema } from "./create-fetch";
-import type { BetterFetchOption } from "./types";
 import { BetterFetchError } from "./error";
+import type { BetterFetchOption } from "./types";
 
 export type RequestContext<T extends Record<string, any> = any> = {
 	url: URL;
@@ -128,7 +128,7 @@ export type BetterFetchPlugin = {
 	/**
 	 * Additional options that can be passed to the plugin
 	 */
-	getOptions?: () => ZodSchema;
+	getOptions?: () => StandardSchemaV1;
 };
 
 export const initializePlugins = async (

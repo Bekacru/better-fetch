@@ -79,10 +79,14 @@ const $fetch = createFetch({
 
 ### Schema
 
-You can define a schema for a plugin. This allows you to easily document the api usage using a schema.
+You can define a schema for a plugin. This allows you to easily document the API usage using a schema.
+The schema is now based on the Standard Schema specification.
+
+Note: Better Fetch now uses Standard Schema internally so you can bring your own Standard Schema–compliant validator. You are no longer limited to zod.
 
 ```ts twoslash title="fetch.ts"
 import { createFetch, createSchema, BetterFetchPlugin } from "@better-fetch/fetch";
+// Example using zod (or any Standard Schema compliant validator)
 import { z } from "zod";
 // @errors: 2353 2561
 const plugin = {

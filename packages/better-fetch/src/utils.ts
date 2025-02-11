@@ -1,3 +1,4 @@
+import type { StandardSchemaV1 } from "./standard-schema";
 import { getAuthHeader } from "./auth";
 import { methods } from "./create-fetch";
 import type { BetterFetchOption, FetchEsque } from "./types";
@@ -245,4 +246,29 @@ export function bodyParser(data: any, responseType: ResponseType) {
 		return JSON.parse(data);
 	}
 	return data;
+}
+
+export class ValidationError extends Error {
+	public readonly issues: ReadonlyArray<StandardSchemaV1.Issue>;
+
+	constructor(issues: ReadonlyArray<StandardSchemaV1.Issue>, message?: string) {
+		// Default message fallback in case one isn't supplied.
+		super(message || JSON.stringify(issues, null, 2));
+		this.issues = issues;
+
+		// Set the prototype explicitly to ensure that instanceof works correctly.
+		Object.setPrototypeOf(this, ValidationError.prototype);
+	}
+}
+
+export async function parseStandardSchema<TSchema extends StandardSchemaV1>(
+	schema: TSchema,
+	input: StandardSchemaV1.InferInput<TSchema>,
+): Promise<StandardSchemaV1.InferOutput<TSchema>> {
+	let result = await schema["~standard"].validate(input);
+
+	if (result.issues) {
+		throw new ValidationError(result.issues);
+	}
+	return result.value;
 }

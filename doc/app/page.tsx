@@ -1,9 +1,6 @@
 import { Icons } from "@/components/icons";
-import AnimatedGridPattern from "@/components/landing/grid";
 import Ripple from "@/components/landing/ripple";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Banner } from "fumadocs-ui/components/banner";
 import Link from "next/link";
 
 export default function HomePage() {
@@ -14,7 +11,7 @@ export default function HomePage() {
 				<h1 className="mb-4 text-5xl font-bold text-center">Better Fetch</h1>
 
 				<p className="text-muted-foreground mx-auto max-w-2xl text-center">
-					Advanced fetch wrapper for typescript with zod schema validations,
+					Advanced fetch wrapper for typescript with standard schema validations (using zod, valibot, arktype or any other compliant validator),
 					pre-defined routes, callbacks, plugins and more.
 				</p>
 				<div className="flex py-4 items-center justify-center gap-4 w-full">
