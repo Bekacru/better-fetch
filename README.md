@@ -1,6 +1,6 @@
 # Better Fetch
 
-Advanced fetch library for typescript, supports zod schema validations, pre-defined routes, hooks, plugins and more. Works on the browser, node (version 18+), workers, deno and bun.
+Advanced fetch wrapper for typescript with standard schema validations (using zod, valibot, arktype or any other compliant validator), pre-defined routes, callbacks, plugins and more. Works on the browser, node (version 18+), workers, deno and bun.
 
 # Documentation
 
