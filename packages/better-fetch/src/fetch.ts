@@ -107,6 +107,7 @@ export const betterFetch = async <
 			return {
 				data: "" as any,
 				error: null,
+				response
 			} as any;
 		}
 		const responseType = detectResponseType(response);
@@ -148,12 +149,13 @@ export const betterFetch = async <
 		}
 
 		if (options?.throw) {
-			return successContext.data as any;
+			return successContext.data as any, successContext.response;
 		}
 
 		return {
 			data: successContext.data,
 			error: null,
+			response: successContext.response
 		} as any;
 	}
 	const parser = options?.jsonParser ?? jsonParse;
@@ -216,5 +218,6 @@ export const betterFetch = async <
 			status: response.status,
 			statusText: response.statusText,
 		},
+		response
 	} as any;
 };
