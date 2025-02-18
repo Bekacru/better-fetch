@@ -381,8 +381,8 @@ describe("fetch-error-throw", () => {
 	});
 
 	it("should return data without error object", async () => {
-		const res = await f<{ message: "ok" }>("/ok");
-		expect(res).toEqual({ message: "ok" });
+		const { data } = await f<{ message: "ok" }>("/ok");
+		expect(data).toEqual({ message: "ok" });
 	});
 });
 

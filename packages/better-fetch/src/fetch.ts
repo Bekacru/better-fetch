@@ -152,7 +152,7 @@ export const betterFetch = async <
 			return {
 				data: successContext.data,
 				response: successContext.response
-			}
+			} as any;
 		}
 
 		return {
