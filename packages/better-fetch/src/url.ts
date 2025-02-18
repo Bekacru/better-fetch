@@ -33,6 +33,7 @@ export function getURL(url: string, option?: BetterFetchOption) {
 	let [path, urlQuery] = url.replace(basePath, "").split("?");
 	const queryParams = new URLSearchParams(urlQuery);
 	for (const [key, value] of Object.entries(query || {})) {
+		if (value == null) continue;
 		queryParams.set(key, String(value));
 	}
 	if (params) {

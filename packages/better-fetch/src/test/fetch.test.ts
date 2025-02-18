@@ -416,6 +416,18 @@ describe("url", () => {
 		expect(url.toString()).toBe("http://localhost:4001/query?id=1");
 	});
 
+	it("should not include nullable values in query params", async () => {
+		const url = getURL("/query", {
+			query: {
+				id: "1",
+				nullValue: null,
+				undefinedValue: undefined,
+			},
+			baseURL: "http://localhost:4001",
+		});
+		expect(url.toString()).toBe("http://localhost:4001/query?id=1");
+	});
+
 	it("should work with dynamic params", async () => {
 		const url = getURL("/param/:id", {
 			params: {
