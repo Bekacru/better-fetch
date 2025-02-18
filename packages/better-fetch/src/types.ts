@@ -140,7 +140,7 @@ export type BetterFetchOption<
 		}
 >;
 
-type Data<T> = { data: T; error: null };
+type Success<T> = { data: T; error: null, response: Response };
 type Error<E> = {
 	data: null;
 	error: Prettify<
@@ -149,9 +149,15 @@ type Error<E> = {
 			statusText: string;
 		}
 	>;
+	response: Response;
 };
+type ThrowError<T> = {
+	data: T;
+	response: Response;
+}
+
 export type BetterFetchResponse<
 	T,
 	E extends Record<string, unknown> | unknown = unknown,
 	Throw extends boolean = false,
-> = Throw extends true ? T | Response : Data<T> | Error<E> | Response;
+> = Throw extends true ? ThrowError<T> : Success<T> | Error<E>;
