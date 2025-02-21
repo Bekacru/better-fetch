@@ -78,7 +78,7 @@ const $fetch = createFetch({
 })
 
 // @errors: 2739
-const { data, error } = await $fetch("/path", {
+const { data, error, response } = await $fetch("/path", {
     body: {}
 })
 ```
@@ -137,7 +137,7 @@ const $fetch = createFetch({
 })
 
 // @errors: 2739
-const { data, error } = await $fetch("/path", {  
+const { data, error, response } = await $fetch("/path", {  
     query: {}
 })
 // @annotate: Hover over the data object to see the type
@@ -229,7 +229,7 @@ const $fetch = createFetch({
     }), 
 })
 
-const { data, error } = await $fetch("/@put/user", {
+const { data, error, response } = await $fetch("/@put/user", {
     body: {
         title: "title",
         completed: true,
@@ -264,7 +264,7 @@ const $fetch = createFetch({
     }), // [!code highlight]
 })
 // @errors: 2345
-const { data, error } = await $fetch("/invalid-path")
+const { data, error, response } = await $fetch("/invalid-path")
 ```
 
 

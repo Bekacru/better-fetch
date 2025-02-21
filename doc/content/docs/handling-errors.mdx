@@ -21,7 +21,7 @@ You can pass a custom error type to be inferred as a second generic argument.
 ```ts
 import { betterFetch } from 'better-fetch';
 
-const { error } = await betterFetch<{
+const { error, response } = await betterFetch<{
     id: number;
     userId: string;
     title: string;
@@ -47,7 +47,7 @@ When you pass the `throw` option, the `betterFetch` function will throw an error
 import { betterFetch } from '@better-fetch/fetch';
 import { z } from 'zod';
 
-const data = await betterFetch("https://jsonplaceholder.typicode.com/todos/1", {
+const { data, response } = await betterFetch("https://jsonplaceholder.typicode.com/todos/1", {
     throw: true, // [!code highlight]
     output: z.object({  
         userId: z.string(),
@@ -77,7 +77,7 @@ export const $fetch = createFetch({
 }); 
 
 
-const data = await $fetch<{
+const { data, response } = await $fetch<{
   userId: number;
   id: number;
   title: string;
@@ -91,7 +91,7 @@ const data = await $fetch<{
 import { betterFetch } from '@better-fetch/fetch';
 import { z } from 'zod';
 
-const data = await betterFetch<{
+const { data, response } = await betterFetch<{
     userId: number;
     id: number;
     title: string;

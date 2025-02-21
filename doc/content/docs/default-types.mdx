@@ -24,7 +24,7 @@ const $fetch = createFetch({
     defaultOutput: z.any(),
 })
 
-const { data, error } = await $fetch("/todos/1")
+const { data, error, response } = await $fetch("/todos/1")
 
 // @annotate: Hover over the data object to see the type
 ```
@@ -40,7 +40,7 @@ const $fetch = createFetch({
     defaultOutput: z.any(),
 });
 
-const { data, error } = await $fetch("/todos/1", {
+const { data, error, response } = await $fetch("/todos/1", {
     output: z.object({
         userId: z.string(),
         id: z.number(),
@@ -79,7 +79,7 @@ const $fetch = createFetch({
     }),
 })
 
-const { data, error } = await $fetch("/todos/1")
+const { data, error, response } = await $fetch("/todos/1")
 // @annotate: Hover over the error object to see the type
 ```
 

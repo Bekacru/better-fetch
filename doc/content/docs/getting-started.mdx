@@ -24,7 +24,7 @@ You can define the response type using generics or use a schema that supports St
 import { betterFetch } from '@better-fetch/fetch';
 
 // Using generic type
-const { data, error } = await betterFetch<{
+const { data, error, response } = await betterFetch<{
     userId: string;
     id: number;
     title: string;
@@ -92,7 +92,7 @@ const $fetch = createFetch({
     throw: true,
 });
 
-const data = await $fetch<{
+const { data, response } = await $fetch<{
     userId: number;
 }>("https://jsonplaceholder.typicode.com/todos/1");
 ```
@@ -136,7 +136,7 @@ const $fetch = createFetch({
     schema: zodSchema // [!code highlight]
 });
 
-const { data, error } = await $fetch("/path", {
+const { data, error, response } = await $fetch("/path", {
     body: {
         userId: "1",
         id: 1,
