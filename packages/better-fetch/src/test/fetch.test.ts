@@ -76,6 +76,24 @@ describe("fetch", () => {
 		}
 	});
 
+	it("should work with query params", async () => {
+		const queries = [
+			{ foo: "bar" },
+			{
+				foo: "bar",
+				bar: "baz",
+			},
+		];
+
+		for (const query of queries) {
+			const response = await betterFetch<any>(getURL("query"), {
+				method: "GET",
+				query,
+			});
+			expect(response.data).toMatchObject(query);
+		}
+	});
+
 	it("does not stringify body when content type != application/json", async () => {
 		const message = '"Hallo von Pascal"';
 		const { data } = await $echo<any>("/echo", {
@@ -329,6 +347,22 @@ describe("hooks", () => {
 		});
 		expect(onResponse).toHaveBeenCalled();
 		expect(onSuccess).not.toHaveBeenCalled();
+	});
+
+	it("should work with relative url", async () => {
+		const onRequest = vi.fn();
+		const onResponse = vi.fn();
+		const f = createFetch({
+			customFetchImpl: async (req, init) => {
+				return new Response(JSON.stringify({ message: "ok" }));
+			},
+			onRequest,
+			onResponse,
+		});
+		const res = await f("/ok");
+		expect(res.data).toMatchObject({ message: "ok" });
+		expect(onRequest).toHaveBeenCalled();
+		expect(onResponse).toHaveBeenCalled();
 	});
 });
 

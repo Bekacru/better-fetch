@@ -12,12 +12,7 @@ export function getURL(url: string, option?: BetterFetchOption) {
 	};
 	let basePath = url.startsWith("http")
 		? url.split("/").slice(0, 3).join("/")
-		: baseURL;
-	if (!basePath) {
-		throw new TypeError(
-			`Invalid URL ${url}. Are you passing in a relative URL but not setting the baseURL?`,
-		);
-	}
+		: baseURL || "";
 
 	/**
 	 * Remove method modifiers
@@ -54,6 +49,9 @@ export function getURL(url: string, option?: BetterFetchOption) {
 	if (path.startsWith("/")) path = path.slice(1);
 	let queryParamString =
 		queryParams.size > 0 ? `?${queryParams}`.replace(/\+/g, "%20") : "";
+	if (!basePath.startsWith("http")) {
+		return `${basePath}${path}${queryParamString}`;
+	}
 	const _url = new URL(`${path}${queryParamString}`, basePath);
 	return _url;
 }

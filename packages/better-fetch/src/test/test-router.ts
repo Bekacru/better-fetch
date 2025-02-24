@@ -52,6 +52,13 @@ export const router = createRouter()
 		}),
 	)
 	.use(
+		"/query",
+		eventHandler((event) => {
+			const searchParams = new URLSearchParams(event.path.split("?")[1]);
+			return Object.fromEntries(searchParams.entries());
+		}),
+	)
+	.use(
 		"/method",
 		eventHandler((event) => {
 			return event.node.req.method;

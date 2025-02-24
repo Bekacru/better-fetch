@@ -4,7 +4,7 @@ import { BetterFetchError } from "./error";
 import type { BetterFetchOption } from "./types";
 
 export type RequestContext<T extends Record<string, any> = any> = {
-	url: URL;
+	url: URL | string;
 	headers: Headers;
 	body: any;
 	method: string;
