@@ -167,9 +167,6 @@ importers:
       tsup:
         specifier: ^8.0.2
         version: 8.3.0(jiti@1.21.6)(postcss@8.4.47)(tsx@4.19.1)(typescript@5.6.2)(yaml@2.5.1)
-      type-fest:
-        specifier: ^4.23.0
-        version: 4.26.1
       typescript:
         specifier: ^5.4.5
         version: 5.6.2
@@ -3411,10 +3408,6 @@ packages:
   type-detect@4.1.0:
     resolution: {integrity: sha512-Acylog8/luQ8L7il+geoSxhEkazvkslg7PSNKOX59mbB9cOveP5aq9h74Y7YU8yDpJwetzQQrfIwtf4Wp4LKcw==}
     engines: {node: '>=4'}
-
-  type-fest@4.26.1:
-    resolution: {integrity: sha512-yOGpmOAL7CkKe/91I5O3gPICmJNLJ1G4zFYVAsRHg7M64biSnPtRj0WNQt++bRkjYOqjWXrhnUw1utzmVErAdg==}
-    engines: {node: '>=16'}
 
   type@2.7.3:
     resolution: {integrity: sha512-8j+1QmAbPvLZow5Qpi6NCaN8FB60p/6x8/vfNqOk/hC+HuvFZhL4+WfekuhQLiqFZXOgQdrs3B+XxEmCc6b3FQ==}
@@ -7208,8 +7201,6 @@ snapshots:
       - supports-color
 
   type-detect@4.1.0: {}
-
-  type-fest@4.26.1: {}
 
   type@2.7.3: {}
 

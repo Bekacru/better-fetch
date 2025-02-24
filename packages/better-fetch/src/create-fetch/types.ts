@@ -1,5 +1,4 @@
 import type { StandardSchemaV1 } from "../standard-schema";
-import { IsEmptyObject } from "type-fest";
 import { BetterFetchPlugin } from "../plugins";
 import type { Prettify, StringLiteralUnion } from "../type-utils";
 import type { BetterFetchOption, BetterFetchResponse } from "../types";
@@ -232,3 +231,7 @@ export type BetterFetch<
 				>?,
 			]
 ) => Promise<Result>;
+
+declare const emptyObjectSymbol: unique symbol;
+export type EmptyObject = { [emptyObjectSymbol]?: never };
+export type IsEmptyObject<T> = T extends EmptyObject ? true : false;
