@@ -90,8 +90,8 @@ export const logger = (options?: LoggerOptions) => {
 				let obj: any;
 				try {
 					if (opts.verbose) {
-						const res = context.response.clone();
-						const json = await res.json();
+						const res = context.response?.clone();
+						const json = await res?.json();
 						if (json) {
 							obj = json;
 						}
@@ -99,12 +99,12 @@ export const logger = (options?: LoggerOptions) => {
 				} catch (e) {}
 				log(
 					"Request failed with status: ",
-					context.response.status,
+					context.response?.status || "Unknown",
 					`(${
-						context.response.statusText ||
-						getStatusText(context.response.status)
-					})`,
-				);
+					  context.response?.statusText ||
+					  (context.response?.status ? getStatusText(context.response.status) : "Network Error")
+					})`
+				  );
 				options?.verbose && obj && opts.console.error(obj);
 			},
 		},
