@@ -1,6 +1,6 @@
-import type { StandardSchemaV1 } from "./standard-schema";
 import { Schema } from "./create-fetch";
 import { BetterFetchError } from "./error";
+import type { StandardSchemaV1 } from "./standard-schema";
 import type { BetterFetchOption } from "./types";
 
 export type RequestContext<T extends Record<string, any> = any> = {
@@ -14,13 +14,16 @@ export type ResponseContext = {
 	response: Response;
 	request: RequestContext;
 };
+export type RetryContext = Omit<ResponseContext, "response"> & {
+	response?: Response;
+};
 export type SuccessContext<Res = any> = {
 	data: Res;
 	response: Response;
 	request: RequestContext;
 };
 export type ErrorContext = {
-	response: Response;
+	response?: Response;
 	request: RequestContext;
 	error: BetterFetchError & Record<string, any>;
 };
@@ -64,7 +67,7 @@ export interface FetchHooks<Res = any> {
 	 * a callback function that will be called when a
 	 * request is retried.
 	 */
-	onRetry?: (response: ResponseContext) => Promise<void> | void;
+	onRetry?: (response: RetryContext) => Promise<void> | void;
 	/**
 	 * Options for the hooks
 	 */
