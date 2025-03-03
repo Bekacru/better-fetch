@@ -158,11 +158,23 @@ describe("fetch", () => {
 		expect(data).toEqual("");
 	});
 
-	it("should retry on error", async () => {
+	it("should retry on http error", async () => {
 		let count = 0;
 		await betterFetch(getURL("error"), {
 			retry: 3,
 			onError() {
+				count++;
+			},
+		});
+		expect(count).toBe(4);
+	});
+
+	it("should retry on network error", async () => {
+		let count = 0;
+		const nonExistentServerUrl = "http://localhost:4002/test";
+		await betterFetch(nonExistentServerUrl, {
+			retry: 3,
+			onError: () => {
 				count++;
 			},
 		});
