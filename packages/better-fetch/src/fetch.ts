@@ -1,10 +1,12 @@
-import type { StandardSchemaV1 } from "./standard-schema";
+import { threadId } from "worker_threads";
 import { BetterFetchError } from "./error";
 import { initializePlugins } from "./plugins";
 import { createRetryStrategy } from "./retry";
+import type { StandardSchemaV1 } from "./standard-schema";
 import type { BetterFetchOption, BetterFetchResponse } from "./types";
 import { getURL } from "./url";
 import {
+	ValidationError,
 	detectResponseType,
 	getBody,
 	getFetch,
@@ -74,72 +76,110 @@ export const betterFetch = async <
 	}
 
 	const { clearTimeout } = getTimeout(opts, controller);
-	let response = await fetch(context.url, context);
-	clearTimeout();
+	try {
+		let response = await fetch(context.url, context);
+		clearTimeout();
 
-	const responseContext = {
-		response,
-		request: context,
-	};
-
-	for (const onResponse of hooks.onResponse) {
-		if (onResponse) {
-			const r = await onResponse({
-				...responseContext,
-				response: options?.hookOptions?.cloneResponse
-					? response.clone()
-					: response,
-			});
-			if (r instanceof Response) {
-				response = r;
-			} else if (r instanceof Object) {
-				response = r.response;
-			}
-		}
-	}
-
-	/**
-	 * OK Branch
-	 */
-	if (response.ok) {
-		const hasBody = context.method !== "HEAD";
-		if (!hasBody) {
-			return {
-				data: "" as any,
-				error: null,
-			} as any;
-		}
-		const responseType = detectResponseType(response);
-		const successContext = {
-			data: "" as any,
+		const responseContext = {
 			response,
 			request: context,
 		};
-		if (responseType === "json" || responseType === "text") {
-			const text = await response.text();
-			const parser = context.jsonParser ?? jsonParse;
-			const data = await parser(text);
-			successContext.data = data;
-		} else {
-			successContext.data = await response[responseType]();
-		}
 
-		/**
-		 * Parse the data if the output schema is defined
-		 */
-		if (context?.output) {
-			if (context.output && !context.disableValidation) {
-				successContext.data = await parseStandardSchema(
-					context.output as StandardSchemaV1,
-					successContext.data,
-				);
+		for (const onResponse of hooks.onResponse) {
+			if (onResponse) {
+				const r = await onResponse({
+					...responseContext,
+					response: options?.hookOptions?.cloneResponse
+						? response.clone()
+						: response,
+				});
+				if (r instanceof Response) {
+					response = r;
+				} else if (r instanceof Object) {
+					response = r.response;
+				}
 			}
 		}
 
-		for (const onSuccess of hooks.onSuccess) {
-			if (onSuccess) {
-				await onSuccess({
-					...successContext,
+		/**
+		 * OK Branch
+		 */
+		if (response.ok) {
+			const hasBody = context.method !== "HEAD";
+			if (!hasBody) {
+				return {
+					data: "" as any,
+					error: null,
+				} as any;
+			}
+			const responseType = detectResponseType(response);
+			const successContext = {
+				data: "" as any,
+				response,
+				request: context,
+			};
+			if (responseType === "json" || responseType === "text") {
+				const text = await response.text();
+				const parser = context.jsonParser ?? jsonParse;
+				const data = await parser(text);
+				successContext.data = data;
+			} else {
+				successContext.data = await response[responseType]();
+			}
+
+			/**
+			 * Parse the data if the output schema is defined
+			 */
+			if (context?.output) {
+				if (context.output && !context.disableValidation) {
+					successContext.data = await parseStandardSchema(
+						context.output as StandardSchemaV1,
+						successContext.data,
+					);
+				}
+			}
+
+			for (const onSuccess of hooks.onSuccess) {
+				if (onSuccess) {
+					await onSuccess({
+						...successContext,
+						response: options?.hookOptions?.cloneResponse
+							? response.clone()
+							: response,
+					});
+				}
+			}
+
+			if (options?.throw) {
+				return successContext.data as any;
+			}
+
+			return {
+				data: successContext.data,
+				error: null,
+			} as any;
+		}
+		const parser = options?.jsonParser ?? jsonParse;
+		const responseText = await response.text();
+		const isJSONResponse = isJSONParsable(responseText);
+		const errorObject = isJSONResponse ? await parser(responseText) : null;
+		/**
+		 * Error Branch
+		 */
+		const errorContext = {
+			response,
+			responseText,
+			request: context,
+			error: {
+				...errorObject,
+				status: response.status,
+				statusText: response.statusText,
+			},
+		};
+		for (const onError of hooks.onError) {
+			if (onError) {
+				await onError({
+					...errorContext,
 					response: options?.hookOptions?.cloneResponse
 						? response.clone()
 						: response,
@@ -147,74 +187,86 @@ export const betterFetch = async <
 			}
 		}
 
-		if (options?.throw) {
-			return successContext.data as any;
+		if (options?.retry) {
+			const retryStrategy = createRetryStrategy(options.retry);
+			const _retryAttempt = options.retryAttempt ?? 0;
+			if (await retryStrategy.shouldAttemptRetry(_retryAttempt, response)) {
+				for (const onRetry of hooks.onRetry) {
+					if (onRetry) {
+						await onRetry(responseContext);
+					}
+				}
+				const delay = retryStrategy.getDelay(_retryAttempt);
+				await new Promise((resolve) => setTimeout(resolve, delay));
+				return await betterFetch(url, {
+					...options,
+					retryAttempt: _retryAttempt + 1,
+				});
+			}
 		}
 
+		if (options?.throw) {
+			throw new BetterFetchError(
+				response.status,
+				response.statusText,
+				isJSONResponse ? errorObject : responseText,
+			);
+		}
 		return {
-			data: successContext.data,
-			error: null,
+			data: null,
+			error: {
+				...errorObject,
+				status: response.status,
+				statusText: response.statusText,
+			},
+		} as any;
+	} catch (error) {
+		const isAbort =
+			error instanceof DOMException && error.name === "AbortError";
+
+		if (error instanceof ValidationError || isAbort) {
+			throw error;
+		}
+
+		const betterError =
+			error instanceof BetterFetchError
+				? error
+				: new BetterFetchError(500, "Request failed", error);
+
+		for (const onError of hooks.onError) {
+			if (onError) {
+				await onError({
+					request: context,
+					error: betterError,
+				});
+			}
+		}
+		if (options?.retry) {
+			const retryStrategy = createRetryStrategy(options.retry);
+			const _retryAttempt = options.retryAttempt ?? 0;
+			if (await retryStrategy.shouldAttemptRetry(_retryAttempt, null)) {
+				for (const onRetry of hooks.onRetry) {
+					if (onRetry) {
+						await onRetry({
+							request: context,
+						});
+					}
+				}
+				const delay = retryStrategy.getDelay(_retryAttempt);
+				await new Promise((resolve) => setTimeout(resolve, delay));
+				return await betterFetch(url, {
+					...options,
+					retryAttempt: _retryAttempt + 1,
+				});
+			}
+		}
+
+		if (options?.throw) {
+			throw betterError;
+		}
+		return {
+			data: null,
+			error: betterError,
 		} as any;
 	}
-	const parser = options?.jsonParser ?? jsonParse;
-	const responseText = await response.text();
-	const isJSONResponse = isJSONParsable(responseText);
-	const errorObject = isJSONResponse ? await parser(responseText) : null;
-	/**
-	 * Error Branch
-	 */
-	const errorContext = {
-		response,
-		responseText,
-		request: context,
-		error: {
-			...errorObject,
-			status: response.status,
-			statusText: response.statusText,
-		},
-	};
-	for (const onError of hooks.onError) {
-		if (onError) {
-			await onError({
-				...errorContext,
-				response: options?.hookOptions?.cloneResponse
-					? response.clone()
-					: response,
-			});
-		}
-	}
-
-	if (options?.retry) {
-		const retryStrategy = createRetryStrategy(options.retry);
-		const _retryAttempt = options.retryAttempt ?? 0;
-		if (await retryStrategy.shouldAttemptRetry(_retryAttempt, response)) {
-			for (const onRetry of hooks.onRetry) {
-				if (onRetry) {
-					await onRetry(responseContext);
-				}
-			}
-			const delay = retryStrategy.getDelay(_retryAttempt);
-			await new Promise((resolve) => setTimeout(resolve, delay));
-			return await betterFetch(url, {
-				...options,
-				retryAttempt: _retryAttempt + 1,
-			});
-		}
-	}
-
-	if (options?.throw) {
-		throw new BetterFetchError(
-			response.status,
-			response.statusText,
-			isJSONResponse ? errorObject : responseText,
-		);
-	}
-	return {
-		data: null,
-		error: {
-			...errorObject,
-			status: response.status,
-			statusText: response.statusText,
-		},
-	} as any;
 };
