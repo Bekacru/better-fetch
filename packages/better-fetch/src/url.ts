@@ -47,8 +47,9 @@ export function getURL(url: string, option?: BetterFetchOption) {
 
 	path = path.split("/").map(encodeURIComponent).join("/");
 	if (path.startsWith("/")) path = path.slice(1);
-	let queryParamString =
-		queryParams.size > 0 ? `?${queryParams}`.replace(/\+/g, "%20") : "";
+	let queryParamString = queryParams.toString();
+	queryParamString =
+		queryParamString.length > 0 ? `?${queryParamString}`.replace(/\+/g, "%20") : "";
 	if (!basePath.startsWith("http")) {
 		return `${basePath}${path}${queryParamString}`;
 	}
