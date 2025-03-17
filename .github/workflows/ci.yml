@@ -1,10 +1,12 @@
 name: CI
 
-on: 
-  pull_request:  
-      branches: main
-  push: 
-      branches: main
+on:
+  pull_request:
+      branches:
+        - main
+  push:
+      branches:
+        - main
   merge_group: {}
 
 jobs:
@@ -18,7 +20,7 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 8
+          version: 9
           run_install: false
 
       - name: Install Node.js
@@ -29,7 +31,7 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-      
+
       - name: Build
         run: pnpm build
 
