@@ -4,21 +4,21 @@ on:
     tags:
       - 'v*'
 
-jobs: 
+jobs:
   release:
-    permissions: 
+    permissions:
       contents: write
       id-token: write
     runs-on: ubuntu-latest
-    steps: 
+    steps:
       - uses: actions/checkout@v4
-        with: 
+        with:
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 8
+          version: 9
           run_install: false
 
       - name: Install Node.js
@@ -29,7 +29,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-    
 
       - name: Check version
         id: check_version
@@ -42,7 +41,7 @@ jobs:
           else
             echo "::set-output name=tag::latest"
           fi
-              
+
       - name: Build
         run: pnpm build
 
@@ -50,7 +49,7 @@ jobs:
         if: steps.check_version.outputs.tag == 'latest'
         env:
             GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          
+
       - name: Publish to npm
         run: pnpm -r publish --access public --no-git-checks --tag ${{steps.check_version.outputs.tag}}
         env:
