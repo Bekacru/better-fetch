@@ -9,7 +9,7 @@ export type typeOrTypeReturning<T> = T | (() => T);
  */
 export type Bearer = {
 	type: "Bearer";
-	token: typeOrTypeReturning<string | undefined>;
+	token: typeOrTypeReturning<string | undefined | Promise<string | undefined>>;
 };
 
 /**
@@ -44,13 +44,16 @@ export type Custom = {
 
 export type Auth = Bearer | Basic | Custom;
 
-export const getAuthHeader = (options?: BetterFetchOption) => {
+export const getAuthHeader = async (options?: BetterFetchOption) => {
 	const headers: Record<string, string> = {};
-	const getValue = (value: typeOrTypeReturning<string | undefined>) =>
-		typeof value === "function" ? value() : value;
+	const getValue = async (
+		value: typeOrTypeReturning<
+			string | undefined | Promise<string | undefined>
+		>,
+	) => (typeof value === "function" ? await value() : value);
 	if (options?.auth) {
 		if (options.auth.type === "Bearer") {
-			const token = getValue(options.auth.token);
+			const token = await getValue(options.auth.token);
 			if (!token) {
 				return headers;
 			}

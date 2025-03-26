@@ -101,9 +101,9 @@ export function isRouteMethod(method?: string) {
 	return routeMethod.includes(method.toUpperCase());
 }
 
-export function getHeaders(opts?: BetterFetchOption) {
+export async function getHeaders(opts?: BetterFetchOption) {
 	const headers = new Headers(opts?.headers);
-	const authHeader = getAuthHeader(opts);
+	const authHeader = await getAuthHeader(opts);
 	for (const [key, value] of Object.entries(authHeader || {})) {
 		headers.set(key, value);
 	}

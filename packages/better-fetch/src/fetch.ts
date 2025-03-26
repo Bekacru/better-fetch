@@ -42,7 +42,7 @@ export const betterFetch = async <
 	const signal = opts.signal ?? controller.signal;
 	const _url = getURL(__url, opts);
 	const body = getBody(opts);
-	const headers = getHeaders(opts);
+	const headers = await getHeaders(opts);
 	const method = getMethod(__url, opts);
 	let context = {
 		...opts,
