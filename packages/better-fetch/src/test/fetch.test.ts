@@ -280,6 +280,21 @@ describe("fetch", () => {
 			authorization: "Bearer test",
 		});
 	});
+
+	it("should work with async auth token", async () => {
+		const url = getURL("post");
+		const res = await betterFetch<any>(url, {
+			auth: {
+				type: "Bearer",
+				token: async () => "test",
+			},
+			method: "POST",
+		});
+
+		expect(res.data.headers).to.include({
+			authorization: "Bearer test",
+		});
+	});
 });
 
 describe("fetch-error", () => {
