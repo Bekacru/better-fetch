@@ -59,18 +59,18 @@ export const getAuthHeader = async (options?: BetterFetchOption) => {
 			}
 			headers["authorization"] = `Bearer ${token}`;
 		} else if (options.auth.type === "Basic") {
-			const username = getValue(options.auth.username);
-			const password = getValue(options.auth.password);
+			const username = await getValue(options.auth.username);
+			const password = await getValue(options.auth.password);
 			if (!username || !password) {
 				return headers;
 			}
 			headers["authorization"] = `Basic ${btoa(`${username}:${password}`)}`;
 		} else if (options.auth.type === "Custom") {
-			const value = getValue(options.auth.value);
+			const value = await getValue(options.auth.value);
 			if (!value) {
 				return headers;
 			}
-			headers["authorization"] = `${getValue(options.auth.prefix)} ${value}`;
+			headers["authorization"] = `${await getValue(options.auth.prefix)} ${value}`;
 		}
 	}
 	return headers;
