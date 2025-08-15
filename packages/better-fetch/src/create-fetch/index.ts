@@ -73,7 +73,7 @@ export const createFetch = <Option extends CreateFetchOption>(
 		const opts = {
 			...config,
 			...options,
-			plugins: [...(config?.plugins || []), applySchemaPlugin(config || {})],
+			plugins: [...(config?.plugins || []), applySchemaPlugin(config || {}), ...(options?.plugins || [])],
 		} as BetterFetchOption;
 
 		if (config?.catchAllError) {
