@@ -295,6 +295,38 @@ describe("fetch", () => {
 			authorization: "Bearer test",
 		});
 	});
+
+	it("should set basic auth headers", async () => {
+		const url = getURL("post");
+		await betterFetch<any>(url, {
+			auth: {
+				type: "Basic",
+				username: "test-user",
+				password: "test-password",
+			},
+			onRequest: (req) => {
+				expect(req.headers.get("authorization")).to.equal(
+					"Basic dGVzdC11c2VyOnRlc3QtcGFzc3dvcmQ=",
+				);
+			},
+		});
+	});
+
+	it("shet set basic auth headers with function for username and password", async () => {
+		const url = getURL("post");
+		await betterFetch<any>(url, {
+			auth: {
+				type: "Basic",
+				username: () => "test-user",
+				password: () => "test-password",
+			},
+			onRequest: (req) => {
+				expect(req.headers.get("authorization")).to.equal(
+					"Basic dGVzdC11c2VyOnRlc3QtcGFzc3dvcmQ=",
+				);
+			},
+		});
+	});
 });
 
 describe("fetch-error", () => {
