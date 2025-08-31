@@ -1,7 +1,7 @@
-import type { StandardSchemaV1 } from "./standard-schema";
 import { BetterFetchError } from "./error";
 import { initializePlugins } from "./plugins";
 import { createRetryStrategy } from "./retry";
+import type { StandardSchemaV1 } from "./standard-schema";
 import type { BetterFetchOption, BetterFetchResponse } from "./types";
 import { getURL } from "./url";
 import {
@@ -58,14 +58,13 @@ export const betterFetch = async <
 	for (const onRequest of hooks.onRequest) {
 		if (onRequest) {
 			const res = await onRequest(context);
-			if (res instanceof Object) {
+			if (typeof res === "object" && res !== null) {
 				context = res;
 			}
 		}
 	}
 	if (
-		("pipeTo" in (context as any) &&
-			typeof (context as any).pipeTo === "function") ||
+		("pipeTo" in context && typeof context.pipeTo === "function") ||
 		typeof options?.body?.pipe === "function"
 	) {
 		if (!("duplex" in context)) {
@@ -92,7 +91,7 @@ export const betterFetch = async <
 			});
 			if (r instanceof Response) {
 				response = r;
-			} else if (r instanceof Object) {
+			} else if (typeof r === "object" && r !== null) {
 				response = r.response;
 			}
 		}
@@ -111,15 +110,14 @@ export const betterFetch = async <
 		}
 		const responseType = detectResponseType(response);
 		const successContext = {
-			data: "" as any,
+			data: null as any,
 			response,
 			request: context,
 		};
 		if (responseType === "json" || responseType === "text") {
 			const text = await response.text();
 			const parser = context.jsonParser ?? jsonParse;
-			const data = await parser(text);
-			successContext.data = data;
+			successContext.data = await parser(text);
 		} else {
 			successContext.data = await response[responseType]();
 		}
@@ -148,7 +146,7 @@ export const betterFetch = async <
 		}
 
 		if (options?.throw) {
-			return successContext.data as any;
+			return successContext.data;
 		}
 
 		return {
