@@ -1,5 +1,5 @@
 import type { StandardSchemaV1 } from "../standard-schema";
-import { BetterFetchPlugin } from "../plugins";
+import type { BetterFetchPlugin } from "../plugins";
 import type { Prettify, StringLiteralUnion } from "../type-utils";
 import type { BetterFetchOption, BetterFetchResponse } from "../types";
 import type { FetchSchema, Schema } from "./schema";
@@ -124,7 +124,11 @@ export type GetKey<S, K> = S extends Schema
 					? AP
 					: string
 				: string
-		: K
+		: S["config"]["prefix"] extends string
+			? K extends `${S["config"]["prefix"]}${infer AP}`
+				? AP
+				: K
+			: K
 	: K;
 
 export type UnionToIntersection<U> = (
@@ -148,11 +152,9 @@ export type MergeSchema<Options extends CreateFetchOption> =
 
 export type InferPluginOptions<Options extends CreateFetchOption> =
 	Options["plugins"] extends Array<infer P>
-		? P extends BetterFetchPlugin
-			? P["getOptions"] extends () => infer O
-				? O extends StandardSchemaV1
-					? UnionToIntersection<StandardSchemaV1.InferOutput<O>>
-					: {}
+		? P extends BetterFetchPlugin<infer O>
+			? O extends Record<string, any>
+				? UnionToIntersection<O>
 				: {}
 			: {}
 		: {};

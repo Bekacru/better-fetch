@@ -1,6 +1,6 @@
 import type { StandardSchemaV1 } from "./standard-schema";
-import { Schema } from "./create-fetch";
-import { BetterFetchError } from "./error";
+import type { Schema } from "./create-fetch";
+import type { BetterFetchError } from "./error";
 import type { BetterFetchOption } from "./types";
 
 export type RequestContext<T extends Record<string, any> = any> = {
@@ -80,7 +80,9 @@ export interface FetchHooks<Res = any> {
 /**
  * A plugin that returns an id and hooks
  */
-export type BetterFetchPlugin = {
+export type BetterFetchPlugin<
+	ExtraOptions extends Record<string, any> = Record<string, any>,
+> = {
 	/**
 	 * A unique id for the plugin
 	 */
@@ -111,7 +113,7 @@ export type BetterFetchPlugin = {
 	 */
 	init?: (
 		url: string,
-		options?: BetterFetchOption,
+		options?: BetterFetchOption & ExtraOptions,
 	) =>
 		| Promise<{
 				url: string;
@@ -127,6 +129,15 @@ export type BetterFetchPlugin = {
 	schema?: Schema;
 	/**
 	 * Additional options that can be passed to the plugin
+	 *
+	 * @deprecated Use type inference through direct typescript instead
+	 * ```ts
+	 * const plugin = {
+	 *
+	 * } satisfies BetterFetchPlugin<{
+	 *  myCustomOptions: string;
+	 * }>
+	 * ```
 	 */
 	getOptions?: () => StandardSchemaV1;
 };

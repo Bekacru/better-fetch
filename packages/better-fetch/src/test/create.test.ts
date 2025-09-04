@@ -18,7 +18,7 @@ import {
 } from "../create-fetch";
 import type { BetterFetchResponse } from "../types";
 
-import { BetterFetchPlugin } from "../plugins";
+import type { BetterFetchPlugin } from "../plugins";
 import { ValidationError } from "../utils";
 import { router } from "./test-router";
 
@@ -455,8 +455,8 @@ describe("plugin", () => {
 	const plugin = {
 		id: "test",
 		name: "Test",
-		schema: createSchema(
-			{
+		schema: {
+			schema: {
 				"/path": {
 					output: z.object({
 						message: z.string(),
@@ -471,16 +471,11 @@ describe("plugin", () => {
 					}),
 				},
 			},
-			{
-				baseURL: "http://localhost:4001",
+			config: {
 				prefix: "prefix",
 				strict: true,
+				baseURL: "http://localhost:4001",
 			},
-		),
-		getOptions() {
-			return z.object({
-				onUpload: z.function(),
-			});
 		},
 	} satisfies BetterFetchPlugin;
 	const plugin2 = {
@@ -511,16 +506,17 @@ describe("plugin", () => {
 			plugins: [plugin],
 			baseURL: "http://localhost:4001",
 		});
-		expectTypeOf($fetch)
-			.parameter(0)
+
+		expectTypeOf($fetch.call)
+			.parameter(1)
 			.toMatchTypeOf<"prefix/path" | "prefix/path/:param">();
 	});
-
 	it("should infer baseURL", async () => {
 		const $fetch = createFetch({
 			plugins: [plugin2],
 			baseURL: "http://localhost:4001",
 		});
+
 		expectTypeOf($fetch)
 			.parameter(0)
 			.toMatchTypeOf<"http://localhost:4001/path">();
@@ -631,7 +627,12 @@ describe("plugin", () => {
 				{
 					id: "test",
 					name: "Test",
-				},
+					getOptions() {
+						return z.object({
+							onUpload: z.function(),
+						});
+					},
+				} satisfies BetterFetchPlugin,
 			],
 			schema: createSchema(
 				{
