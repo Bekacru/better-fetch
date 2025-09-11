@@ -265,6 +265,16 @@ describe("create-fetch-type-test", () => {
 		catchAllError: true,
 		disableValidation: true,
 	});
+
+	it("should be data when throw is true", async () => {
+		const res = await $fetch("/", {
+			throw: true,
+		});
+		expectTypeOf(res).toMatchTypeOf<
+			{ message: string }
+		>();
+	})
+
 	it("should return unknown if no output is defined", () => {
 		const res = $fetch("/");
 		expectTypeOf(res).toMatchTypeOf<Promise<BetterFetchResponse<unknown>>>();
