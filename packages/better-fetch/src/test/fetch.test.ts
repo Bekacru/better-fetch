@@ -534,7 +534,7 @@ describe("url", () => {
 		expect(url.toString()).toBe("http://localhost:4001/param/%23test/item%201");
 	});
 
-	it("should preserve arrays as JSON strings", () => {
+	it("should expand array values into multiple query parameters", () => {
 		const url = getURL("/test", {
 			query: {
 				filterValue: ["admin", "user"],
@@ -543,7 +543,7 @@ describe("url", () => {
 		});
 
 		expect(url.toString()).toBe(
-			'http://localhost:4000/test?filterValue=%5B%22admin%22%2C%22user%22%5D'
+			"http://localhost:4000/test?filterValue=admin&filterValue=user",
 		);
 	});
 
@@ -556,7 +556,7 @@ describe("url", () => {
 		});
 
 		expect(url.toString()).toBe(
-			'http://localhost:4000/test?options=%7B%22page%22%3A1%2C%22limit%22%3A10%7D'
+			"http://localhost:4000/test?options=%7B%22page%22%3A1%2C%22limit%22%3A10%7D",
 		);
 	});
 
