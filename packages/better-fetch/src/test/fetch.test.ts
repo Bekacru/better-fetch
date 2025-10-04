@@ -437,7 +437,7 @@ describe("fetch-error-throw", () => {
 
 describe("url", () => {
 	it("should work with params", async () => {
-		const url = await getURL("param/:id", {
+		const url = getURL("param/:id", {
 			params: {
 				id: "1",
 			},
@@ -447,7 +447,7 @@ describe("url", () => {
 	});
 
 	it("should use the url base if the url starts with http", async () => {
-		const url = await getURL("http://localhost:4001/param/:id", {
+		const url = getURL("http://localhost:4001/param/:id", {
 			params: {
 				id: "1",
 			},
@@ -456,7 +456,7 @@ describe("url", () => {
 	});
 
 	it("should work with query params", async () => {
-		const url = await getURL("/query", {
+		const url = getURL("/query", {
 			query: {
 				id: "1",
 			},
@@ -466,7 +466,7 @@ describe("url", () => {
 	});
 
 	it("should not include nullable values in query params", async () => {
-		const url = await getURL("/query", {
+		const url = getURL("/query", {
 			query: {
 				id: "1",
 				nullValue: null,
@@ -478,7 +478,7 @@ describe("url", () => {
 	});
 
 	it("should work with dynamic params", async () => {
-		const url = await getURL("/param/:id", {
+		const url = getURL("/param/:id", {
 			params: {
 				id: "1",
 			},
@@ -488,7 +488,7 @@ describe("url", () => {
 	});
 
 	it("should merge query from the url", async () => {
-		const url = await getURL("/query?name=test&age=20", {
+		const url = getURL("/query?name=test&age=20", {
 			query: {
 				id: "1",
 			},
@@ -500,7 +500,7 @@ describe("url", () => {
 	});
 
 	it("should give priority based on the order", async () => {
-		const url = await getURL("/query", {
+		const url = getURL("/query", {
 			query: {
 				id: "1",
 				name: "test2",
@@ -511,7 +511,7 @@ describe("url", () => {
 	});
 
 	it("should encode the query params", async () => {
-		const url = await getURL("/query", {
+		const url = getURL("/query", {
 			query: {
 				id: "#20",
 				name: "test 2",
@@ -524,7 +524,7 @@ describe("url", () => {
 	});
 
 	it("should encode dynamic params", async () => {
-		const url = await getURL("/param/:id/:space", {
+		const url = getURL("/param/:id/:space", {
 			params: {
 				id: "#test",
 				space: "item 1",

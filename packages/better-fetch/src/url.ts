@@ -4,7 +4,7 @@ import { BetterFetchOption } from "./types";
 /**
  * Normalize URL
  */
-export async function getURL(url: string, option?: BetterFetchOption) {
+export function getURL(url: string, option?: BetterFetchOption) {
 	let { baseURL, params, query } = option || {
 		query: {},
 		params: {},
