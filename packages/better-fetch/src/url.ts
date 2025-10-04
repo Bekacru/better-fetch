@@ -4,7 +4,7 @@ import { BetterFetchOption } from "./types";
 /**
  * Normalize URL
  */
-export function getURL(url: string, option?: BetterFetchOption) {
+export async function getURL(url: string, option?: BetterFetchOption) {
 	let { baseURL, params, query } = option || {
 		query: {},
 		params: {},
@@ -29,7 +29,7 @@ export function getURL(url: string, option?: BetterFetchOption) {
 	const queryParams = new URLSearchParams(urlQuery);
 	for (const [key, value] of Object.entries(query || {})) {
 		if (value == null) continue;
-		queryParams.set(key, String(value));
+		queryParams.set(key, typeof value === "string" ? value : JSON.stringify(value));
 	}
 	if (params) {
 		if (Array.isArray(params)) {
