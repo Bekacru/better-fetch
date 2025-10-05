@@ -1,11 +1,11 @@
 import { methods } from "./create-fetch";
-import { BetterFetchOption } from "./types";
+import type { BetterFetchOption } from "./types";
 
 /**
  * Normalize URL
  */
 export function getURL(url: string, option?: BetterFetchOption) {
-	let { baseURL, params, query } = option || {
+	const { baseURL, params, query } = option || {
 		query: {},
 		params: {},
 		baseURL: "",
@@ -29,7 +29,18 @@ export function getURL(url: string, option?: BetterFetchOption) {
 	const queryParams = new URLSearchParams(urlQuery);
 	for (const [key, value] of Object.entries(query || {})) {
 		if (value == null) continue;
-		queryParams.set(key, String(value));
+		let serializedValue;
+		if (typeof value === "string") {
+			serializedValue = value;
+		} else if (Array.isArray(value)) {
+			for (const val of value) {
+				queryParams.append(key, val);
+			}
+			continue;
+		} else {
+			serializedValue = JSON.stringify(value);
+		}
+		queryParams.set(key, serializedValue);
 	}
 	if (params) {
 		if (Array.isArray(params)) {
@@ -49,7 +60,9 @@ export function getURL(url: string, option?: BetterFetchOption) {
 	if (path.startsWith("/")) path = path.slice(1);
 	let queryParamString = queryParams.toString();
 	queryParamString =
-		queryParamString.length > 0 ? `?${queryParamString}`.replace(/\+/g, "%20") : "";
+		queryParamString.length > 0
+			? `?${queryParamString}`.replace(/\+/g, "%20")
+			: "";
 	if (!basePath.startsWith("http")) {
 		return `${basePath}${path}${queryParamString}`;
 	}
